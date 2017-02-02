@@ -4,7 +4,6 @@
 gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
-.idea/workspace.xml
 .idea/tasks.xml
 .idea/dataSources/
 .idea/dataSources.ids
@@ -13,8 +12,6 @@ gradle-app.setting
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
 .idea/uiDesigner.xml
-.idea/gradle.xml
-.idea/libraries
 .idea/mongoSettings.xml
 *.iws
 /out/
@@ -24,3 +21,4 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+/.idea/
