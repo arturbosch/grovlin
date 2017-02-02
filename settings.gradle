@@ -1,2 +1,3 @@
 rootProject.name = 'grovlin'
+include 'grovlin-parser'
 

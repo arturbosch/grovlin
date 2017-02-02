@@ -1,23 +1,49 @@
-group 'io.gitlab.arturbosch'
-version '0.0.1'
-
 buildscript {
-    ext.kotlin_version = '1.0.6'
+	ext.kotlin_version = '1.0.6'
 
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+	repositories {
+		mavenCentral()
+		mavenLocal()
+		jcenter()
+	}
+	dependencies {
+		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+	}
 }
 
-apply plugin: 'kotlin'
+allprojects {
+	group 'io.gitlab.arturbosch'
+	version '0.1.0'
 
-repositories {
-    mavenCentral()
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		jcenter()
+	}
+
+	apply plugin: 'kotlin'
+	apply plugin: 'java'
+	apply plugin: 'idea'
+
+	if (project.name.endsWith("parser")) {
+		apply plugin: 'antlr'
+	}
+
+	configurations {
+		kotlin
+		kotlinTest
+	}
+
+	dependencies {
+		kotlin "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+		kotlin "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+		kotlinTest "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+		kotlinTest "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+		kotlinTest 'junit:junit:4.12'
+	}
 }
 
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+configurations {
+	compile.extendsFrom kotlin
+	testCompile.extendsFrom kotlinTest
 }

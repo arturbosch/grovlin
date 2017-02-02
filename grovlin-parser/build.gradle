@@ -1,0 +1,35 @@
+configurations {
+	compile.extendsFrom kotlin
+	testCompile.extendsFrom kotlinTestz
+}
+
+dependencies {
+	antlr "org.antlr:antlr4:4.6"
+	compile "org.antlr:antlr4-runtime:4.6"
+}
+
+generateGrammarSource {
+	maxHeapSize = "64m"
+	arguments += ['-package', 'io.gitlab.arturbosch.grovlin']
+	outputDirectory = new File("src/antlr/main/io/gitlab/arturbosch/grovlin".toString())
+}
+compileJava.dependsOn generateGrammarSource
+
+sourceSets {
+	generated {
+		java.srcDir 'generated-src/antlr/main/'
+		kotlin.srcDir 'generated-src/antlr/main/'
+	}
+}
+compileJava.source sourceSets.generated.java, sourceSets.main.java
+compileKotlin.source sourceSets.generated.java, sourceSets.main.java, sourceSets.main.kotlin
+
+clean {
+	delete "generated-src"
+}
+
+idea {
+	module {
+		sourceDirs += file("src/antlr/main")
+	}
+}
