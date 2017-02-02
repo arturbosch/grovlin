@@ -3,6 +3,7 @@ lexer grammar GrovlinLexer;
 // Whitespace
 NEWLINE            : '\r\n' | 'r' | '\n' ;
 WS                 : [\t ]+ -> skip ;
+SKIP_NL            : NEWLINE -> skip;
 
 // Keywords
 TYPE               : 'type';
@@ -27,8 +28,9 @@ DECLIT             : '0'|[1-9][0-9]* '.' [0-9]+ ;
 // Operators
 PLUS               : '+' ;
 MINUS              : '-' ;
-ASTERISK           : '*' ;
-DIVISION           : '/' ;
+MUL                : '*' ;
+DIV                : '/' ;
+MOD                : '%' ;
 ASSIGN             : '=' ;
 LPAREN             : '(' ;
 RPAREN             : ')' ;
@@ -40,4 +42,4 @@ LBRACE             : '{';
 RBRACE             : '}';
 
 // Identifiers
-ID                 : [_]*[a-z][A-Za-z0-9_]* ;
+ID                 : [_]*[A-Za-z0-9_]+ ;

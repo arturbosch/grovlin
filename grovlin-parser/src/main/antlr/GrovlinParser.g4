@@ -10,9 +10,12 @@ line
 : statement (NEWLINE | EOF)
 ;
 
+statements
+: statement*
+;
+
 statement
-: typeDeclaration
-| defDeclaration
+: memberDeclaration
 | varDeclaration
 | assignment
 | print
@@ -38,15 +41,11 @@ defDeclaration
 ;
 
 methodDeclaration
-: ID ASSIGN LPAREN ((ID ID COMMA)* ID ID)* RPAREN LBRACE statements RBRACE
+: ID LPAREN RPAREN LBRACE statements RBRACE
 ;
 
 lambdaDeclaration
-: ID ASSIGN LBRACE expression RBRACE
-;
-
-statements
-: statement*
+: ID ASSIGN LBRACE statements RBRACE
 ;
 
 print
@@ -61,7 +60,7 @@ assignment
 : ID ASSIGN expression
 ;
 
-expression : left=expression operator=(DIVISION|ASTERISK) right=expression # binaryOperation
+expression : left=expression operator=(DIV|MUL) right=expression # binaryOperation
            | left=expression operator=(PLUS|MINUS) right=expression        # binaryOperation
            | value=expression AS targetType=type                           # typeConversion
            | LPAREN expression RPAREN                                      # parenExpression

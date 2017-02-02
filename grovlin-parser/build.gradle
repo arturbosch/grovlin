@@ -1,6 +1,6 @@
 configurations {
 	compile.extendsFrom kotlin
-	testCompile.extendsFrom kotlinTestz
+	testCompile.extendsFrom kotlinTest
 }
 
 dependencies {
