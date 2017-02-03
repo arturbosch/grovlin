@@ -10,6 +10,8 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 import java.io.StringReader
+import java.nio.file.Files
+import java.nio.file.Path
 
 
 /**
@@ -19,11 +21,9 @@ object Parsing
 
 fun lexer(code: String): GrovlinLexer = GrovlinLexer(ANTLRInputStream(StringReader(code)))
 
-fun lexerFromResource(resourceName: String) =
-		GrovlinLexer(ANTLRInputStream(Parsing.javaClass.getResourceAsStream("/$resourceName")))
-
-fun parse(resourceName: String): GrovlinFile {
-	return GrovlinParser(CommonTokenStream(lexerFromResource(resourceName))).apply {
+fun Path.parse(): GrovlinFile {
+	val code = String(Files.readAllBytes(this))
+	return GrovlinParser(CommonTokenStream(lexer(code))).apply {
 		addErrorListener(errorListener)
 	}.grovlinFile().toAsT()
 }
@@ -35,7 +35,7 @@ fun tokens(code: String): List<String> {
 			.map { vocabulary.getSymbolicName(it.type) }
 }
 
-private val errorListener = object : BaseErrorListener() {
+val errorListener = object : BaseErrorListener() {
 	override fun syntaxError(recognizer: Recognizer<*, *>, offendingSymbol: Any,
 							 line: Int, charPositionInLine: Int, msg: String, e: RecognitionException) {
 		throw IllegalStateException("failed to parse at L $line, C $charPositionInLine due to $msg", e)
