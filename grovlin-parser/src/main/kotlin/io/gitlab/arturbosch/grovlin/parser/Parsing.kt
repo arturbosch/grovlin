@@ -28,6 +28,15 @@ fun Path.parse(): GrovlinFile {
 	}.grovlinFile().toAsT()
 }
 
+fun parseFromResource(resourceName: String): GrovlinFile {
+	return GrovlinParser(CommonTokenStream(lexerFromResource(resourceName))).apply {
+		addErrorListener(errorListener)
+	}.grovlinFile().toAsT()
+}
+
+fun lexerFromResource(resourceName: String) =
+		GrovlinLexer(ANTLRInputStream(Parsing.javaClass.getResourceAsStream("/$resourceName")))
+
 fun tokens(code: String): List<String> {
 	val lexer = lexer(code)
 	val vocabulary = lexer.vocabulary
@@ -38,6 +47,6 @@ fun tokens(code: String): List<String> {
 val errorListener = object : BaseErrorListener() {
 	override fun syntaxError(recognizer: Recognizer<*, *>, offendingSymbol: Any,
 							 line: Int, charPositionInLine: Int, msg: String, e: RecognitionException) {
-		throw IllegalStateException("failed to parse at L $line, C $charPositionInLine due to $msg", e)
+		throw IllegalStateException("failed to parseFromResource at L $line, C $charPositionInLine due to $msg", e)
 	}
 }

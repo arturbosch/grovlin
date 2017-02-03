@@ -15,7 +15,7 @@ class ParserTest {
 
 	@Test
 	fun parseFromResource() {
-		val file = parse("example.grovlin")
+		val file = parseFromResource("example.grovlin")
 
 		assertEquals(file.statements.size, 3)
 		assertTrue(file.statements[0] is TypeDeclaration)
@@ -32,12 +32,6 @@ class ParserTest {
 		assertTrue(file.statements[0] is TypeDeclaration)
 		assertTrue(file.statements[1] is VarDeclaration)
 		assertTrue(file.statements[2] is Print)
-	}
-
-	@Test
-	fun parseProgram() {
-		val file = parse("program.grovlin")
-		println(file.print())
 	}
 
 }
