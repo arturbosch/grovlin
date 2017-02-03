@@ -20,16 +20,15 @@ sourceSets {
 		java.srcDir 'src/antlr/main/'
 		kotlin.srcDir 'src/antlr/main/'
 	}
+	main {
+		java {
+			srcDirs = ["src/main/java", "src/antlr/main"]
+		}
+	}
 }
 compileJava.source sourceSets.generated.java, sourceSets.main.java
 compileKotlin.source sourceSets.generated.java, sourceSets.main.java, sourceSets.main.kotlin
 
 clean {
-	delete "src/antlr/main/"
-}
-
-idea {
-	module {
-		sourceDirs += file("src/antlr/main")
-	}
+	delete "src/antlr/main"
 }
