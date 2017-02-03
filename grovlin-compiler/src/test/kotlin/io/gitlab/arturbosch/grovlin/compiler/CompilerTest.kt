@@ -11,6 +11,7 @@ class CompilerTest {
 
 	@Test
 	fun parseProgram() {
+		File("./out").mkdir()
 		val file = parseFromResource("program.grovlin")
 		println(file.print())
 		val unit = file.toJava()
