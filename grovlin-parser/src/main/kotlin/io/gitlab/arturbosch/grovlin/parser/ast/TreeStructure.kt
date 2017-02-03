@@ -108,21 +108,26 @@ data class Print(val value: Expression) : Statement {
 // Expressions
 //
 
+enum class Operator(val value: String) {
+	sum("+"), sub("-"), mul("*"), div("/"), mod("%")
+}
+
 interface BinaryExpression : Expression {
 	val left: Expression
 	val right: Expression
+	val operator: Operator
 	override fun print(indent: Int): String {
 		return "${times(indent + 1)}${javaClass.simpleName}\n${left.print(indent + 1)}${right.print(indent + 1)}"
 	}
 }
 
-data class SumExpression(override val left: Expression, override val right: Expression) : BinaryExpression
+data class SumExpression(override val left: Expression, override val right: Expression, override val operator: Operator = Operator.sum) : BinaryExpression
 
-data class SubtractionExpression(override val left: Expression, override val right: Expression) : BinaryExpression
+data class SubtractionExpression(override val left: Expression, override val right: Expression, override val operator: Operator = Operator.sub) : BinaryExpression
 
-data class MultiplicationExpression(override val left: Expression, override val right: Expression) : BinaryExpression
+data class MultiplicationExpression(override val left: Expression, override val right: Expression, override val operator: Operator = Operator.mul) : BinaryExpression
 
-data class DivisionExpression(override val left: Expression, override val right: Expression) : BinaryExpression
+data class DivisionExpression(override val left: Expression, override val right: Expression, override val operator: Operator = Operator.div) : BinaryExpression
 
 data class UnaryMinusExpression(val value: Expression) : Expression {
 	override fun print(indent: Int): String {
