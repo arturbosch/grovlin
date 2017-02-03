@@ -3,49 +3,49 @@ parser grammar GrovlinParser;
 options { tokenVocab=GrovlinLexer; }
 
 grovlinFile
-: lines=line+
+: statements EOF
 ;
 
-line
-: statement (NEWLINE | EOF)
+nls
+: NL*
 ;
 
 statements
-: statement*
+: (statement nls) *
 ;
 
 statement
-: memberDeclaration
-| varDeclaration
-| assignment
-| print
+: memberDeclaration #memberDeclarationStatement
+| varDeclaration    #varDeclarationStatement
+| assignment        #assignmentStatement
+| print             #printStatement
 ;
 
 typeDeclaration
-: TYPE ID LBRACE memberDeclaration* RBRACE
+: TYPE ID LBRACE nls memberDeclaration* RBRACE nls
 ;
 
 memberDeclaration
-: propertyDeclaration
-| typeDeclaration
-| defDeclaration
+: propertyDeclaration   #propertyMemberDeclaration
+| typeDeclaration       #typeMemberDeclaration
+| defDeclaration        #defMemberDeclaration
 ;
 
 propertyDeclaration
-: HAS assignment
+: HAS assignment nls
 ;
 
 defDeclaration
-: DEF methodDeclaration
-| DEF lambdaDeclaration
+: DEF methodDeclaration #MethodDefinition
+| DEF lambdaDeclaration #LambdaDefinition
 ;
 
 methodDeclaration
-: ID LPAREN RPAREN LBRACE statements RBRACE
+: ID LPAREN RPAREN LBRACE nls statements RBRACE nls
 ;
 
 lambdaDeclaration
-: ID ASSIGN LBRACE statements RBRACE
+: ID ASSIGN LBRACE nls statements RBRACE nls
 ;
 
 print
@@ -53,7 +53,7 @@ print
 ;
 
 varDeclaration
-: (VAR | VAL) assignment
+: (VAR | VAL) assignment nls
 ;
 
 assignment

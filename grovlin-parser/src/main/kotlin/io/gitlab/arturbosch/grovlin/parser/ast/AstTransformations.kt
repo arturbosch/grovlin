@@ -1,56 +1,57 @@
 package io.gitlab.arturbosch.grovlin.parser.ast
 
-import io.gitlab.arturbosch.grovlin.GrovlinParser.AssignmentContext
+import io.gitlab.arturbosch.grovlin.GrovlinParser.AssignmentStatementContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.BinaryOperationContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.DecimalContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.DecimalLiteralContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.DefDeclarationContext
+import io.gitlab.arturbosch.grovlin.GrovlinParser.DefMemberDeclarationContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.ExpressionContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.GrovlinFileContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.IntLiteralContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.IntegerContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.LambdaDeclarationContext
+import io.gitlab.arturbosch.grovlin.GrovlinParser.LambdaDefinitionContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.MemberDeclarationContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.MethodDeclarationContext
+import io.gitlab.arturbosch.grovlin.GrovlinParser.MemberDeclarationStatementContext
+import io.gitlab.arturbosch.grovlin.GrovlinParser.MethodDefinitionContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.ParenExpressionContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.PrintContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.PropertyDeclarationContext
+import io.gitlab.arturbosch.grovlin.GrovlinParser.PrintStatementContext
+import io.gitlab.arturbosch.grovlin.GrovlinParser.PropertyMemberDeclarationContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.StatementContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.TypeContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.TypeConversionContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.TypeDeclarationContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.VarDeclarationContext
+import io.gitlab.arturbosch.grovlin.GrovlinParser.TypeMemberDeclarationContext
+import io.gitlab.arturbosch.grovlin.GrovlinParser.VarDeclarationStatementContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.VarReferenceContext
 import java.util.ArrayList
 
 /**
  * @author Artur Bosch
  */
+fun GrovlinFileContext.toAsT(): GrovlinFile = GrovlinFile(statements().statement().mapTo(ArrayList()) { it.toAst() })
 
-fun GrovlinFileContext.toAsT(): GrovlinFile = GrovlinFile(line().mapTo(ArrayList()) { it.statement().toAst() })
-
-private fun StatementContext.toAst(): Statement = when (this) {
-	is MemberDeclarationContext -> memberDeclaration().toAst()
-	is VarDeclarationContext -> VarDeclaration(varDeclaration().assignment().ID().text,
+fun StatementContext.toAst(): Statement = when (this) {
+	is MemberDeclarationStatementContext -> memberDeclaration().toAst()
+	is VarDeclarationStatementContext -> VarDeclaration(varDeclaration().assignment().ID().text,
 			varDeclaration().assignment().expression().toAst())
-	is AssignmentContext -> Assignment(assignment().ID().text, assignment().expression().toAst())
-	is PrintContext -> Print(print().expression().toAst())
+	is AssignmentStatementContext -> Assignment(assignment().ID().text, assignment().expression().toAst())
+	is PrintStatementContext -> Print(print().expression().toAst())
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }
 
-private fun MemberDeclarationContext.toAst(): Statement = when (this) {
-	is PropertyDeclarationContext -> PropertyDeclaration(propertyDeclaration().assignment().ID().text,
+fun MemberDeclarationContext.toAst(): Statement = when (this) {
+	is PropertyMemberDeclarationContext -> PropertyDeclaration(propertyDeclaration().assignment().ID().text,
 			propertyDeclaration().assignment().expression().toAst())
-	is TypeDeclarationContext -> TypeDeclaration(typeDeclaration().ID().text,
+	is TypeMemberDeclarationContext -> TypeDeclaration(typeDeclaration().ID().text,
 			typeDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() })
-	is DefDeclarationContext -> defDeclaration().toAst()
+	is DefMemberDeclarationContext -> defDeclaration().toAst()
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }
 
-private fun DefDeclarationContext.toAst(): Statement = when (this) {
-	is MethodDeclarationContext -> MethodDeclaration(methodDeclaration().ID().text,
+fun DefDeclarationContext.toAst(): Statement = when (this) {
+	is MethodDefinitionContext -> MethodDeclaration(methodDeclaration().ID().text,
 			methodDeclaration().statements().statement().mapTo(ArrayList()) { it.toAst() })
-	is LambdaDeclarationContext -> LambdaDeclaration(lambdaDeclaration().ID().text,
+	is LambdaDefinitionContext -> LambdaDeclaration(lambdaDeclaration().ID().text,
 			lambdaDeclaration().statements().statement().mapTo(ArrayList()) { it.toAst() })
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }

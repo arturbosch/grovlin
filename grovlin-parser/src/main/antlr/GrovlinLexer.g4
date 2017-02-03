@@ -1,9 +1,8 @@
 lexer grammar GrovlinLexer;
 
 // Whitespace
-NEWLINE            : '\r\n' | 'r' | '\n' ;
+NL            : '\r\n' | 'r' | '\n' ;
 WS                 : [\t ]+ -> skip ;
-SKIP_NL            : NEWLINE -> skip;
 
 // Keywords
 TYPE               : 'type';
