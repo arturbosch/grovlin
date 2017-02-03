@@ -19,6 +19,7 @@ statement
 | varDeclaration    #varDeclarationStatement
 | assignment        #assignmentStatement
 | print             #printStatement
+| program           #programStatement
 ;
 
 typeDeclaration
@@ -50,6 +51,10 @@ lambdaDeclaration
 
 print
 : PRINT LPAREN expression RPAREN
+;
+
+program
+: PROGRAM LBRACE nls statements RBRACE nls
 ;
 
 varDeclaration

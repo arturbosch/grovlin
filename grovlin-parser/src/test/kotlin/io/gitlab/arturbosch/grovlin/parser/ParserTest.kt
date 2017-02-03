@@ -17,10 +17,10 @@ class ParserTest {
 	fun parseFromResource() {
 		val file = parse("example.grovlin")
 
-		assertEquals(file.statement.size, 3)
-		assertTrue(file.statement[0] is TypeDeclaration)
-		assertTrue(file.statement[1] is VarDeclaration)
-		assertTrue(file.statement[2] is Print)
+		assertEquals(file.statements.size, 3)
+		assertTrue(file.statements[0] is TypeDeclaration)
+		assertTrue(file.statements[1] is VarDeclaration)
+		assertTrue(file.statements[2] is Print)
 	}
 
 	@Test
@@ -28,10 +28,16 @@ class ParserTest {
 		val path = Paths.get(javaClass.getResource("/example.grovlin").path)
 		val file = path.parse()
 
-		assertEquals(file.statement.size, 3)
-		assertTrue(file.statement[0] is TypeDeclaration)
-		assertTrue(file.statement[1] is VarDeclaration)
-		assertTrue(file.statement[2] is Print)
+		assertEquals(file.statements.size, 3)
+		assertTrue(file.statements[0] is TypeDeclaration)
+		assertTrue(file.statements[1] is VarDeclaration)
+		assertTrue(file.statements[2] is Print)
+	}
+
+	@Test
+	fun parseProgram() {
+		val file = parse("program.grovlin")
+		println(file.print())
 	}
 
 }

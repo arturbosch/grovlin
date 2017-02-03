@@ -16,6 +16,7 @@ import io.gitlab.arturbosch.grovlin.GrovlinParser.MemberDeclarationStatementCont
 import io.gitlab.arturbosch.grovlin.GrovlinParser.MethodDefinitionContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.ParenExpressionContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.PrintStatementContext
+import io.gitlab.arturbosch.grovlin.GrovlinParser.ProgramStatementContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.PropertyMemberDeclarationContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.StatementContext
 import io.gitlab.arturbosch.grovlin.GrovlinParser.TypeContext
@@ -28,7 +29,7 @@ import java.util.ArrayList
 /**
  * @author Artur Bosch
  */
-fun GrovlinFileContext.toAsT(): GrovlinFile = GrovlinFile(statements().statement().mapTo(ArrayList()) { it.toAst() })
+fun GrovlinFileContext.toAsT(): GrovlinFile = GrovlinFile("File.grovlin", statements().statement().mapTo(ArrayList()) { it.toAst() })
 
 fun StatementContext.toAst(): Statement = when (this) {
 	is MemberDeclarationStatementContext -> memberDeclaration().toAst()
@@ -36,6 +37,7 @@ fun StatementContext.toAst(): Statement = when (this) {
 			varDeclaration().assignment().expression().toAst())
 	is AssignmentStatementContext -> Assignment(assignment().ID().text, assignment().expression().toAst())
 	is PrintStatementContext -> Print(print().expression().toAst())
+	is ProgramStatementContext -> Program(program().statements().statement().mapTo(ArrayList()) { it.toAst() })
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }
 

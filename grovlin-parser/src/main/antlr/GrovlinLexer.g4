@@ -15,6 +15,7 @@ SELF               : 'self';
 AS                 : 'as';
 IS                 : 'is';
 PRINT              : 'print';
+PROGRAM            : 'program';
 
 // Defined Types
 INT                : 'Int';
