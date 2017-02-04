@@ -1,0 +1,7 @@
+program {
+    var x = 5
+    var y = 4
+    y = 10
+    x = y + x / 3
+    print(x as Decimal + y)
+}
