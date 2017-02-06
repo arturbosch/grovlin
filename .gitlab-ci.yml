@@ -1,7 +1,7 @@
 image: java:8-jdk
 stages:
-  - build
   - grammar
+  - build
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
 cache:
