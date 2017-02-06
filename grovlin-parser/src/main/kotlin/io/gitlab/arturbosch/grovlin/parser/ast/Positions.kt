@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.Token
 
 data class Point(val line: Int, val column: Int) {
 
-	override fun toString() = "Line $line, Column $column"
+	override fun toString() = "$line/$column"
 
 	fun offset(lines: List<String>): Int {
 		val newLines = this.line - 1
@@ -21,9 +21,11 @@ data class Position(val start: Point, val end: Point) {
 
 	init {
 		if (end.isBefore(start)) {
-			throw IllegalArgumentException("End should follows start")
+			throw IllegalArgumentException("Start positions should be located before end positions!")
 		}
 	}
+
+	override fun toString() = "($start to $end)"
 
 	fun text(code: String): String {
 		val lines = code.split("\n")
@@ -44,11 +46,11 @@ fun Node.isBefore(other: Node): Boolean = position != null && other.position != 
 
 fun Node.isAfter(other: Node): Boolean = position != null && other.position != null && position!!.start.isAfter(other.position!!.start)
 
-// Grovlin Parser
+// Parser extensions
 
-fun Token.startPoint() = Point(line, charPositionInLine)
+fun Token.startPoint() = Point(line, charPositionInLine + 1)
 
-fun Token.endPoint() = Point(line, charPositionInLine + text.length)
+fun Token.endPoint() = Point(line, charPositionInLine + 1 + text.length)
 
 fun ParserRuleContext.toPosition(): Position? {
 	return Position(start.startPoint(), stop.endPoint())

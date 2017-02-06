@@ -49,8 +49,8 @@ fun ExpressionContext.toAst(): Expression = when (this) {
 fun BinaryOperationContext.toAst(): Expression = when (operator.text) {
 	"+" -> SumExpression(left.toAst(), right.toAst(), toPosition())
 	"-" -> SubtractionExpression(left.toAst(), right.toAst(), toPosition())
-	"*" -> MultiplicationExpression(left.toAst(), right.toAst())
-	"/" -> DivisionExpression(left.toAst(), right.toAst())
+	"*" -> MultiplicationExpression(left.toAst(), right.toAst(), toPosition())
+	"/" -> DivisionExpression(left.toAst(), right.toAst(), toPosition())
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
 }
 
