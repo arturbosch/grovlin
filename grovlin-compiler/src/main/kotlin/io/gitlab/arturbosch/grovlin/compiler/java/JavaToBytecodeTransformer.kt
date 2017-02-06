@@ -1,4 +1,4 @@
-package io.gitlab.arturbosch.grovlin.compiler
+package io.gitlab.arturbosch.grovlin.compiler.java
 
 import com.github.javaparser.ast.CompilationUnit
 import java.io.File

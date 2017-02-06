@@ -4,6 +4,8 @@ import io.gitlab.arturbosch.grovlin.compiler.args.Args
 import io.gitlab.arturbosch.grovlin.compiler.args.failWithErrorMessage
 import io.gitlab.arturbosch.grovlin.compiler.args.jCommander
 import io.gitlab.arturbosch.grovlin.compiler.args.parseArguments
+import io.gitlab.arturbosch.grovlin.compiler.java.toFile
+import io.gitlab.arturbosch.grovlin.compiler.java.toJava
 import io.gitlab.arturbosch.grovlin.parser.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.parser.ast.asString
 import io.gitlab.arturbosch.grovlin.parser.parse

@@ -1,4 +1,4 @@
-package io.gitlab.arturbosch.grovlin.compiler
+package io.gitlab.arturbosch.grovlin.compiler.java
 
 import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.Modifier
@@ -60,13 +60,13 @@ fun GrovlinFile.toJava(): CompilationUnit {
 
 	val main = clazz.addMethod("main", Modifier.PUBLIC, Modifier.STATIC)
 	main.addParameter(ArrayType(ClassOrInterfaceType("String")), "args")
-	val statements = program.statements.mapTo(NodeList<JavaParserStatement>()) { it.toJava() }
+	val statements = program.statements.mapTo(NodeList<com.github.javaparser.ast.stmt.Statement>()) { it.toJava() }
 	main.setBody(BlockStmt(statements))
 
 	return unit
 }
 
-private fun Statement.toJava(): JavaParserStatement = when (this) {
+private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {
 	is VarDeclaration -> ExpressionStmt(VariableDeclarationExpr(VariableDeclarator(PrimitiveType.intType(), name, value.toJava())))
 	is Print -> ExpressionStmt(MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
 			SimpleName("println"), NodeList.nodeList(value.toJava())))
@@ -74,7 +74,7 @@ private fun Statement.toJava(): JavaParserStatement = when (this) {
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
-private fun Expression.toJava(): JavaParserExpression = when (this) {
+private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = when (this) {
 	is SumExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.PLUS)
 	is SubtractionExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.MINUS)
 	is MultiplicationExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.MULTIPLY)
@@ -87,7 +87,7 @@ private fun Expression.toJava(): JavaParserExpression = when (this) {
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
-private fun Type.toJava(): JavaParserType = when (this) {
+private fun Type.toJava(): com.github.javaparser.ast.type.Type = when (this) {
 	is IntType -> PrimitiveType.intType()
 	is DecimalType -> PrimitiveType.doubleType()
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
