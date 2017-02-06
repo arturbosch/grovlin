@@ -5,7 +5,8 @@ configurations {
 
 dependencies {
 	compile project(":grovlin-parser")
-	compile 'com.github.javaparser:javaparser-core:3.0.1'
+	compile "com.github.javaparser:javaparser-core:3.0.1"
+	compile "com.beust:jcommander:1.60"
 }
 
 task fatJar(type: Jar) {

@@ -1,25 +1,25 @@
 package io.gitlab.arturbosch.grovlin.compiler
 
+import io.gitlab.arturbosch.grovlin.compiler.args.Args
+import io.gitlab.arturbosch.grovlin.compiler.args.failWithErrorMessage
+import io.gitlab.arturbosch.grovlin.compiler.args.jCommander
+import io.gitlab.arturbosch.grovlin.compiler.args.parseArguments
 import io.gitlab.arturbosch.grovlin.parser.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.parser.parse
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Paths
 
 /**
  * @author Artur Bosch
  */
 fun main(args: Array<String>) {
 
-	if (args.size < 2) throw IllegalArgumentException("Usage: [compile|run] path/to/grovlin/file [path/to/java/class]?")
+	val arguments = parseArguments(args)
 
-	val type = args[0]
-	val input = args[1]
-
-	val grovlinFile = Paths.get(input).parse()
-	if (type == "compile") {
-		runCompiler(args, grovlinFile)
-	} else if (type == "run") {
+	val grovlinFile = arguments.input!!.parse()
+	if (arguments.mode == "compile") {
+		runCompiler(grovlinFile)
+	} else if (arguments.mode == "run") {
 		runJvm(grovlinFile)
 	}
 
@@ -34,9 +34,9 @@ private fun runJvm(grovlinFile: GrovlinFile) {
 	println(String(process.errorStream.buffered().readBytes()))
 }
 
-private fun runCompiler(args: Array<String>, grovlinFile: GrovlinFile) {
-	if (args.size < 3) throw IllegalArgumentException("Usage: [compile|run] path/to/grovlin/file [path/to/java/class]?")
-	val output = File(args[2])
+private fun runCompiler(grovlinFile: GrovlinFile) {
+	if (Args.output == null) jCommander.failWithErrorMessage("For compilation specify an output path!")
+	val output: File = Args.output!!.toFile()
 	if (!output.exists()) output.mkdir()
 	grovlinFile.toJava().toFile(output)
 }
