@@ -1,4 +1,5 @@
 # Grovlin - Just another JVM language - My playground
+[![build status](https://gitlab.com/arturbosch/Grovlin/badges/master/build.svg)](https://gitlab.com/arturbosch/Grovlin/commits/master)
 
 Building an own language I bet is the dream of every programmer who already programmed in a lot of different languages but never was 100% happy with one of them.
 
