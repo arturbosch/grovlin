@@ -1,29 +1,6 @@
 package io.gitlab.arturbosch.grovlin.parser.ast
 
-import io.gitlab.arturbosch.grovlin.GrovlinParser.AssignmentStatementContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.BinaryOperationContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.DecimalContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.DecimalLiteralContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.DefDeclarationContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.DefMemberDeclarationContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.ExpressionContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.GrovlinFileContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.IntLiteralContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.IntegerContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.LambdaDefinitionContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.MemberDeclarationContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.MemberDeclarationStatementContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.MethodDefinitionContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.ParenExpressionContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.PrintStatementContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.ProgramStatementContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.PropertyMemberDeclarationContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.StatementContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.TypeContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.TypeConversionContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.TypeMemberDeclarationContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.VarDeclarationStatementContext
-import io.gitlab.arturbosch.grovlin.GrovlinParser.VarReferenceContext
+import io.gitlab.arturbosch.grovlin.GrovlinParser.*
 import java.util.ArrayList
 
 /**
