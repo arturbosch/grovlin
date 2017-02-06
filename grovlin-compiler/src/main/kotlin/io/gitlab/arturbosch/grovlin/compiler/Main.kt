@@ -5,6 +5,7 @@ import io.gitlab.arturbosch.grovlin.compiler.args.failWithErrorMessage
 import io.gitlab.arturbosch.grovlin.compiler.args.jCommander
 import io.gitlab.arturbosch.grovlin.compiler.args.parseArguments
 import io.gitlab.arturbosch.grovlin.parser.ast.GrovlinFile
+import io.gitlab.arturbosch.grovlin.parser.ast.asString
 import io.gitlab.arturbosch.grovlin.parser.parse
 import java.io.File
 import java.nio.file.Files
@@ -17,6 +18,8 @@ fun main(args: Array<String>) {
 	val arguments = parseArguments(args)
 
 	val grovlinFile = arguments.input!!.parse()
+	if (arguments.showTree) println(grovlinFile.asString())
+
 	if (arguments.mode == "compile") {
 		runCompiler(grovlinFile)
 	} else if (arguments.mode == "run") {
