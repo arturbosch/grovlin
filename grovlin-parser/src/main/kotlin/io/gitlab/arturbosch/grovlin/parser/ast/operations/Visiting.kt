@@ -1,5 +1,6 @@
-package io.gitlab.arturbosch.grovlin.parser.ast
+package io.gitlab.arturbosch.grovlin.parser.ast.operations
 
+import io.gitlab.arturbosch.grovlin.parser.ast.Node
 import kotlin.reflect.memberProperties
 
 fun Node.process(operation: (Node) -> Unit) {

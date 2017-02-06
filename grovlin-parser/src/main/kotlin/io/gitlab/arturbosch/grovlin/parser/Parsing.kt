@@ -3,7 +3,7 @@ package io.gitlab.arturbosch.grovlin.parser
 import io.gitlab.arturbosch.grovlin.GrovlinLexer
 import io.gitlab.arturbosch.grovlin.GrovlinParser
 import io.gitlab.arturbosch.grovlin.parser.ast.GrovlinFile
-import io.gitlab.arturbosch.grovlin.parser.ast.toAsT
+import io.gitlab.arturbosch.grovlin.parser.toAsT
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.CommonTokenStream

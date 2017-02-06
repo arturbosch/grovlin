@@ -1,10 +1,11 @@
-package io.gitlab.arturbosch.grovlin.parser.ast
+package io.gitlab.arturbosch.grovlin.parser.ast.operations
 
+import io.gitlab.arturbosch.grovlin.parser.ast.Node
 import java.lang.reflect.ParameterizedType
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.memberProperties
 
-const val indentBlock = "\t"
+const val tab = "\t"
 
 fun Node.asString(indent: String = ""): String {
 	val sb = StringBuilder()
@@ -15,13 +16,13 @@ fun Node.asString(indent: String = ""): String {
 		if (type is ParameterizedType && type.rawType == List::class.java) {
 			val paramType = type.actualTypeArguments[0]
 			if (paramType is Class<*> && Node::class.java.isAssignableFrom(paramType)) {
-				(value as List<*>).forEach { sb.append((it as Node).asString(indent + indentBlock)) }
+				(value as List<*>).forEach { sb.append((it as Node).asString(indent + tab)) }
 			}
 		} else {
 			if (value is Node) {
-				sb.append(value.asString(indent + indentBlock))
+				sb.append(value.asString(indent + tab))
 			} else {
-				sb.append("$indent$indentBlock$value\n")
+				sb.append("$indent$tab$value\n")
 			}
 		}
 	}

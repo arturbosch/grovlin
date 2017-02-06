@@ -1,6 +1,6 @@
 package io.gitlab.arturbosch.grovlin.parser
 
-import io.gitlab.arturbosch.grovlin.parser.ast.process
+import io.gitlab.arturbosch.grovlin.parser.ast.operations.process
 import org.junit.Test
 
 /**

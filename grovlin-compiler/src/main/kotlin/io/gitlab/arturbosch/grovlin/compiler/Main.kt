@@ -7,7 +7,7 @@ import io.gitlab.arturbosch.grovlin.compiler.args.parseArguments
 import io.gitlab.arturbosch.grovlin.compiler.java.toFile
 import io.gitlab.arturbosch.grovlin.compiler.java.toJava
 import io.gitlab.arturbosch.grovlin.parser.ast.GrovlinFile
-import io.gitlab.arturbosch.grovlin.parser.ast.asString
+import io.gitlab.arturbosch.grovlin.parser.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.parser.parse
 import java.io.File
 import java.nio.file.Files
