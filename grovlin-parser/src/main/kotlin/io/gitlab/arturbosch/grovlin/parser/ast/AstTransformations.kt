@@ -6,48 +6,49 @@ import java.util.ArrayList
 /**
  * @author Artur Bosch
  */
-fun GrovlinFileContext.toAsT(): GrovlinFile = GrovlinFile("File.grovlin", statements().statement().mapTo(ArrayList()) { it.toAst() })
+fun GrovlinFileContext.toAsT(): GrovlinFile = GrovlinFile("File.grovlin",
+		statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
 
 fun StatementContext.toAst(): Statement = when (this) {
 	is MemberDeclarationStatementContext -> memberDeclaration().toAst()
 	is VarDeclarationStatementContext -> VarDeclaration(varDeclaration().assignment().ID().text,
-			varDeclaration().assignment().expression().toAst())
-	is AssignmentStatementContext -> Assignment(assignment().ID().text, assignment().expression().toAst())
-	is PrintStatementContext -> Print(print().expression().toAst())
-	is ProgramStatementContext -> Program(program().statements().statement().mapTo(ArrayList()) { it.toAst() })
+			varDeclaration().assignment().expression().toAst(), toPosition())
+	is AssignmentStatementContext -> Assignment(assignment().ID().text, assignment().expression().toAst(), toPosition())
+	is PrintStatementContext -> Print(print().expression().toAst(), toPosition())
+	is ProgramStatementContext -> Program(program().statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }
 
 fun MemberDeclarationContext.toAst(): Statement = when (this) {
 	is PropertyMemberDeclarationContext -> PropertyDeclaration(propertyDeclaration().assignment().ID().text,
-			propertyDeclaration().assignment().expression().toAst())
+			propertyDeclaration().assignment().expression().toAst(), toPosition())
 	is TypeMemberDeclarationContext -> TypeDeclaration(typeDeclaration().ID().text,
-			typeDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() })
+			typeDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() }, toPosition())
 	is DefMemberDeclarationContext -> defDeclaration().toAst()
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }
 
 fun DefDeclarationContext.toAst(): Statement = when (this) {
 	is MethodDefinitionContext -> MethodDeclaration(methodDeclaration().ID().text,
-			methodDeclaration().statements().statement().mapTo(ArrayList()) { it.toAst() })
+			methodDeclaration().statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
 	is LambdaDefinitionContext -> LambdaDeclaration(lambdaDeclaration().ID().text,
-			lambdaDeclaration().statements().statement().mapTo(ArrayList()) { it.toAst() })
+			lambdaDeclaration().statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }
 
 fun ExpressionContext.toAst(): Expression = when (this) {
 	is BinaryOperationContext -> toAst()
-	is IntLiteralContext -> IntLit(text)
-	is DecimalLiteralContext -> DecLit(text)
+	is IntLiteralContext -> IntLit(text, toPosition())
+	is DecimalLiteralContext -> DecLit(text, toPosition())
 	is ParenExpressionContext -> expression().toAst()
-	is VarReferenceContext -> VarReference(text)
-	is TypeConversionContext -> TypeConversion(expression().toAst(), targetType.toAst())
+	is VarReferenceContext -> VarReference(text, toPosition())
+	is TypeConversionContext -> TypeConversion(expression().toAst(), targetType.toAst(), toPosition())
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
 }
 
 fun BinaryOperationContext.toAst(): Expression = when (operator.text) {
-	"+" -> SumExpression(left.toAst(), right.toAst())
-	"-" -> SubtractionExpression(left.toAst(), right.toAst())
+	"+" -> SumExpression(left.toAst(), right.toAst(), toPosition())
+	"-" -> SubtractionExpression(left.toAst(), right.toAst(), toPosition())
 	"*" -> MultiplicationExpression(left.toAst(), right.toAst())
 	"/" -> DivisionExpression(left.toAst(), right.toAst())
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
