@@ -15,4 +15,5 @@ class PositionsTest {
 			assert(it.position != null)
 		}
 	}
+
 }
