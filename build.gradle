@@ -47,3 +47,5 @@ configurations {
 	compile.extendsFrom kotlin
 	testCompile.extendsFrom kotlinTest
 }
+
+tasks.findByName('build').mustRunAfter ':grovlin-parser:generateGrammarSource'
