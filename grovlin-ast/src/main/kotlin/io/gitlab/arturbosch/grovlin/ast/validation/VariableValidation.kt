@@ -19,20 +19,20 @@ fun Program.validateVariables(errors: MutableList<SemanticError>) {
 
 private fun Program.noAssignmentsBeforeVariableDeclaration(errors: MutableList<SemanticError>, varsByName: MutableMap<String, VarDeclaration>) {
 	processNodesOfType<Assignment> {
-		if (!varsByName.containsKey(it.name)) {
-			errors.add(SemanticError("There is no variable named '${it.name}'", it.position!!.start))
-		} else if (it.isBefore(varsByName[it.name]!!)) {
-			errors.add(SemanticError("You cannot refer to variable '${it.name}' before its declaration", it.position!!.start))
+		if (!varsByName.containsKey(it.reference.name)) {
+			errors.add(SemanticError("There is no variable named '${it.reference.name}'", it.position!!.start))
+		} else if (it.isBefore(varsByName[it.reference.name]!!)) {
+			errors.add(SemanticError("You cannot refer to variable '${it.reference.name}' before its declaration", it.position!!.start))
 		}
 	}
 }
 
 private fun Program.noReferencesBeforeVariableDeclarations(errors: MutableList<SemanticError>, varsByName: MutableMap<String, VarDeclaration>) {
 	processNodesOfType<VarReference> {
-		if (!varsByName.containsKey(it.name)) {
-			errors.add(SemanticError("There is no variable named '${it.name}'", it.position!!.start))
-		} else if (it.isBefore(varsByName[it.name]!!)) {
-			errors.add(SemanticError("You cannot refer to variable '${it.name}' before its declaration", it.position!!.start))
+		if (!varsByName.containsKey(it.reference.name)) {
+			errors.add(SemanticError("There is no variable named '${it.reference.name}'", it.position!!.start))
+		} else if (it.isBefore(varsByName[it.reference.name]!!)) {
+			errors.add(SemanticError("You cannot refer to variable '${it.reference.name}' before its declaration", it.position!!.start))
 		}
 	}
 }

@@ -17,3 +17,9 @@ fun Node.process(operation: (Node) -> Unit) {
 inline fun <reified T : Node> Node.processNodesOfType(crossinline operation: (T) -> Unit) = process {
 	if (it is T) operation(it)
 }
+
+inline fun <reified T : Node> Node.collectByType(): List<T> {
+	val list = mutableListOf<T>()
+	process { if (it is T) list.add(it) }
+	return list
+}
