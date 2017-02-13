@@ -2,8 +2,6 @@ package io.gitlab.arturbosch.grovlin.parser
 
 import io.gitlab.arturbosch.grovlin.GrovlinLexer
 import io.gitlab.arturbosch.grovlin.GrovlinParser
-import io.gitlab.arturbosch.grovlin.parser.ast.GrovlinFile
-import io.gitlab.arturbosch.grovlin.parser.toAsT
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.CommonTokenStream
@@ -21,17 +19,26 @@ object Parsing
 
 fun lexer(code: String): GrovlinLexer = GrovlinLexer(ANTLRInputStream(StringReader(code)))
 
-fun Path.parse(): GrovlinFile {
+fun Path.parse(): RawParsingResult {
 	val code = String(Files.readAllBytes(this))
-	return GrovlinParser(CommonTokenStream(lexer(code))).apply {
-		addErrorListener(errorListener)
-	}.grovlinFile().toAsT()
+	val errors = mutableListOf<Error>()
+
+	val grovlinParser = GrovlinParser(CommonTokenStream(lexer(code)))
+	grovlinParser.addErrorListener(SyntaxErrorListener(errors))
+	val grovlinFile = grovlinParser.grovlinFile()
+
+	return RawParsingResult(grovlinFile, this, errors)
 }
 
-fun parseFromResource(resourceName: String): GrovlinFile {
-	return GrovlinParser(CommonTokenStream(lexerFromResource(resourceName))).apply {
-		addErrorListener(errorListener)
-	}.grovlinFile().toAsT()
+fun parseFromResource(resourceName: String): GrovlinParser.GrovlinFileContext {
+	val errors = mutableListOf<Error>()
+
+	val grovlinParser = GrovlinParser(CommonTokenStream(lexerFromResource(resourceName)))
+	grovlinParser.addErrorListener(SyntaxErrorListener(errors))
+	val grovlinFile = grovlinParser.grovlinFile()
+
+	errors.forEach(::println)
+	return grovlinFile
 }
 
 fun lexerFromResource(resourceName: String) =
@@ -44,9 +51,9 @@ fun tokens(code: String): List<String> {
 			.map { vocabulary.getSymbolicName(it.type) }
 }
 
-val errorListener = object : BaseErrorListener() {
+class SyntaxErrorListener(val errors: MutableList<Error>) : BaseErrorListener() {
 	override fun syntaxError(recognizer: Recognizer<*, *>, offendingSymbol: Any,
 							 line: Int, charPositionInLine: Int, msg: String, e: RecognitionException) {
-		throw IllegalStateException("failed to parseFromResource at L $line, C $charPositionInLine due to $msg", e)
+		errors.add(SyntaxError(msg, CodePoint(line, charPositionInLine)))
 	}
 }

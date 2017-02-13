@@ -1,29 +1,6 @@
-package io.gitlab.arturbosch.grovlin.parser
+package io.gitlab.arturbosch.grovlin.ast
 
 import io.gitlab.arturbosch.grovlin.GrovlinParser.*
-import io.gitlab.arturbosch.grovlin.parser.ast.Assignment
-import io.gitlab.arturbosch.grovlin.parser.ast.DecLit
-import io.gitlab.arturbosch.grovlin.parser.ast.DecimalType
-import io.gitlab.arturbosch.grovlin.parser.ast.DivisionExpression
-import io.gitlab.arturbosch.grovlin.parser.ast.Expression
-import io.gitlab.arturbosch.grovlin.parser.ast.GrovlinFile
-import io.gitlab.arturbosch.grovlin.parser.ast.IntLit
-import io.gitlab.arturbosch.grovlin.parser.ast.IntType
-import io.gitlab.arturbosch.grovlin.parser.ast.LambdaDeclaration
-import io.gitlab.arturbosch.grovlin.parser.ast.MethodDeclaration
-import io.gitlab.arturbosch.grovlin.parser.ast.MultiplicationExpression
-import io.gitlab.arturbosch.grovlin.parser.ast.Print
-import io.gitlab.arturbosch.grovlin.parser.ast.Program
-import io.gitlab.arturbosch.grovlin.parser.ast.PropertyDeclaration
-import io.gitlab.arturbosch.grovlin.parser.ast.Statement
-import io.gitlab.arturbosch.grovlin.parser.ast.SubtractionExpression
-import io.gitlab.arturbosch.grovlin.parser.ast.SumExpression
-import io.gitlab.arturbosch.grovlin.parser.ast.Type
-import io.gitlab.arturbosch.grovlin.parser.ast.TypeConversion
-import io.gitlab.arturbosch.grovlin.parser.ast.TypeDeclaration
-import io.gitlab.arturbosch.grovlin.parser.ast.VarDeclaration
-import io.gitlab.arturbosch.grovlin.parser.ast.VarReference
-import io.gitlab.arturbosch.grovlin.parser.ast.toPosition
 import java.util.ArrayList
 
 /**

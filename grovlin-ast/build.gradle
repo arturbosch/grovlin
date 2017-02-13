@@ -1,0 +1,8 @@
+configurations {
+	compile.extendsFrom kotlin
+	testCompile.extendsFrom kotlinTest
+}
+
+dependencies {
+	compile project(":grovlin-parser")
+}

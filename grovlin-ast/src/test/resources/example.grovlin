@@ -1,0 +1,8 @@
+type Example {
+    has age = 5
+    def speak() {
+        print(age)
+    }
+}
+var a = 4
+print(a)

@@ -1,4 +1,4 @@
-package io.gitlab.arturbosch.grovlin.parser.ast
+package io.gitlab.arturbosch.grovlin.ast
 
 /**
  * @author Artur Bosch

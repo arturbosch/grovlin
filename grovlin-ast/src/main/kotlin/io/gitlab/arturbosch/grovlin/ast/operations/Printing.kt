@@ -1,6 +1,6 @@
-package io.gitlab.arturbosch.grovlin.parser.ast.operations
+package io.gitlab.arturbosch.grovlin.ast.operations
 
-import io.gitlab.arturbosch.grovlin.parser.ast.Node
+import io.gitlab.arturbosch.grovlin.ast.Node
 import java.lang.reflect.ParameterizedType
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.memberProperties

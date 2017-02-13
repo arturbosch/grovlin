@@ -1,4 +1,5 @@
 rootProject.name = 'grovlin'
 include 'grovlin-parser'
 include 'grovlin-compiler'
+include 'grovlin-ast'
 

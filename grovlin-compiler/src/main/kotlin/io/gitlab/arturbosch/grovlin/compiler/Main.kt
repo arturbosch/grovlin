@@ -1,14 +1,14 @@
 package io.gitlab.arturbosch.grovlin.compiler
 
+import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
+import io.gitlab.arturbosch.grovlin.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.compiler.args.Args
 import io.gitlab.arturbosch.grovlin.compiler.args.failWithErrorMessage
 import io.gitlab.arturbosch.grovlin.compiler.args.jCommander
 import io.gitlab.arturbosch.grovlin.compiler.args.parseArguments
 import io.gitlab.arturbosch.grovlin.compiler.java.toFile
 import io.gitlab.arturbosch.grovlin.compiler.java.toJava
-import io.gitlab.arturbosch.grovlin.parser.ast.GrovlinFile
-import io.gitlab.arturbosch.grovlin.parser.ast.operations.asString
-import io.gitlab.arturbosch.grovlin.parser.parse
+import io.gitlab.arturbosch.grovlin.compiler.parser.Parser
 import java.io.File
 import java.nio.file.Files
 import java.util.concurrent.CompletableFuture
@@ -20,7 +20,15 @@ fun main(args: Array<String>) {
 
 	val arguments = parseArguments(args)
 
-	val grovlinFile = arguments.input!!.parse()
+	val parsingResult = Parser.parse(arguments.input!!)
+
+	if (!parsingResult.isValid()) {
+		parsingResult.errors.forEach { println(" * L${it.position.line}: ${it.message}") }
+		return
+	}
+
+	val grovlinFile = parsingResult.root!!
+
 	if (arguments.showTree) {
 		CompletableFuture.runAsync { println(grovlinFile.asString()) }
 	}

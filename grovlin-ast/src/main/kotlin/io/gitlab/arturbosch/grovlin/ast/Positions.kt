@@ -1,11 +1,10 @@
-package io.gitlab.arturbosch.grovlin.parser.ast
+package io.gitlab.arturbosch.grovlin.ast
 
+import io.gitlab.arturbosch.grovlin.parser.CodePoint
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
 
-data class Point(val line: Int, val column: Int) {
-
-	override fun toString() = "$line/$column"
+class Point(line: Int, column: Int) : CodePoint(line, column) {
 
 	fun offset(lines: List<String>): Int {
 		val newLines = this.line - 1
@@ -15,6 +14,7 @@ data class Point(val line: Int, val column: Int) {
 	fun isBefore(other: Point): Boolean = line < other.line || (line == other.line && column < other.column)
 
 	fun isAfter(other: Point): Boolean = line > other.line || (line == other.line && column > other.column)
+
 }
 
 data class Position(val start: Point, val end: Point) {

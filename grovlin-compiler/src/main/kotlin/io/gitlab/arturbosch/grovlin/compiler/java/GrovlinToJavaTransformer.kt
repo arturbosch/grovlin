@@ -21,26 +21,25 @@ import com.github.javaparser.ast.stmt.ExpressionStmt
 import com.github.javaparser.ast.type.ArrayType
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.type.PrimitiveType
-import io.gitlab.arturbosch.grovlin.parser.ast.Assignment
-import io.gitlab.arturbosch.grovlin.parser.ast.DecLit
-import io.gitlab.arturbosch.grovlin.parser.ast.DecimalType
-import io.gitlab.arturbosch.grovlin.parser.ast.DivisionExpression
-import io.gitlab.arturbosch.grovlin.parser.ast.Expression
-import io.gitlab.arturbosch.grovlin.parser.ast.GrovlinFile
-import io.gitlab.arturbosch.grovlin.parser.ast.IntLit
-import io.gitlab.arturbosch.grovlin.parser.ast.IntType
-import io.gitlab.arturbosch.grovlin.parser.ast.MultiplicationExpression
-import io.gitlab.arturbosch.grovlin.parser.ast.Print
-import io.gitlab.arturbosch.grovlin.parser.ast.Program
-import io.gitlab.arturbosch.grovlin.parser.ast.Statement
-import io.gitlab.arturbosch.grovlin.parser.ast.SubtractionExpression
-import io.gitlab.arturbosch.grovlin.parser.ast.SumExpression
-import io.gitlab.arturbosch.grovlin.parser.ast.Type
-import io.gitlab.arturbosch.grovlin.parser.ast.TypeConversion
-import io.gitlab.arturbosch.grovlin.parser.ast.UnaryMinusExpression
-import io.gitlab.arturbosch.grovlin.parser.ast.VarDeclaration
-import io.gitlab.arturbosch.grovlin.parser.ast.VarReference
-import com.github.javaparser.ast.expr.Expression as JavaParserExpression
+import io.gitlab.arturbosch.grovlin.ast.Assignment
+import io.gitlab.arturbosch.grovlin.ast.DecLit
+import io.gitlab.arturbosch.grovlin.ast.DecimalType
+import io.gitlab.arturbosch.grovlin.ast.DivisionExpression
+import io.gitlab.arturbosch.grovlin.ast.Expression
+import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
+import io.gitlab.arturbosch.grovlin.ast.IntLit
+import io.gitlab.arturbosch.grovlin.ast.IntType
+import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
+import io.gitlab.arturbosch.grovlin.ast.Print
+import io.gitlab.arturbosch.grovlin.ast.Program
+import io.gitlab.arturbosch.grovlin.ast.Statement
+import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
+import io.gitlab.arturbosch.grovlin.ast.SumExpression
+import io.gitlab.arturbosch.grovlin.ast.Type
+import io.gitlab.arturbosch.grovlin.ast.TypeConversion
+import io.gitlab.arturbosch.grovlin.ast.UnaryMinusExpression
+import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
+import io.gitlab.arturbosch.grovlin.ast.VarReference
 import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
 import com.github.javaparser.ast.type.Type as JavaParserType
 

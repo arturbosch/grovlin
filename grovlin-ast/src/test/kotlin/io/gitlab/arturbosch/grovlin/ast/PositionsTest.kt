@@ -1,6 +1,6 @@
-package io.gitlab.arturbosch.grovlin.parser
+package io.gitlab.arturbosch.grovlin.ast
 
-import io.gitlab.arturbosch.grovlin.parser.ast.operations.process
+import io.gitlab.arturbosch.grovlin.ast.operations.process
 import org.junit.Test
 
 /**
@@ -10,7 +10,7 @@ class PositionsTest {
 
 	@Test
 	fun `positions are parsed`() {
-		val grovlinFile = parseFromResource("example.grovlin")
+		val grovlinFile = parseFromTestResource("example.grovlin")
 		grovlinFile.process {
 			assert(it.position != null)
 		}
