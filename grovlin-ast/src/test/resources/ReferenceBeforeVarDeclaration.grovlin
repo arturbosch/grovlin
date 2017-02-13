@@ -1,0 +1,5 @@
+program {
+    print(x + y)
+    var y = 4
+    var x = 5
+}
