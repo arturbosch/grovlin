@@ -13,7 +13,7 @@ fun StatementContext.toAst(): Statement = when (this) {
 	is MemberDeclarationStatementContext -> memberDeclaration().toAst()
 	is VarDeclarationStatementContext -> VarDeclaration(varDeclaration().assignment().ID().text,
 			varDeclaration().assignment().expression().toAst(), toPosition())
-	is AssignmentStatementContext -> Assignment(assignment().ID().text, assignment().expression().toAst(), toPosition())
+	is AssignmentStatementContext -> Assignment(Reference(assignment().ID().text), assignment().expression().toAst(), toPosition())
 	is PrintStatementContext -> Print(print().expression().toAst(), toPosition())
 	is ProgramStatementContext -> Program(program().statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
@@ -41,7 +41,7 @@ fun ExpressionContext.toAst(): Expression = when (this) {
 	is IntLiteralContext -> IntLit(text, toPosition())
 	is DecimalLiteralContext -> DecLit(text, toPosition())
 	is ParenExpressionContext -> expression().toAst()
-	is VarReferenceContext -> VarReference(text, toPosition())
+	is VarReferenceContext -> VarReference(Reference(text), toPosition())
 	is TypeConversionContext -> TypeConversion(expression().toAst(), targetType.toAst(), toPosition())
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
 }

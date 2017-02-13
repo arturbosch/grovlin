@@ -117,9 +117,9 @@ data class VarDeclaration(override val name: String, val value: Expression, over
 	}
 }
 
-data class Assignment(override val name: String, val value: Expression, override val position: Position? = null) : Statement, NodeWithName {
+data class Assignment(val reference: Reference<VarDeclaration>, val value: Expression, override val position: Position? = null) : Statement {
 	override fun print(indent: Int): String {
-		return printTypeAndName(indent + 1) + value.print(indent + 2)
+		return "${times(indent)}${javaClass.simpleName}: ${reference.name}\n" + value.print(indent + 2)
 	}
 }
 
@@ -160,9 +160,9 @@ data class TypeConversion(val value: Expression, val targetType: Type, override 
 	override fun print(indent: Int): String = "${javaClass.simpleName}\n${times(indent)}${value.print(indent + 1)} as ${targetType.print(indent + 1)}"
 }
 
-data class VarReference(override val name: String, override val position: Position? = null) : Expression, NodeWithName {
+data class VarReference(val reference: Reference<VarDeclaration>, override val position: Position? = null) : Expression {
 	override fun print(indent: Int): String {
-		return printTypeAndName(indent + 1)
+		return "${times(indent)}${javaClass.simpleName}: ${reference.name}\n"
 	}
 }
 
