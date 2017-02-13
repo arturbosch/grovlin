@@ -8,13 +8,32 @@ package io.gitlab.arturbosch.grovlin.ast
 // Interfaces
 //
 
+interface Named {
+	val name: String
+}
+
+data class Reference<N : Named>(val name: String, var referred: N? = null) {
+	override fun toString(): String {
+		if (referred == null) {
+			return "Ref($name)[Unsolved]"
+		} else {
+			return "Ref($name)[Solved]"
+		}
+	}
+}
+
+fun <N : Named> Reference<N>.tryToResolve(candidates: List<N>): Boolean {
+	val res = candidates.find { it.name == this.name }
+	referred = res
+	return res != null
+}
+
 interface Node {
 	val position: Position?
 	fun print(indent: Int = 0): String
 }
 
-interface NodeWithName : Node {
-	val name: String
+interface NodeWithName : Node, Named {
 	fun printTypeAndName(indent: Int = 0): String = "${times(indent)}${javaClass.simpleName}: $name\n"
 }
 
