@@ -10,7 +10,6 @@ import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.isBefore
 import io.gitlab.arturbosch.grovlin.ast.operations.processNodesOfType
-import io.gitlab.arturbosch.grovlin.ast.tryToResolve
 import java.util.IdentityHashMap
 import kotlin.reflect.memberProperties
 

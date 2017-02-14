@@ -20,12 +20,13 @@ data class Reference<N : Named>(val name: String, var referred: N? = null) {
 			return "Ref($name)[Solved]"
 		}
 	}
-}
 
-fun <N : Named> Reference<N>.tryToResolve(candidates: List<N>): Boolean {
-	val res = candidates.find { it.name == this.name }
-	referred = res
-	return res != null
+	fun tryToResolve(candidates: List<N>): Boolean {
+		val res = candidates.find { it.name == this.name }
+		referred = res
+		return res != null
+	}
+
 }
 
 interface Node {
