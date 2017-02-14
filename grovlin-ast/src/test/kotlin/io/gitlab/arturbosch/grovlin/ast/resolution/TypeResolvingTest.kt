@@ -5,6 +5,7 @@ import io.gitlab.arturbosch.grovlin.ast.UnknownType
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
+import io.gitlab.arturbosch.grovlin.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import io.gitlab.arturbosch.grovlin.ast.parseFromTestResource
 import io.gitlab.arturbosch.grovlin.ast.resolved
@@ -22,6 +23,12 @@ class TypeResolvingTest {
 		assert(grovlinFile.collectByType<VarDeclaration>()[0].type is IntType)
 	}
 
+	@Test
+	fun resolveMixedIntAndDecimalTypes() {
+		val grovlinFile = "var a = 5\nvar b = 5.0\n var c = a + b".asGrovlinFile().resolved()
+
+		println(grovlinFile.asString())
+	}
 
 	@Test
 	fun varReferencesToDeclarationType() {
