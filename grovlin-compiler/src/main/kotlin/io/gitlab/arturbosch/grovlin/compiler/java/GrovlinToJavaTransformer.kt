@@ -69,7 +69,7 @@ private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when 
 	is VarDeclaration -> ExpressionStmt(VariableDeclarationExpr(VariableDeclarator(PrimitiveType.intType(), name, value.toJava())))
 	is Print -> ExpressionStmt(MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
 			SimpleName("println"), NodeList.nodeList(value.toJava())))
-	is Assignment -> ExpressionStmt(AssignExpr(NameExpr(name), value.toJava(), AssignExpr.Operator.ASSIGN))
+	is Assignment -> ExpressionStmt(AssignExpr(NameExpr(reference.name), value.toJava(), AssignExpr.Operator.ASSIGN))
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
@@ -82,7 +82,7 @@ private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = whe
 	is TypeConversion -> CastExpr(targetType.toJava(), value.toJava())
 	is IntLit -> IntegerLiteralExpr(value)
 	is DecLit -> DoubleLiteralExpr(value)
-	is VarReference -> NameExpr(name)
+	is VarReference -> NameExpr(reference.name)
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
