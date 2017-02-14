@@ -21,8 +21,8 @@ class ResolveVariablesTest {
 		file.resolveSymbols()
 
 		val varReference = file.collectByType<VarReference>().find { it.reference.name == "a" }
-		assert(varReference!!.reference.referred!!.name == "a")
-		assert(varReference.reference.referred is VarDeclaration)
+		assert(varReference!!.reference.source!!.name == "a")
+		assert(varReference.reference.source is VarDeclaration)
 	}
 
 	@Test
@@ -32,7 +32,7 @@ class ResolveVariablesTest {
 
 		grovlinFile.resolveSymbols()
 
-		assert(grovlinFile.collectByType<VarReference>()[0].reference.referred == null)
+		assert(grovlinFile.collectByType<VarReference>()[0].reference.source == null)
 	}
 
 
@@ -43,7 +43,7 @@ class ResolveVariablesTest {
 
 		grovlinFile.resolveSymbols()
 
-		assert(grovlinFile.collectByType<Assignment>()[0].reference.referred == null)
+		assert(grovlinFile.collectByType<Assignment>()[0].reference.source == null)
 	}
 
 
@@ -54,6 +54,6 @@ class ResolveVariablesTest {
 
 		grovlinFile.resolveSymbols()
 
-		assert(grovlinFile.collectByType<VarReference>()[0].reference.referred == null)
+		assert(grovlinFile.collectByType<VarReference>()[0].reference.source == null)
 	}
 }
