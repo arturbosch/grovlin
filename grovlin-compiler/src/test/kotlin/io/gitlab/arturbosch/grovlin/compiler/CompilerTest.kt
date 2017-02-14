@@ -1,5 +1,6 @@
 package io.gitlab.arturbosch.grovlin.compiler
 
+import io.gitlab.arturbosch.grovlin.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.compiler.java.toFile
 import io.gitlab.arturbosch.grovlin.compiler.java.toJava
 import org.junit.Test
@@ -14,7 +15,7 @@ class CompilerTest {
 	fun parseProgram() {
 		File("./out").mkdir()
 		val file = parseFromTestResource("program.grovlin")
-		println(file.print())
+		println(file.asString())
 		val unit = file.toJava()
 		println(unit.toString())
 		unit.toFile(File("./out"), File("./out/ProgramGrovlin.java"))
