@@ -19,6 +19,16 @@ object Parsing
 
 fun lexer(code: String): GrovlinLexer = GrovlinLexer(ANTLRInputStream(StringReader(code)))
 
+fun String.parse(): RawParsingResult {
+
+	val errors = mutableListOf<Error>()
+	val grovlinParser = GrovlinParser(CommonTokenStream(lexer(this)))
+	grovlinParser.addErrorListener(SyntaxErrorListener(errors))
+	val grovlinFile = grovlinParser.grovlinFile()
+
+	return RawParsingResult(grovlinFile, null, errors)
+}
+
 fun Path.parse(): RawParsingResult {
 	val code = String(Files.readAllBytes(this))
 	val errors = mutableListOf<Error>()
