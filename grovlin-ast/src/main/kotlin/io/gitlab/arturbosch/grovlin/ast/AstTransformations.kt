@@ -6,7 +6,7 @@ import java.util.ArrayList
 /**
  * @author Artur Bosch
  */
-fun GrovlinFileContext.toAsT(): GrovlinFile = GrovlinFile("File.grovlin",
+fun GrovlinFileContext.toAsT(fileName: String = "Program"): GrovlinFile = GrovlinFile(fileName,
 		statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
 
 fun StatementContext.toAst(): Statement = when (this) {

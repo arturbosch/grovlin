@@ -1,0 +1,15 @@
+def finished() {
+    print(0)
+}
+
+program {
+    print(6)
+}
+
+def countdown() {
+    print(5)
+    print(4)
+    print(3)
+    print(2)
+    print(1)
+}

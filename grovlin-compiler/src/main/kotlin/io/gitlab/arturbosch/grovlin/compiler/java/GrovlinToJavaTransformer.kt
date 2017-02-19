@@ -48,13 +48,14 @@ import com.github.javaparser.ast.type.Type as JavaParserType
  */
 
 fun GrovlinFile.toJava(): CompilationUnit {
+	if (name.isNullOrBlank()) throw IllegalStateException("You cannot convert a grovlin file with no file name to java!")
+
 	val unit = CompilationUnit()
 
 	val program = (statements.find { it is Program } ?: throw IllegalStateException("No program statement found!")) as Program
 
-	val clazz = ClassOrInterfaceDeclaration()
-	clazz.setName("ProgramGrovlin")
-	clazz.addModifier(Modifier.PUBLIC)
+	val clazzName = name[0].toUpperCase() + name.substring(1)
+	val clazz = program.toJava(clazzName)
 	unit.addType(clazz)
 
 	val main = clazz.addMethod("main", Modifier.PUBLIC, Modifier.STATIC)
@@ -63,6 +64,11 @@ fun GrovlinFile.toJava(): CompilationUnit {
 	main.setBody(BlockStmt(statements))
 
 	return unit
+}
+
+private fun Program.toJava(clazzName: String) = ClassOrInterfaceDeclaration().apply {
+	setName(clazzName + "Gv") // #20
+	addModifier(Modifier.PUBLIC)
 }
 
 private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {

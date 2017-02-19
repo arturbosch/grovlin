@@ -13,10 +13,14 @@ import java.nio.file.Path
 object Parser {
 
 	fun parse(path: Path): ParsingResult {
+		val fileName = path.fileName.toString()
+		if (!fileName.endsWith(".gv") || !fileName.endsWith(".grovlin")) {
+			throw IllegalArgumentException("Only grovlin files should be parsed!")
+		}
 		val parsingResult = path.parse()
 		val root = parsingResult.root
 		val syntaxErrors = parsingResult.errors
-		val grovlinFile = if (parsingResult.isValid()) root!!.toAsT() else null
+		val grovlinFile = if (parsingResult.isValid()) root!!.toAsT(fileName.substring(0, fileName.lastIndexOf("."))) else null
 		val semanticErrors = grovlinFile?.validate() ?: emptyList()
 		return ParsingResult(grovlinFile, path, syntaxErrors + semanticErrors)
 	}
