@@ -1,13 +1,11 @@
 buildscript {
-	ext.kotlin_version = '1.0.6'
-
 	repositories {
 		mavenCentral()
 		mavenLocal()
 		jcenter()
 	}
 	dependencies {
-		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 	}
 }
 
@@ -35,10 +33,11 @@ allprojects {
 	}
 
 	dependencies {
-		kotlin "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-		kotlin "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-		kotlinTest "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
-		kotlinTest "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+		kotlin "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+		kotlin "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+		kotlinTest "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+		kotlinTest "com.natpryce:hamkrest:$hamkrestVersion"
+		kotlinTest "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 		kotlinTest 'junit:junit:4.12'
 	}
 }
