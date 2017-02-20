@@ -7,15 +7,15 @@ import java.util.ArrayList
  * @author Artur Bosch
  */
 fun GrovlinFileContext.toAsT(fileName: String = "Program"): GrovlinFile = GrovlinFile(fileName,
-		statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
+		statements().statement().mapTo(ArrayList()) { it.toAst(fileName) }, toPosition())
 
-fun StatementContext.toAst(): Statement = when (this) {
+fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this) {
 	is MemberDeclarationStatementContext -> memberDeclaration().toAst()
 	is VarDeclarationStatementContext -> VarDeclaration(varDeclaration().assignment().ID().text,
 			varDeclaration().assignment().expression().toAst(), toPosition())
 	is AssignmentStatementContext -> Assignment(Reference(assignment().ID().text), assignment().expression().toAst(), toPosition())
 	is PrintStatementContext -> Print(print().expression().toAst(), toPosition())
-	is ProgramStatementContext -> Program(program().statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
+	is ProgramStatementContext -> Program(fileName, program().statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }
 

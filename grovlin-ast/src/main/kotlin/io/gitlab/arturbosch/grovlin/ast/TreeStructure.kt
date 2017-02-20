@@ -48,6 +48,10 @@ interface Expression : Node
 
 interface Statement : Node
 
+interface TopLevelDeclarable {
+	fun isTopLevelDeclaration(): Boolean = true
+}
+
 //
 // Types
 //
@@ -82,19 +86,29 @@ object UnknownType : Type {
 
 data class GrovlinFile(override val name: String, override val statements: MutableList<Statement>, override val position: Position? = null) : NodeWithStatements, NodeWithName
 
-data class Program(override val statements: MutableList<Statement>, override val position: Position? = null) : Statement, NodeWithStatements
+data class Program(override val name: String,
+				   override val statements: MutableList<Statement>,
+				   override val position: Position? = null) : Statement, NodeWithStatements, TopLevelDeclarable, NodeWithName
 
 //
 // Statements
 //
 
-data class TypeDeclaration(override val name: String, override val statements: MutableList<Statement>, override val position: Position? = null) : Statement, NodeWithStatements, NodeWithName
+data class TypeDeclaration(override val name: String,
+						   override val statements: MutableList<Statement>,
+						   override val position: Position? = null) : Statement, NodeWithStatements, NodeWithName, TopLevelDeclarable
 
-data class MethodDeclaration(override val name: String, override val statements: MutableList<Statement>, override val position: Position? = null) : Statement, NodeWithStatements, NodeWithName
+data class MethodDeclaration(override val name: String,
+							 override val statements: MutableList<Statement>,
+							 override val position: Position? = null) : Statement, NodeWithStatements, NodeWithName, TopLevelDeclarable
 
-data class LambdaDeclaration(override val name: String, override val statements: MutableList<Statement>, override val position: Position? = null) : Statement, NodeWithStatements, NodeWithName
+data class LambdaDeclaration(override val name: String,
+							 override val statements: MutableList<Statement>,
+							 override val position: Position? = null) : Statement, NodeWithStatements, NodeWithName, TopLevelDeclarable
 
-data class PropertyDeclaration(override val name: String, val value: Expression, override val position: Position? = null) : Statement, NodeWithName
+data class PropertyDeclaration(override val name: String,
+							   val value: Expression,
+							   override val position: Position? = null) : Statement, NodeWithName
 
 data class VarDeclaration(override val name: String, val value: Expression, override val position: Position? = null) : Statement, NodeWithName, NodeWithType {
 	override var type: Type = UnknownType

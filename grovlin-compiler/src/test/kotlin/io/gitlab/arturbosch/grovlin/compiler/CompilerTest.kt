@@ -2,6 +2,8 @@ package io.gitlab.arturbosch.grovlin.compiler
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasSize
+import com.natpryce.hamkrest.present
 import io.gitlab.arturbosch.grovlin.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.compiler.java.toJava
 import org.junit.Test
@@ -29,7 +31,15 @@ class CompilerTest {
 		println(file.asString())
 		val unit = file.toJava()
 		println(unit.toString())
-		assertThat(unit.getClassByName("ProgramWithMethodsGv").isPresent, equalTo(true))
+		val clazz = unit.getClassByName("ProgramWithMethodsGv").get()
+		assertThat(clazz, present())
+		assertThat(clazz.methods, hasSize(equalTo(3))) // 2 defs + main
+
+	}
+
+	@Test
+	fun parseProgramStatementWithinTypeDeclaration() {
+
 	}
 
 }

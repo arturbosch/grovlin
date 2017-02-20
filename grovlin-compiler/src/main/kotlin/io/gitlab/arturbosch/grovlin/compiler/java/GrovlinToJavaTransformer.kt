@@ -3,6 +3,7 @@ package io.gitlab.arturbosch.grovlin.compiler.java
 import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.Modifier
 import com.github.javaparser.ast.NodeList
+import com.github.javaparser.ast.body.BodyDeclaration
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.VariableDeclarator
 import com.github.javaparser.ast.expr.AssignExpr
@@ -21,6 +22,7 @@ import com.github.javaparser.ast.stmt.ExpressionStmt
 import com.github.javaparser.ast.type.ArrayType
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.type.PrimitiveType
+import com.github.javaparser.ast.type.VoidType
 import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
@@ -29,17 +31,21 @@ import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
+import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
 import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
 import io.gitlab.arturbosch.grovlin.ast.SumExpression
+import io.gitlab.arturbosch.grovlin.ast.TopLevelDeclarable
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
 import io.gitlab.arturbosch.grovlin.ast.UnaryMinusExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
+import java.util.EnumSet
+import com.github.javaparser.ast.body.MethodDeclaration as JavaParserMethod
 import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
 import com.github.javaparser.ast.type.Type as JavaParserType
 
@@ -54,21 +60,36 @@ fun GrovlinFile.toJava(): CompilationUnit {
 
 	val program = (statements.find { it is Program } ?: throw IllegalStateException("No program statement found!")) as Program
 
-	val clazzName = name[0].toUpperCase() + name.substring(1)
-	val clazz = program.toJava(clazzName)
-	unit.addType(clazz)
+	val topLevelDeclarations = statements.filterIsInstance(TopLevelDeclarable::class.java)
+			.filterNot { it is Program }
+			.filter { it.isTopLevelDeclaration() }
+			.map { it.toJava() }
 
-	val main = clazz.addMethod("main", Modifier.PUBLIC, Modifier.STATIC)
-	main.addParameter(ArrayType(ClassOrInterfaceType("String")), "args")
-	val statements = program.statements.mapTo(NodeList<com.github.javaparser.ast.stmt.Statement>()) { it.toJava() }
-	main.setBody(BlockStmt(statements))
+	val clazz = program.toJava()
+	topLevelDeclarations.forEach { clazz.addMember(it) }
+	unit.addType(clazz)
 
 	return unit
 }
 
-private fun Program.toJava(clazzName: String) = ClassOrInterfaceDeclaration().apply {
-	setName(clazzName + "Gv") // #20
-	addModifier(Modifier.PUBLIC)
+private fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
+	is MethodDeclaration -> JavaParserMethod(EnumSet.of(Modifier.PUBLIC), VoidType(), name).apply {
+		setBody(BlockStmt(NodeList.nodeList(this@toJava.statements.map { it.toJava() })))
+	}
+	else -> throw UnsupportedOperationException(javaClass.canonicalName)
+}
+
+private fun Program.toJava(): ClassOrInterfaceDeclaration {
+	val clazzName = name[0].toUpperCase() + name.substring(1)
+	val statementsOfProgram = this@toJava.statements
+	return ClassOrInterfaceDeclaration().apply {
+		setName(clazzName + "Gv") // #20
+		addModifier(Modifier.PUBLIC)
+		val main = addMethod("main", Modifier.PUBLIC, Modifier.STATIC)
+		main.addParameter(ArrayType(ClassOrInterfaceType("String")), "args")
+		val statements = statementsOfProgram.mapTo(NodeList<JavaParserStatement>()) { it.toJava() }
+		main.setBody(BlockStmt(statements))
+	}
 }
 
 private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {
