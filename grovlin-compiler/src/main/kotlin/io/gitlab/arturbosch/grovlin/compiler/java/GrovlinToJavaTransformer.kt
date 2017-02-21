@@ -15,6 +15,7 @@ import com.github.javaparser.ast.expr.IntegerLiteralExpr
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.expr.NameExpr
 import com.github.javaparser.ast.expr.SimpleName
+import com.github.javaparser.ast.expr.ThisExpr
 import com.github.javaparser.ast.expr.UnaryExpr
 import com.github.javaparser.ast.expr.VariableDeclarationExpr
 import com.github.javaparser.ast.stmt.BlockStmt
@@ -24,10 +25,12 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.type.PrimitiveType
 import com.github.javaparser.ast.type.VoidType
 import io.gitlab.arturbosch.grovlin.ast.Assignment
+import io.gitlab.arturbosch.grovlin.ast.CallExpression
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.DivisionExpression
 import io.gitlab.arturbosch.grovlin.ast.Expression
+import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
@@ -38,6 +41,7 @@ import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
 import io.gitlab.arturbosch.grovlin.ast.SumExpression
+import io.gitlab.arturbosch.grovlin.ast.ThisReference
 import io.gitlab.arturbosch.grovlin.ast.TopLevelDeclarable
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
@@ -72,7 +76,7 @@ fun GrovlinFile.toJava(): CUnit {
 }
 
 private fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
-	is MethodDeclaration -> JavaParserMethod(EnumSet.of(Modifier.PUBLIC), VoidType(), name).apply {
+	is MethodDeclaration -> JavaParserMethod(EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), VoidType(), name).apply {
 		setBody(BlockStmt(NodeList.nodeList(this@toJava.statements.map { it.toJava() })))
 	}
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
@@ -96,6 +100,7 @@ private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when 
 	is Print -> ExpressionStmt(MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
 			SimpleName("println"), NodeList.nodeList(value.toJava())))
 	is Assignment -> ExpressionStmt(AssignExpr(NameExpr(reference.name), value.toJava(), AssignExpr.Operator.ASSIGN))
+	is ExpressionStatement -> ExpressionStmt(expression.toJava())
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
@@ -109,6 +114,11 @@ private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = whe
 	is IntLit -> IntegerLiteralExpr(value)
 	is DecLit -> DoubleLiteralExpr(value)
 	is VarReference -> NameExpr(reference.name)
+	is ThisReference -> ThisExpr()
+	is CallExpression -> MethodCallExpr().apply {
+		setName(this@toJava.name)
+		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
+	}
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 

@@ -4,6 +4,8 @@ def finished() {
 
 program {
     print(6)
+    countdown()
+    finished()
 }
 
 def countdown() {
