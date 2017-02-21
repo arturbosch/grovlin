@@ -11,7 +11,7 @@ VAR                : 'var';
 VAL                : 'val';
 HAS                : 'has';
 OBJECT             : 'object';
-SELF               : 'self';
+THIS               : 'this';
 AS                 : 'as';
 IS                 : 'is';
 PRINT              : 'print';
@@ -36,6 +36,7 @@ LPAREN             : '(' ;
 RPAREN             : ')' ;
 
 // Misc
+POINT              : '.';
 COMMA              : ',';
 SEMICOLON          : ':';
 LBRACE             : '{';

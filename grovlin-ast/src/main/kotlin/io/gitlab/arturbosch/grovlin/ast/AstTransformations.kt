@@ -10,6 +10,7 @@ fun GrovlinFileContext.toAsT(fileName: String = "Program"): GrovlinFile = Grovli
 		statements().statement().mapTo(ArrayList()) { it.toAst(fileName) }, toPosition())
 
 fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this) {
+	is ExpressionStatementContext -> ExpressionStatement(expressionStmt().expression().toAst(), toPosition())
 	is MemberDeclarationStatementContext -> memberDeclaration().toAst()
 	is VarDeclarationStatementContext -> VarDeclaration(varDeclaration().assignment().ID().text,
 			varDeclaration().assignment().expression().toAst(), toPosition())
@@ -37,6 +38,8 @@ fun DefDeclarationContext.toAst(): Statement = when (this) {
 }
 
 fun ExpressionContext.toAst(): Expression = when (this) {
+	is ThisExpressionContext -> ThisReference(Reference("this"), toPosition())
+	is CallExpressionContext -> CallExpression(container?.toAst(), methodName.text, toPosition())
 	is BinaryOperationContext -> toAst()
 	is IntLiteralContext -> IntLit(text, toPosition())
 	is DecimalLiteralContext -> DecLit(text, toPosition())

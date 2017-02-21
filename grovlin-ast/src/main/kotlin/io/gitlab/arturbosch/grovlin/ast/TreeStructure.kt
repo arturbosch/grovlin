@@ -113,6 +113,8 @@ data class VarDeclaration(override val name: String, val value: Expression, over
 	override var type: Type = UnknownType
 }
 
+data class ExpressionStatement(val expression: Expression, override val position: Position?) : Statement
+
 data class Assignment(val reference: Reference<VarDeclaration>, val value: Expression, override val position: Position? = null) : Statement
 
 data class Print(val value: Expression, override val position: Position? = null) : Statement
@@ -120,6 +122,10 @@ data class Print(val value: Expression, override val position: Position? = null)
 //
 // Expressions
 //
+
+data class CallExpression(val scope: Expression?, override val name: String, override val position: Position?) : Expression, NodeWithName
+
+data class ThisReference(val reference: Reference<TypeDeclaration>, override val position: Position?) : Expression
 
 interface BinaryExpression : Expression {
 	val left: Expression

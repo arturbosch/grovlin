@@ -17,9 +17,14 @@ statements
 statement
 : memberDeclaration #memberDeclarationStatement
 | varDeclaration    #varDeclarationStatement
+| expressionStmt    #expressionStatement
 | assignment        #assignmentStatement
 | print             #printStatement
 | program           #programStatement
+;
+
+expressionStmt
+: expression nls
 ;
 
 typeDeclaration
@@ -65,15 +70,20 @@ assignment
 : ID ASSIGN expression
 ;
 
-expression : left=expression operator=(DIV|MUL) right=expression           # binaryOperation
-           | left=expression operator=(PLUS|MINUS) right=expression        # binaryOperation
-           | value=expression AS targetType=type                           # typeConversion
-           | LPAREN expression RPAREN                                      # parenExpression
-           | ID                                                            # varReference
-           | MINUS expression                                              # minusExpression
-           | INTLIT                                                        # intLiteral
-           | DECLIT                                                        # decimalLiteral
-           ;
+expression
+: THIS  #thisExpression
+| container=expression POINT methodName=ID LPAREN RPAREN        # callExpression
+| methodName=ID LPAREN RPAREN                                   # callExpression
+| left=expression operator=(DIV|MUL) right=expression           # binaryOperation
+| left=expression operator=(PLUS|MINUS) right=expression        # binaryOperation
+| value=expression AS targetType=type                           # typeConversion
+| LPAREN expression RPAREN                                      # parenExpression
+| ID                                                            # varReference
+| MINUS expression                                              # minusExpression
+| INTLIT                                                        # intLiteral
+| DECLIT                                                        # decimalLiteral
+;
 
-type : INT     # integer
-     | DECIMAL # decimal ;
+type
+: INT     # integer
+| DECIMAL # decimal ;
