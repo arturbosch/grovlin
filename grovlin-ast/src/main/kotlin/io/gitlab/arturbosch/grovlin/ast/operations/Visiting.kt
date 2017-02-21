@@ -5,12 +5,16 @@ import kotlin.reflect.memberProperties
 
 fun Node.process(operation: (Node) -> Unit) {
 	operation(this)
-	this.javaClass.kotlin.memberProperties.forEach { property ->
+	javaClass.kotlin.memberProperties.forEach { property ->
 		val value = property.get(this)
-		when (value) {
-			is Node -> value.process(operation)
-			is Collection<*> -> value.forEach { if (it is Node) it.process(operation) }
-		}
+		value.processIfPropertyIsFromTypeNode(operation)
+	}
+}
+
+private fun Any?.processIfPropertyIsFromTypeNode(operation: (Node) -> Unit) {
+	when (this) {
+		is Node -> process(operation)
+		is Collection<*> -> this.forEach { if (it is Node) it.process(operation) }
 	}
 }
 
