@@ -1,6 +1,5 @@
 package io.gitlab.arturbosch.grovlin.compiler.java
 
-import com.github.javaparser.ast.CompilationUnit
 import java.io.File
 import java.nio.file.Files
 import javax.tools.JavaCompiler
@@ -23,12 +22,12 @@ object JavaParserCompiler {
 	}
 }
 
-fun CompilationUnit.toFile(file: File, debugJavaFile: File = tempJavaFile()) {
+fun CUnit.toFile(file: File, debugJavaFile: File = tempJavaFile(fileName)) {
 	if (!debugJavaFile.exists()) debugJavaFile.createNewFile()
-	debugJavaFile.writeText(this.toString())
+	debugJavaFile.writeText(unit.toString())
 	JavaParserCompiler.compile(file, debugJavaFile)
 }
 
-private fun tempJavaFile(): File = Files.createTempDirectory("grovlin").let {
-	Files.createFile(it.resolve("ProgramGrovlin.java"))
+private fun tempJavaFile(fileName: String): File = Files.createTempDirectory("grovlin").let {
+	Files.createFile(it.resolve(fileName + ".java"))
 }.toFile()

@@ -52,7 +52,7 @@ import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
  * @author Artur Bosch
  */
 
-fun GrovlinFile.toJava(): CompilationUnit {
+fun GrovlinFile.toJava(): CUnit {
 	if (name.isNullOrBlank()) throw IllegalStateException("You cannot convert a grovlin file with no file name to java!")
 
 	val unit = CompilationUnit()
@@ -68,7 +68,7 @@ fun GrovlinFile.toJava(): CompilationUnit {
 	topLevelDeclarations.forEach { clazz.addMember(it) }
 	unit.addType(clazz)
 
-	return unit
+	return CUnit(clazz.nameAsString, clazz, unit)
 }
 
 private fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {

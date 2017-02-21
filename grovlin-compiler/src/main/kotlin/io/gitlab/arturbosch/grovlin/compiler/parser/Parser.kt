@@ -14,7 +14,7 @@ object Parser {
 
 	fun parse(path: Path): ParsingResult {
 		val fileName = path.fileName.toString()
-		if (!fileName.endsWith(".gv") || !fileName.endsWith(".grovlin")) {
+		if (!fileName.endsWith(".gv") && !fileName.endsWith(".grovlin")) {
 			throw IllegalArgumentException("Only grovlin files should be parsed!")
 		}
 		val parsingResult = path.parse()

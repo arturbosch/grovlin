@@ -19,9 +19,10 @@ class CompilerTest {
 		File("./out").mkdir()
 		val file = parseFromTestResource("program.grovlin")
 		println(file.asString())
-		val unit = file.toJava()
-		println(unit.toString())
-		assertThat(unit.getClassByName("ProgramGv").isPresent, equalTo(true))
+		val cUnit = file.toJava()
+		println(cUnit.unit.toString())
+		val clazz = cUnit.mainClass
+		assertThat(clazz.nameAsString, equalTo("ProgramGv"))
 	}
 
 	@Test
@@ -29,9 +30,9 @@ class CompilerTest {
 		File("./out").mkdir()
 		val file = parseFromTestResource("programWithMethods.grovlin")
 		println(file.asString())
-		val unit = file.toJava()
-		println(unit.toString())
-		val clazz = unit.getClassByName("ProgramWithMethodsGv").get()
+		val cUnit = file.toJava()
+		println(cUnit.unit.toString())
+		val clazz = cUnit.mainClass
 		assertThat(clazz, present())
 		assertThat(clazz.methods, hasSize(equalTo(3))) // 2 defs + main
 

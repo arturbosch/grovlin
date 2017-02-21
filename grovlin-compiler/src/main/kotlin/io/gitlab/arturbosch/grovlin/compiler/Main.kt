@@ -43,8 +43,9 @@ fun main(args: Array<String>) {
 
 private fun runJvm(grovlinFile: GrovlinFile) {
 	val tempFile = Files.createTempDirectory("grovlin_run")
-	grovlinFile.toJava().toFile(tempFile.toFile())
-	val process = ProcessBuilder("java", "-classpath", tempFile.toString(), "ProgramGrovlin").start()
+	val cUnit = grovlinFile.toJava()
+	cUnit.toFile(tempFile.toFile())
+	val process = ProcessBuilder("java", "-classpath", tempFile.toString(), cUnit.fileName).start()
 	process.waitFor()
 	println(String(process.inputStream.buffered().readBytes()))
 	println(String(process.errorStream.buffered().readBytes()))
