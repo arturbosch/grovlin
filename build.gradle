@@ -17,6 +17,7 @@ allprojects {
 		mavenLocal()
 		mavenCentral()
 		jcenter()
+		maven { url "http://dl.bintray.com/arturbosch/code-analysis" }
 	}
 
 	apply plugin: 'kotlin'
@@ -40,11 +41,29 @@ allprojects {
 		kotlinTest "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 		kotlinTest 'junit:junit:4.12'
 	}
+
 }
 
 configurations {
+	detekt
 	compile.extendsFrom kotlin
 	testCompile.extendsFrom kotlinTest
+}
+
+dependencies {
+	detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.0.0.M7.b1'
+	detekt 'io.gitlab.arturbosch.detekt:detekt-formatting:1.0.0.M7.b1'
+}
+
+task detekt(type: JavaExec) {
+	main = "io.gitlab.arturbosch.detekt.cli.Main"
+	classpath = configurations.detekt
+	def input = "$project.projectDir.absolutePath"
+	def config = "$project.projectDir/detekt.yml"
+	def filters = ".*test.*"
+	def rulesets = ""
+	def params = ['-p', input, '-c', config, '-f', filters, '-r', rulesets]
+	args(params)
 }
 
 tasks.findByName('build').mustRunAfter ':grovlin-parser:generateGrammarSource'
