@@ -47,7 +47,6 @@ import io.gitlab.arturbosch.grovlin.ast.VarReference
 import java.util.EnumSet
 import com.github.javaparser.ast.body.MethodDeclaration as JavaParserMethod
 import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
-import com.github.javaparser.ast.type.Type as JavaParserType
 
 /**
  * @author Artur Bosch

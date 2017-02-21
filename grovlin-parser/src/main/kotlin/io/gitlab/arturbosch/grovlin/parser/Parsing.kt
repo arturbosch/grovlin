@@ -11,7 +11,6 @@ import java.io.StringReader
 import java.nio.file.Files
 import java.nio.file.Path
 
-
 /**
  * @author Artur Bosch
  */

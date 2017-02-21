@@ -79,7 +79,6 @@ object UnknownType : Type {
 	override fun toString(): String = name
 }
 
-
 //
 // File & Program
 //
@@ -117,7 +116,6 @@ data class VarDeclaration(override val name: String, val value: Expression, over
 data class Assignment(val reference: Reference<VarDeclaration>, val value: Expression, override val position: Position? = null) : Statement
 
 data class Print(val value: Expression, override val position: Position? = null) : Statement
-
 
 //
 // Expressions
