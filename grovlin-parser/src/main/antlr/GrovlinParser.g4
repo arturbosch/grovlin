@@ -21,10 +21,23 @@ statement
 | assignment        #assignmentStatement
 | print             #printStatement
 | program           #programStatement
+| ifStmt                #ifStatement
 ;
 
 expressionStmt
 : expression nls
+;
+
+ifStmt
+: IF LPAREN expression RPAREN nls LBRACE nls statements nls RBRACE nls (elifStmt|elseStmt)?
+;
+
+elifStmt
+: ELIF LPAREN expression RPAREN nls LBRACE nls statements nls RBRACE nls (elifStmt|elseStmt)?
+;
+
+elseStmt
+: RPAREN nls LBRACE nls statements nls RBRACE nls (elifStmt|elseStmt)?
 ;
 
 typeDeclaration
@@ -47,7 +60,7 @@ defDeclaration
 ;
 
 methodDeclaration
-: ID LPAREN RPAREN LBRACE nls statements RBRACE nls
+: ID LPAREN RPAREN nls LBRACE nls statements RBRACE nls
 ;
 
 lambdaDeclaration

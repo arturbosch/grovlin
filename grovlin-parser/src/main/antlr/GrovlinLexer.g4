@@ -17,6 +17,10 @@ IS                 : 'is';
 PRINT              : 'print';
 PROGRAM            : 'program';
 
+IF                 : 'if';
+ELSE               : 'else';
+ELIF               : 'elif';
+
 // Defined Types
 INT                : 'Int';
 DECIMAL            : 'Decimal';
