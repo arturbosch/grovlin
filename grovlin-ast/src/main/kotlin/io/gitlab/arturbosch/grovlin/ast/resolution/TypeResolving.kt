@@ -1,6 +1,7 @@
 package io.gitlab.arturbosch.grovlin.ast.resolution
 
 import io.gitlab.arturbosch.grovlin.ast.BinaryExpression
+import io.gitlab.arturbosch.grovlin.ast.BoolLit
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.Expression
@@ -9,11 +10,12 @@ import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.Node
 import io.gitlab.arturbosch.grovlin.ast.NodeWithType
+import io.gitlab.arturbosch.grovlin.ast.NotExpression
 import io.gitlab.arturbosch.grovlin.ast.Position
 import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
-import io.gitlab.arturbosch.grovlin.ast.UnaryMinusExpression
+import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.operations.processNodesOfType
@@ -49,10 +51,12 @@ private fun Expression.resolveType(): Type = when (this) {
 		type ?: throw TypeMissMatchError(leftType, rightType, position)
 	}
 	is TypeConversion -> targetType
-	is UnaryMinusExpression -> value.resolveType()
+	is MinusExpression -> value.resolveType()
+	is NotExpression -> value.resolveType()
 	is VarReference -> safeDeclaration().resolveVarDeclaration()
 	is IntLit -> type
 	is DecLit -> type
+	is BoolLit -> type
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }
 

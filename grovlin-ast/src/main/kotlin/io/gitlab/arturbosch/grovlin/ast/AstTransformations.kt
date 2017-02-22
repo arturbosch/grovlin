@@ -42,7 +42,7 @@ fun ExpressionContext.toAst(): Expression = when (this) {
 	is ThisExpressionContext -> ThisReference(Reference("this"), toPosition())
 	is CallExpressionContext -> CallExpression(container?.toAst(), methodName.text, toPosition())
 	is BinaryOperationContext -> toAst()
-	is MinusExpressionContext -> UnaryMinusExpression(expression().toAst(), toPosition())
+	is MinusExpressionContext -> MinusExpression(expression().toAst(), toPosition())
 	is NotExpressionContext -> NotExpression(expression().toAst(), toPosition())
 	is IntLiteralContext -> IntLit(text, toPosition())
 	is DecimalLiteralContext -> DecLit(text, toPosition())

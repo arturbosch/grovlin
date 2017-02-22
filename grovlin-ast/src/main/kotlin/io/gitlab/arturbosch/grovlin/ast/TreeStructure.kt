@@ -156,7 +156,7 @@ data class OrExpression(override val left: Expression, override val right: Expre
 data class XorExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) :
 		BinaryExpression
 
-data class UnaryMinusExpression(val value: Expression, override val position: Position? = null) : Expression
+data class MinusExpression(val value: Expression, override val position: Position? = null) : Expression
 
 data class NotExpression(val value: Expression, override val position: Position? = null) : Expression
 

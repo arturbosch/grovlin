@@ -53,7 +53,7 @@ import io.gitlab.arturbosch.grovlin.ast.ThisReference
 import io.gitlab.arturbosch.grovlin.ast.TopLevelDeclarable
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
-import io.gitlab.arturbosch.grovlin.ast.UnaryMinusExpression
+import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
@@ -119,7 +119,7 @@ private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = whe
 	is SubtractionExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.MINUS)
 	is MultiplicationExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.MULTIPLY)
 	is DivisionExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.DIVIDE)
-	is UnaryMinusExpression -> UnaryExpr(value.toJava(), UnaryExpr.Operator.MINUS)
+	is MinusExpression -> UnaryExpr(value.toJava(), UnaryExpr.Operator.MINUS)
 	is AndExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.AND)
 	is OrExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.OR)
 	is XorExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.XOR)
