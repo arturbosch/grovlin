@@ -8,14 +8,15 @@ import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
+import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.Node
 import io.gitlab.arturbosch.grovlin.ast.NodeWithType
 import io.gitlab.arturbosch.grovlin.ast.NotExpression
+import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.Position
 import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
-import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.operations.processNodesOfType
@@ -38,6 +39,7 @@ private fun VarDeclaration.resolveVarDeclaration(): Type {
 }
 
 private fun Expression.resolveType(): Type = when (this) {
+	is ParenExpression -> expression.resolveType()
 	is BinaryExpression -> {
 		val leftType = left.resolveType()
 		val rightType = right.resolveType()
@@ -62,7 +64,7 @@ private fun Expression.resolveType(): Type = when (this) {
 
 private fun VarReference.safeDeclaration() = this.reference.source ?: throw RelationsNotResolvedError(this)
 
-fun resolvePrimitiveType(leftType: Type, rightType: Type): Type? = when {
+private fun resolvePrimitiveType(leftType: Type, rightType: Type): Type? = when {
 	leftType is IntType && rightType is DecimalType -> rightType
 	leftType is DecimalType && rightType is IntType -> leftType
 	else -> null

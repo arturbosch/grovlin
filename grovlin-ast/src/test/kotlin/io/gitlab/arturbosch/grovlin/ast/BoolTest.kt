@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import org.junit.Test
+import kotlin.test.assertTrue
 
 /**
  * @author Artur Bosch
@@ -31,6 +32,14 @@ class BoolTest {
 
 		assertThat(orExpression.left is AndExpression, equalTo(true))
 		assertThat(orExpression.right is XorExpression, equalTo(true))
+	}
+	
+	@Test
+	fun resolveBooleanTypes() {
+		val grovlinFile = "val b = true && false || true ^ false".asGrovlinFile().resolved()
+		val varDeclaration = grovlinFile.collectByType<VarDeclaration>()[0]
+
+		assertTrue(varDeclaration.type is BoolType)
 	}
 
 }

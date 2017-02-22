@@ -6,7 +6,6 @@ import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
 import io.gitlab.arturbosch.grovlin.ast.SumExpression
 import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
-import io.gitlab.arturbosch.grovlin.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import org.junit.Test
 import kotlin.test.assertTrue
@@ -20,7 +19,7 @@ class NumberTest {
 	fun parseComplexExpressions() {
 		val grovlinFile = "val a = (5 * 5) + (1 + (8 - (4 / 2)))".asGrovlinFile()
 		val sum = grovlinFile.collectByType<SumExpression>()[0]
-		println(grovlinFile.asString())
+		
 		assertThat(sum.left.collectByType<MultiplicationExpression>()[0], present())
 		assertThat(sum.right.collectByType<SumExpression>()[0], present())
 		assertThat(sum.right.collectByType<SumExpression>()[0], present())

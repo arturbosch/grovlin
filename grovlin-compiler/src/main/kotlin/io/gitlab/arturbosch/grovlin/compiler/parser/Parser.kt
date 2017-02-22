@@ -1,6 +1,8 @@
 package io.gitlab.arturbosch.grovlin.compiler.parser
 
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
+import io.gitlab.arturbosch.grovlin.ast.resolution.resolveSymbols
+import io.gitlab.arturbosch.grovlin.ast.resolution.resolveTypes
 import io.gitlab.arturbosch.grovlin.ast.toAsT
 import io.gitlab.arturbosch.grovlin.ast.validation.validate
 import io.gitlab.arturbosch.grovlin.parser.Error
@@ -22,6 +24,8 @@ object Parser {
 		val syntaxErrors = parsingResult.errors
 		val grovlinFile = if (parsingResult.isValid()) root!!.toAsT(fileName.substring(0, fileName.lastIndexOf("."))) else null
 		val semanticErrors = grovlinFile?.validate() ?: emptyList()
+		grovlinFile?.resolveSymbols()
+		grovlinFile?.resolveTypes()
 		return ParsingResult(grovlinFile, path, syntaxErrors + semanticErrors)
 	}
 
