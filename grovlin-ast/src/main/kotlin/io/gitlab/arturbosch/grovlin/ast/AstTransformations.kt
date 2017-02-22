@@ -2,6 +2,7 @@ package io.gitlab.arturbosch.grovlin.ast
 
 import io.gitlab.arturbosch.grovlin.GrovlinParser.*
 import java.util.ArrayList
+import java.util.LinkedList
 
 /**
  * @author Artur Bosch
@@ -89,7 +90,7 @@ private fun IfStatementContext.transformElseBlock(): BlockStatement? {
 
 private fun IfStatementContext.transformElifStatements(): MutableList<ElifStatement> {
 	val elifs = ifStmt().elifStmt()
-	return elifs?.mapTo(ArrayList()) {
+	return elifs?.mapTo(LinkedList()) {
 		ElifStatement(condition = it.expression().toAst(),
 				thenStatement = BlockStatement(it.statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition()),
 				position = it.statements().toPosition())

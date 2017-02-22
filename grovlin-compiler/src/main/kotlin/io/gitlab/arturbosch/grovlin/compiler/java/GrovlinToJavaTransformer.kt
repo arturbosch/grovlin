@@ -22,24 +22,29 @@ import com.github.javaparser.ast.expr.UnaryExpr
 import com.github.javaparser.ast.expr.VariableDeclarationExpr
 import com.github.javaparser.ast.stmt.BlockStmt
 import com.github.javaparser.ast.stmt.ExpressionStmt
+import com.github.javaparser.ast.stmt.IfStmt
 import com.github.javaparser.ast.type.ArrayType
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.type.PrimitiveType
 import com.github.javaparser.ast.type.VoidType
 import io.gitlab.arturbosch.grovlin.ast.AndExpression
 import io.gitlab.arturbosch.grovlin.ast.Assignment
+import io.gitlab.arturbosch.grovlin.ast.BlockStatement
 import io.gitlab.arturbosch.grovlin.ast.BoolLit
 import io.gitlab.arturbosch.grovlin.ast.BoolType
 import io.gitlab.arturbosch.grovlin.ast.CallExpression
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.DivisionExpression
+import io.gitlab.arturbosch.grovlin.ast.ElifStatement
 import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
+import io.gitlab.arturbosch.grovlin.ast.IfStatement
 import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
+import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
 import io.gitlab.arturbosch.grovlin.ast.NotExpression
 import io.gitlab.arturbosch.grovlin.ast.OrExpression
@@ -53,7 +58,6 @@ import io.gitlab.arturbosch.grovlin.ast.ThisReference
 import io.gitlab.arturbosch.grovlin.ast.TopLevelDeclarable
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
-import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
@@ -110,7 +114,19 @@ private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when 
 			SimpleName("println"), NodeList.nodeList(value.toJava())))
 	is Assignment -> ExpressionStmt(AssignExpr(NameExpr(reference.name), value.toJava(), AssignExpr.Operator.ASSIGN))
 	is ExpressionStatement -> ExpressionStmt(expression.toJava())
+	is IfStatement -> IfStmt(condition.toJava(), thenStatement.toJava(), transformElifsToElseIfConstructs(elifs, elseStatement))
+	is BlockStatement -> BlockStmt(NodeList.nodeList(statements.map { it.toJava() }))
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
+}
+
+fun transformElifsToElseIfConstructs(elifs: MutableList<ElifStatement>, elseStatement: BlockStatement?): JavaParserStatement? {
+	return if (elifs.isNotEmpty()) {
+		val elif = elifs[0]
+		IfStmt(elif.condition.toJava(), elif.thenStatement.toJava(),
+				transformElifsToElseIfConstructs(elifs.subList(1, elifs.size), elseStatement))
+	} else {
+		elseStatement?.toJava()
+	}
 }
 
 private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = when (this) {
