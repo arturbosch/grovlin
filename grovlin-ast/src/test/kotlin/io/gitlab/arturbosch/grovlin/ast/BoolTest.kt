@@ -2,6 +2,7 @@ package io.gitlab.arturbosch.grovlin.ast
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import io.gitlab.arturbosch.grovlin.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import org.junit.Test
 import kotlin.test.assertTrue
@@ -29,7 +30,7 @@ class BoolTest {
 	fun parseComplexBooleanExpression() {
 		val grovlinFile = "val b = true && false || true ^ false".asGrovlinFile()
 		val orExpression = grovlinFile.collectByType<OrExpression>()[0]
-
+		println(grovlinFile.asString())
 		assertThat(orExpression.left is AndExpression, equalTo(true))
 		assertThat(orExpression.right is XorExpression, equalTo(true))
 	}

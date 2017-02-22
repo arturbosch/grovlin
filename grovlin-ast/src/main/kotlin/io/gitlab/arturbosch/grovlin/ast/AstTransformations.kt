@@ -62,6 +62,12 @@ fun BinaryOperationContext.toAst(): Expression = when (operator.text) {
 	"&&" -> AndExpression(left.toAst(), right.toAst(), toPosition())
 	"||" -> OrExpression(left.toAst(), right.toAst(), toPosition())
 	"^" -> XorExpression(left.toAst(), right.toAst(), toPosition())
+	"==" -> EqualExpression(left.toAst(), right.toAst(), toPosition())
+	"!=" -> UnequalExpression(left.toAst(), right.toAst(), toPosition())
+	">=" -> GreaterEqualExpression(left.toAst(), right.toAst(), toPosition())
+	"<=" -> LessEqualExpression(left.toAst(), right.toAst(), toPosition())
+	">" -> GreaterExpression(left.toAst(), right.toAst(), toPosition())
+	"<" -> LessExpression(left.toAst(), right.toAst(), toPosition())
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
 }
 

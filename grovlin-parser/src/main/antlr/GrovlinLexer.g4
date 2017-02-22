@@ -31,13 +31,12 @@ INTLIT             : '0'|[1-9][0-9]* ;
 DECLIT             : '0'|[1-9][0-9]* '.' [0-9]+ ;
 BOOLLIT            : 'true' | 'false';
 
-// Operators
-PLUS               : '+' ;
-MINUS              : '-' ;
-MUL                : '*' ;
-DIV                : '/' ;
-MOD                : '%' ;
-ASSIGN             : '=' ;
+// Misc
+POINT              : '.';
+COMMA              : ',';
+SEMICOLON          : ':';
+LBRACE             : '{';
+RBRACE             : '}';
 LPAREN             : '(' ;
 RPAREN             : ')' ;
 
@@ -50,18 +49,20 @@ LESS               : '<'  ;
 GREATEREQUAL       : '>=' ;
 GREATER            : '>'  ;
 
+// Operators
+PLUS               : '+' ;
+MINUS              : '-' ;
+MUL                : '*' ;
+DIV                : '/' ;
+MOD                : '%' ;
+
+ASSIGN             : '=' ;
+
 // Bool operators
 NOT : '!'  ;
 OR  : '||' ;
 AND : '&&' ;
 XOR : '^'  ;
-
-// Misc
-POINT              : '.';
-COMMA              : ',';
-SEMICOLON          : ':';
-LBRACE             : '{';
-RBRACE             : '}';
 
 // Identifiers
 ID                 : [_]*[A-Za-z0-9_]+ ;

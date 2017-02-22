@@ -88,10 +88,11 @@ expression
 | THIS                                                          # thisExpression
 | container=expression POINT methodName=ID LPAREN RPAREN        # callExpression
 | methodName=ID LPAREN RPAREN                                   # callExpression
-| left=expression operator=(DIV|MUL|AND) right=expression       # binaryOperation
-| left=expression operator=XOR right=expression                 # binaryOperation
-| left=expression operator=(PLUS|MINUS|OR) right=expression     # binaryOperation
 | left=expression operator=(EQUAL|INEQUAL|LESS|LESSEQUAL|GREATER|GREATEREQUAL) right=expression       # binaryOperation
+| left=expression operator=(PLUS|MINUS) right=expression        # binaryOperation
+| left=expression operator=XOR right=expression                 # binaryOperation
+| left=expression operator=(DIV|MUL|AND) right=expression       # binaryOperation
+| left=expression operator=OR right=expression                  # binaryOperation
 | value=expression AS targetType=type                           # typeConversion
 | LPAREN expression RPAREN                                      # parenExpression
 | ID                                                            # varReference
