@@ -71,7 +71,8 @@ assignment
 ;
 
 expression
-: THIS  #thisExpression
+: LPAREN expression RPAREN                                      # parenExpression
+| THIS                                                          # thisExpression
 | container=expression POINT methodName=ID LPAREN RPAREN        # callExpression
 | methodName=ID LPAREN RPAREN                                   # callExpression
 | left=expression operator=(DIV|MUL|AND) right=expression       # binaryOperation

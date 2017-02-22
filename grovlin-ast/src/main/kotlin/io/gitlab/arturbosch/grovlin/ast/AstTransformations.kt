@@ -38,6 +38,7 @@ fun DefDeclarationContext.toAst(): Statement = when (this) {
 }
 
 fun ExpressionContext.toAst(): Expression = when (this) {
+	is ParenExpressionContext -> ParenExpression(expression().toAst(), toPosition())
 	is ThisExpressionContext -> ThisReference(Reference("this"), toPosition())
 	is CallExpressionContext -> CallExpression(container?.toAst(), methodName.text, toPosition())
 	is BinaryOperationContext -> toAst()
@@ -46,7 +47,6 @@ fun ExpressionContext.toAst(): Expression = when (this) {
 	is IntLiteralContext -> IntLit(text, toPosition())
 	is DecimalLiteralContext -> DecLit(text, toPosition())
 	is BoolLiteralContext -> BoolLit(text.toBoolean(), toPosition())
-	is ParenExpressionContext -> expression().toAst()
 	is VarReferenceContext -> VarReference(Reference(text), toPosition())
 	is TypeConversionContext -> TypeConversion(expression().toAst(), targetType.toAst(), toPosition())
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)

@@ -11,6 +11,7 @@ import com.github.javaparser.ast.expr.BinaryExpr
 import com.github.javaparser.ast.expr.BooleanLiteralExpr
 import com.github.javaparser.ast.expr.CastExpr
 import com.github.javaparser.ast.expr.DoubleLiteralExpr
+import com.github.javaparser.ast.expr.EnclosedExpr
 import com.github.javaparser.ast.expr.FieldAccessExpr
 import com.github.javaparser.ast.expr.IntegerLiteralExpr
 import com.github.javaparser.ast.expr.MethodCallExpr
@@ -28,6 +29,7 @@ import com.github.javaparser.ast.type.VoidType
 import io.gitlab.arturbosch.grovlin.ast.AndExpression
 import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.BoolLit
+import io.gitlab.arturbosch.grovlin.ast.BoolType
 import io.gitlab.arturbosch.grovlin.ast.CallExpression
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
@@ -41,6 +43,7 @@ import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
 import io.gitlab.arturbosch.grovlin.ast.NotExpression
 import io.gitlab.arturbosch.grovlin.ast.OrExpression
+import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.Statement
@@ -102,7 +105,7 @@ private fun Program.toJava(): ClassOrInterfaceDeclaration {
 }
 
 private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {
-	is VarDeclaration -> ExpressionStmt(VariableDeclarationExpr(VariableDeclarator(PrimitiveType.intType(), name, value.toJava())))
+	is VarDeclaration -> ExpressionStmt(VariableDeclarationExpr(VariableDeclarator(type.toJava(), name, value.toJava())))
 	is Print -> ExpressionStmt(MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
 			SimpleName("println"), NodeList.nodeList(value.toJava())))
 	is Assignment -> ExpressionStmt(AssignExpr(NameExpr(reference.name), value.toJava(), AssignExpr.Operator.ASSIGN))
@@ -111,6 +114,7 @@ private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when 
 }
 
 private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = when (this) {
+	is ParenExpression -> EnclosedExpr(expression.toJava())
 	is SumExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.PLUS)
 	is SubtractionExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.MINUS)
 	is MultiplicationExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.MULTIPLY)
@@ -136,5 +140,6 @@ private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = whe
 private fun Type.toJava(): com.github.javaparser.ast.type.Type = when (this) {
 	is IntType -> PrimitiveType.intType()
 	is DecimalType -> PrimitiveType.doubleType()
+	is BoolType -> PrimitiveType.booleanType()
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }

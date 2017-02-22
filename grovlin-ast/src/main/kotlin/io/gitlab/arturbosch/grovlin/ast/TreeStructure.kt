@@ -128,6 +128,8 @@ data class Print(val value: Expression, override val position: Position? = null)
 // Expressions
 //
 
+data class ParenExpression(val expression: Expression, override val position: Position?) : Expression
+
 data class CallExpression(val scope: Expression?, override val name: String, override val position: Position?) : Expression, NodeWithName
 
 data class ThisReference(val reference: Reference<TypeDeclaration>, override val position: Position?) : Expression
