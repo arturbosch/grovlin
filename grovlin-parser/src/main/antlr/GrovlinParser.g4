@@ -74,16 +74,21 @@ expression
 : THIS  #thisExpression
 | container=expression POINT methodName=ID LPAREN RPAREN        # callExpression
 | methodName=ID LPAREN RPAREN                                   # callExpression
-| left=expression operator=(DIV|MUL) right=expression           # binaryOperation
-| left=expression operator=(PLUS|MINUS) right=expression        # binaryOperation
+| left=expression operator=(DIV|MUL|AND) right=expression       # binaryOperation
+| left=expression operator=XOR right=expression                 # binaryOperation
+| left=expression operator=(PLUS|MINUS|OR) right=expression     # binaryOperation
 | value=expression AS targetType=type                           # typeConversion
 | LPAREN expression RPAREN                                      # parenExpression
 | ID                                                            # varReference
 | MINUS expression                                              # minusExpression
+| NOT expression                                                # notExpression
 | INTLIT                                                        # intLiteral
 | DECLIT                                                        # decimalLiteral
+| BOOLLIT                                                       # boolLiteral
 ;
 
 type
 : INT     # integer
-| DECIMAL # decimal ;
+| DECIMAL # decimal
+| BOOL    # bool
+;

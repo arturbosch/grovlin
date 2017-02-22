@@ -41,8 +41,11 @@ fun ExpressionContext.toAst(): Expression = when (this) {
 	is ThisExpressionContext -> ThisReference(Reference("this"), toPosition())
 	is CallExpressionContext -> CallExpression(container?.toAst(), methodName.text, toPosition())
 	is BinaryOperationContext -> toAst()
+	is MinusExpressionContext -> UnaryMinusExpression(expression().toAst(), toPosition())
+	is NotExpressionContext -> NotExpression(expression().toAst(), toPosition())
 	is IntLiteralContext -> IntLit(text, toPosition())
 	is DecimalLiteralContext -> DecLit(text, toPosition())
+	is BoolLiteralContext -> BoolLit(text.toBoolean(), toPosition())
 	is ParenExpressionContext -> expression().toAst()
 	is VarReferenceContext -> VarReference(Reference(text), toPosition())
 	is TypeConversionContext -> TypeConversion(expression().toAst(), targetType.toAst(), toPosition())
@@ -54,12 +57,16 @@ fun BinaryOperationContext.toAst(): Expression = when (operator.text) {
 	"-" -> SubtractionExpression(left.toAst(), right.toAst(), toPosition())
 	"*" -> MultiplicationExpression(left.toAst(), right.toAst(), toPosition())
 	"/" -> DivisionExpression(left.toAst(), right.toAst(), toPosition())
+	"&&" -> AndExpression(left.toAst(), right.toAst(), toPosition())
+	"||" -> OrExpression(left.toAst(), right.toAst(), toPosition())
+	"^" -> XorExpression(left.toAst(), right.toAst(), toPosition())
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
 }
 
 fun TypeContext.toAst(): Type = when (this) {
 	is IntegerContext -> IntType
 	is DecimalContext -> DecimalType
+	is BoolContext -> BoolType
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
 }
 

@@ -20,10 +20,12 @@ PROGRAM            : 'program';
 // Defined Types
 INT                : 'Int';
 DECIMAL            : 'Decimal';
+BOOL               : 'Bool';
 
 // Literals
 INTLIT             : '0'|[1-9][0-9]* ;
 DECLIT             : '0'|[1-9][0-9]* '.' [0-9]+ ;
+BOOLLIT            : 'true' | 'false';
 
 // Operators
 PLUS               : '+' ;
@@ -34,6 +36,12 @@ MOD                : '%' ;
 ASSIGN             : '=' ;
 LPAREN             : '(' ;
 RPAREN             : ')' ;
+
+// Bool operators
+NOT : '!'  ;
+OR  : '||' ;
+AND : '&&' ;
+XOR : '^'  ;
 
 // Misc
 POINT              : '.';

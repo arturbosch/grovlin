@@ -62,6 +62,11 @@ abstract class PrimitiveType : Type {
 	override fun toString(): String = name
 }
 
+object BoolType : PrimitiveType() {
+	override val name: String
+		get() = "Bool"
+}
+
 object IntType : PrimitiveType() {
 	override val name: String
 		get() = "Int"
@@ -140,7 +145,18 @@ data class MultiplicationExpression(override val left: Expression, override val 
 
 data class DivisionExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) : BinaryExpression
 
+data class AndExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) :
+		BinaryExpression
+
+data class OrExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) :
+		BinaryExpression
+
+data class XorExpression(override val left: Expression, override val right: Expression, override val position: Position? = null) :
+		BinaryExpression
+
 data class UnaryMinusExpression(val value: Expression, override val position: Position? = null) : Expression
+
+data class NotExpression(val value: Expression, override val position: Position? = null) : Expression
 
 data class TypeConversion(val value: Expression, val targetType: Type, override val position: Position? = null) : Expression
 
@@ -148,6 +164,10 @@ data class VarReference(val reference: Reference<VarDeclaration>, override val p
 
 data class IntLit(val value: String, override val position: Position? = null) : Expression, NodeWithType {
 	override var type: Type = IntType
+}
+
+data class BoolLit(val value: Boolean, override val position: Position? = null) : Expression, NodeWithType {
+	override var type: Type = BoolType
 }
 
 data class DecLit(val value: String, override val position: Position? = null) : Expression, NodeWithType {
