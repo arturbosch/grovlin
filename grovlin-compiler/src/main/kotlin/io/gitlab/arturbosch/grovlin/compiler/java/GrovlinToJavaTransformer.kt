@@ -37,12 +37,17 @@ import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.DivisionExpression
 import io.gitlab.arturbosch.grovlin.ast.ElifStatement
+import io.gitlab.arturbosch.grovlin.ast.EqualExpression
 import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
+import io.gitlab.arturbosch.grovlin.ast.GreaterEqualExpression
+import io.gitlab.arturbosch.grovlin.ast.GreaterExpression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.IfStatement
 import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
+import io.gitlab.arturbosch.grovlin.ast.LessEqualExpression
+import io.gitlab.arturbosch.grovlin.ast.LessExpression
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
@@ -58,6 +63,7 @@ import io.gitlab.arturbosch.grovlin.ast.ThisReference
 import io.gitlab.arturbosch.grovlin.ast.TopLevelDeclarable
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
+import io.gitlab.arturbosch.grovlin.ast.UnequalExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
@@ -139,6 +145,12 @@ private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = whe
 	is AndExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.AND)
 	is OrExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.OR)
 	is XorExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.XOR)
+	is EqualExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.EQUALS)
+	is UnequalExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.NOT_EQUALS)
+	is LessEqualExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.LESS_EQUALS)
+	is GreaterEqualExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.GREATER_EQUALS)
+	is LessExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.LESS)
+	is GreaterExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.GREATER)
 	is NotExpression -> UnaryExpr(value.toJava(), UnaryExpr.Operator.LOGICAL_COMPLEMENT)
 	is TypeConversion -> CastExpr(targetType.toJava(), value.toJava())
 	is IntLit -> IntegerLiteralExpr(value)

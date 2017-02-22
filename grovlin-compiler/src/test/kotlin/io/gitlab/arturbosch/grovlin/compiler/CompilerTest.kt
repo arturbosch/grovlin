@@ -1,5 +1,6 @@
 package io.gitlab.arturbosch.grovlin.compiler
 
+import com.github.javaparser.ast.expr.BinaryExpr
 import com.github.javaparser.ast.expr.VariableDeclarationExpr
 import com.github.javaparser.ast.stmt.IfStmt
 import com.natpryce.hamkrest.assertion.assertThat
@@ -51,6 +52,17 @@ class CompilerTest {
 		val clazz = cUnit.mainClass
 		val ifs = clazz.getNodesByType(IfStmt::class.java)
 		assertThat(ifs, hasSize(equalTo(3)))
+	}
+
+	@Test
+	fun parseProgramWithRelationalOperators() {
+		File("./out").mkdir()
+		val file = parseFromTestResource("RelationalOperators.grovlin")
+		val cUnit = file.toJava()
+		val clazz = cUnit.mainClass
+		println(clazz)
+		val expressions = clazz.getNodesByType(BinaryExpr::class.java)
+		assertThat(expressions, hasSize(equalTo(11)))
 	}
 
 	@Test
