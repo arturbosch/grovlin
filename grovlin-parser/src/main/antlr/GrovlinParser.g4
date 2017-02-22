@@ -91,6 +91,7 @@ expression
 | left=expression operator=(DIV|MUL|AND) right=expression       # binaryOperation
 | left=expression operator=XOR right=expression                 # binaryOperation
 | left=expression operator=(PLUS|MINUS|OR) right=expression     # binaryOperation
+| left=expression operator=(EQUAL|INEQUAL|LESS|LESSEQUAL|GREATER|GREATEREQUAL) right=expression       # binaryOperation
 | value=expression AS targetType=type                           # typeConversion
 | LPAREN expression RPAREN                                      # parenExpression
 | ID                                                            # varReference

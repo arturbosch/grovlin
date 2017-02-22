@@ -41,6 +41,15 @@ ASSIGN             : '=' ;
 LPAREN             : '(' ;
 RPAREN             : ')' ;
 
+// Relations
+
+EQUAL              : '==' ;
+INEQUAL            : '!=' ;
+LESSEQUAL          : '<=' ;
+LESS               : '<'  ;
+GREATEREQUAL       : '>=' ;
+GREATER            : '>'  ;
+
 // Bool operators
 NOT : '!'  ;
 OR  : '||' ;
