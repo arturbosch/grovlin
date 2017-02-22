@@ -21,3 +21,9 @@ data class ElifStatement(override val condition: Expression,
 
 data class BlockStatement(override val statements: MutableList<Statement>,
 						  override val position: Position?) : Statement, NodeWithStatements
+
+data class ExpressionStatement(val expression: Expression, override val position: Position?) : Statement
+
+data class Assignment(val reference: Reference<VarDeclaration>, val value: Expression, override val position: Position? = null) : Statement
+
+data class Print(val value: Expression, override val position: Position? = null) : Statement
