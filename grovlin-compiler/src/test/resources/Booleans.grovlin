@@ -1,0 +1,4 @@
+program {
+    val b = false || (true && true || (true ^ true))
+    print(b)
+}

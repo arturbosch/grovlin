@@ -8,6 +8,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.VariableDeclarator
 import com.github.javaparser.ast.expr.AssignExpr
 import com.github.javaparser.ast.expr.BinaryExpr
+import com.github.javaparser.ast.expr.BooleanLiteralExpr
 import com.github.javaparser.ast.expr.CastExpr
 import com.github.javaparser.ast.expr.DoubleLiteralExpr
 import com.github.javaparser.ast.expr.FieldAccessExpr
@@ -24,7 +25,9 @@ import com.github.javaparser.ast.type.ArrayType
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.type.PrimitiveType
 import com.github.javaparser.ast.type.VoidType
+import io.gitlab.arturbosch.grovlin.ast.AndExpression
 import io.gitlab.arturbosch.grovlin.ast.Assignment
+import io.gitlab.arturbosch.grovlin.ast.BoolLit
 import io.gitlab.arturbosch.grovlin.ast.CallExpression
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
@@ -36,6 +39,8 @@ import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
+import io.gitlab.arturbosch.grovlin.ast.NotExpression
+import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.Statement
@@ -48,6 +53,7 @@ import io.gitlab.arturbosch.grovlin.ast.TypeConversion
 import io.gitlab.arturbosch.grovlin.ast.UnaryMinusExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
+import io.gitlab.arturbosch.grovlin.ast.XorExpression
 import java.util.EnumSet
 import com.github.javaparser.ast.body.MethodDeclaration as JavaParserMethod
 import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
@@ -110,9 +116,14 @@ private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = whe
 	is MultiplicationExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.MULTIPLY)
 	is DivisionExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.DIVIDE)
 	is UnaryMinusExpression -> UnaryExpr(value.toJava(), UnaryExpr.Operator.MINUS)
+	is AndExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.AND)
+	is OrExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.OR)
+	is XorExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.XOR)
+	is NotExpression -> UnaryExpr(value.toJava(), UnaryExpr.Operator.LOGICAL_COMPLEMENT)
 	is TypeConversion -> CastExpr(targetType.toJava(), value.toJava())
 	is IntLit -> IntegerLiteralExpr(value)
 	is DecLit -> DoubleLiteralExpr(value)
+	is BoolLit -> BooleanLiteralExpr(value)
 	is VarReference -> NameExpr(reference.name)
 	is ThisReference -> ThisExpr()
 	is CallExpression -> MethodCallExpr().apply {
