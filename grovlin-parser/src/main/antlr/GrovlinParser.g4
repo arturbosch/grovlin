@@ -21,7 +21,7 @@ statement
 | assignment        #assignmentStatement
 | print             #printStatement
 | program           #programStatement
-| ifStmt                #ifStatement
+| ifStmt            #ifStatement
 ;
 
 expressionStmt
@@ -29,15 +29,15 @@ expressionStmt
 ;
 
 ifStmt
-: IF LPAREN expression RPAREN nls LBRACE nls statements nls RBRACE nls (elifStmt|elseStmt)?
+: IF nls LPAREN expression RPAREN nls LBRACE nls statements nls RBRACE nls (elifs=elifStmt)* (elseStmt)?
 ;
 
 elifStmt
-: ELIF LPAREN expression RPAREN nls LBRACE nls statements nls RBRACE nls (elifStmt|elseStmt)?
+: ELIF nls LPAREN expression RPAREN nls LBRACE nls statements nls RBRACE nls
 ;
 
 elseStmt
-: RPAREN nls LBRACE nls statements nls RBRACE nls (elifStmt|elseStmt)?
+: ELSE nls LBRACE nls statements nls RBRACE nls (elifStmt|elseStmt)? nls
 ;
 
 typeDeclaration

@@ -17,6 +17,7 @@ fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this
 	is AssignmentStatementContext -> Assignment(Reference(assignment().ID().text), assignment().expression().toAst(), toPosition())
 	is PrintStatementContext -> Print(print().expression().toAst(), toPosition())
 	is ProgramStatementContext -> Program(fileName, program().statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
+	is IfStatementContext -> transformToIfStatement()
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }
 
@@ -68,5 +69,30 @@ fun TypeContext.toAst(): Type = when (this) {
 	is DecimalContext -> DecimalType
 	is BoolContext -> BoolType
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
+}
+
+private fun IfStatementContext.transformToIfStatement(): IfStatement {
+	return IfStatement(condition = ifStmt().expression().toAst(),
+			thenStatement = transformThenBlock(),
+			elifs = transformElifStatements(),
+			elseStatement = transformElseBlock(),
+			position = toPosition())
+}
+
+private fun IfStatementContext.transformThenBlock() = BlockStatement(ifStmt().statements().statement().mapTo(ArrayList()) { it.toAst() },
+		ifStmt().statements().toPosition())
+
+private fun IfStatementContext.transformElseBlock(): BlockStatement? {
+	val elseStmt = ifStmt().elseStmt() ?: return null
+	return BlockStatement(elseStmt.statements().statement().mapTo(ArrayList()) { it.toAst() }, elseStmt.statements().toPosition())
+}
+
+private fun IfStatementContext.transformElifStatements(): MutableList<ElifStatement> {
+	val elifs = ifStmt().elifStmt()
+	return elifs?.mapTo(ArrayList()) {
+		ElifStatement(condition = it.expression().toAst(),
+				thenStatement = BlockStatement(it.statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition()),
+				position = it.statements().toPosition())
+	} ?: mutableListOf()
 }
 
