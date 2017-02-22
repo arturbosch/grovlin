@@ -39,7 +39,6 @@ class CompilerTest {
 		val file = parseFromTestResource("Booleans.grovlin")
 		val cUnit = file.toJava()
 		val clazz = cUnit.mainClass
-		println(clazz.toString())
 		assertThat(clazz.getNodesByType(VariableDeclarationExpr::class.java), hasSize(equalTo(1)))
 	}
 

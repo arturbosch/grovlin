@@ -1,11 +1,14 @@
 package io.gitlab.arturbosch.grovlin.ast.resolution
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.hasSize
+import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.UnknownType
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
-import io.gitlab.arturbosch.grovlin.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import io.gitlab.arturbosch.grovlin.ast.parseFromTestResource
 import io.gitlab.arturbosch.grovlin.ast.resolved
@@ -26,8 +29,11 @@ class TypeResolvingTest {
 	@Test
 	fun resolveMixedIntAndDecimalTypes() {
 		val grovlinFile = "var a = 5\nvar b = 5.0\n var c = a + b".asGrovlinFile().resolved()
+		val vars = grovlinFile.collectByType<VarDeclaration>()
 
-		println(grovlinFile.asString())
+		assert(vars[0].type is IntType)
+		assert(vars[1].type is DecimalType)
+		assert(vars[2].type is DecimalType)
 	}
 
 	@Test
@@ -50,5 +56,13 @@ class TypeResolvingTest {
 		grovlinFile.resolved()
 
 		assert(varDeclaration.type is IntType)
+	}
+
+	@Test
+	fun resolutionOfUnknownTypeResultsInSemanticError() {
+		val grovlinFile = "var a = Unknown".asGrovlinFile()
+		val errors = grovlinFile.resolveTypes()
+
+		assertThat(errors, hasSize(equalTo(1)))
 	}
 }

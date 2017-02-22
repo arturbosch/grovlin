@@ -20,13 +20,27 @@ import io.gitlab.arturbosch.grovlin.ast.TypeConversion
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.operations.processNodesOfType
+import io.gitlab.arturbosch.grovlin.ast.validation.SemanticError
 
 /**
  * @author Artur Bosch
  */
 
-fun GrovlinFile.resolveTypes() = processNodesOfType<NodeWithType> {
-	if (it.isUnsolved()) it.tryToSolve()
+fun GrovlinFile.resolveTypes(): List<SemanticError> {
+	val errors = mutableListOf<SemanticError>()
+	resolveSymbols()
+	processNodesOfType<NodeWithType> {
+		if (it.isUnsolved()) {
+			try {
+				it.tryToSolve()
+			} catch (ex: TypeMissMatchError) {
+				errors.add(SemanticError(ex.message!!, it.position!!.start))
+			} catch (ex: RelationsNotResolvedError) {
+				errors.add(SemanticError(ex.message!!, it.position!!.start))
+			}
+		}
+	}
+	return errors
 }
 
 private fun NodeWithType.tryToSolve() = when (this) {
