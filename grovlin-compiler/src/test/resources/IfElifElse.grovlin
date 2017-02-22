@@ -1,0 +1,12 @@
+program {
+    val b = true && true ^ (false ^ true)
+    if (b) {
+        print(0)
+    } elif (!b) {
+        print(1)
+    } elif (true) {
+        print(2)
+    } else {
+        print(3)
+    }
+}

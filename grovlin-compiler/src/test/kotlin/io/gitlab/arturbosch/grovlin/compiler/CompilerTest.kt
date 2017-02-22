@@ -1,6 +1,7 @@
 package io.gitlab.arturbosch.grovlin.compiler
 
 import com.github.javaparser.ast.expr.VariableDeclarationExpr
+import com.github.javaparser.ast.stmt.IfStmt
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
@@ -40,6 +41,16 @@ class CompilerTest {
 		val cUnit = file.toJava()
 		val clazz = cUnit.mainClass
 		assertThat(clazz.getNodesByType(VariableDeclarationExpr::class.java), hasSize(equalTo(1)))
+	}
+
+	@Test
+	fun parseProgramWithIfElifElse() {
+		File("./out").mkdir()
+		val file = parseFromTestResource("IfElifElse.grovlin")
+		val cUnit = file.toJava()
+		val clazz = cUnit.mainClass
+		val ifs = clazz.getNodesByType(IfStmt::class.java)
+		assertThat(ifs, hasSize(equalTo(3)))
 	}
 
 	@Test
