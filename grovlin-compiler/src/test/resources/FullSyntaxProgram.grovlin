@@ -1,0 +1,23 @@
+program { args ->
+    var x = 5
+
+    if (5 > 4 && 4 == 4) {
+        printTrue()
+    }
+
+    val node = Node("Artur")
+    lambda.invoke(node)
+}
+
+@Data
+type Node {
+    has name
+}
+
+def lambda: (Node) -> Unit { node ->
+    print(node.name)
+}
+
+def printTrue() {
+    print(true)
+}
