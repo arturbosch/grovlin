@@ -25,8 +25,13 @@ fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this
 fun MemberDeclarationContext.toAst(): Statement = when (this) {
 	is PropertyMemberDeclarationContext -> PropertyDeclaration(propertyDeclaration().assignment().ID().text,
 			propertyDeclaration().assignment().expression().toAst(), toPosition())
-	is TypeMemberDeclarationContext -> TypeDeclaration(typeDeclaration().ID().text,
+	is TypeMemberDeclarationContext -> TypeDeclaration(ObjectOrTypeType(typeDeclaration().typeName.text),
+			typeDeclaration().extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) },
 			typeDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() }, toPosition())
+	is ObjectMemberDeclarationContext -> ObjectDeclaration(ObjectOrTypeType(objectDeclaration().objectName.text),
+			ObjectOrTypeType(objectDeclaration().extendObject.text),
+			objectDeclaration().extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) },
+			objectDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() }, toPosition())
 	is DefMemberDeclarationContext -> defDeclaration().toAst()
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }

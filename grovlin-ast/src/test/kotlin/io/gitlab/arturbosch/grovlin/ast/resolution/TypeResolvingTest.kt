@@ -62,7 +62,7 @@ class TypeResolvingTest {
 
 	@Test
 	fun resolutionOfUnknownTypeResultsInSemanticError() {
-		val grovlinFile = "var a = Unknown".asGrovlinFile()
+		val grovlinFile = "var a = b".asGrovlinFile()
 		val errors = grovlinFile.resolveTypes()
 
 		assertThat(errors, hasSize(equalTo(1)))

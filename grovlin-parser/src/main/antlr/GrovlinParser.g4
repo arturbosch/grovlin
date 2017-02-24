@@ -41,17 +41,23 @@ elseStmt
 ;
 
 typeDeclaration
-: TYPE ID LBRACE nls memberDeclaration* RBRACE nls
+: TYPE typeName=TYPEID (EXTENDS extendTypes+=TYPEID (COMMA extendTypes+=TYPEID)*)? (LBRACE nls memberDeclaration* RBRACE nls)?
+;
+
+objectDeclaration
+: OBJECT objectName=TYPEID (EXTENDS extendObject=TYPEID)? (AS extendTypes+=TYPEID (COMMA extendTypes+=TYPEID)*)? (LBRACE nls
+memberDeclaration* RBRACE nls)?
 ;
 
 memberDeclaration
 : propertyDeclaration   #propertyMemberDeclaration
 | typeDeclaration       #typeMemberDeclaration
+| objectDeclaration     #objectMemberDeclaration
 | defDeclaration        #defMemberDeclaration
 ;
 
 propertyDeclaration
-: HAS assignment nls
+: TYPEID (ID nls|assignment nls)
 ;
 
 defDeclaration

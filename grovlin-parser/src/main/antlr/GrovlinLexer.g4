@@ -16,15 +16,11 @@ AS                 : 'as';
 IS                 : 'is';
 PRINT              : 'print';
 PROGRAM            : 'program';
+EXTENDS            : 'extends';
 
 IF                 : 'if';
 ELSE               : 'else';
 ELIF               : 'elif';
-
-// Defined Types
-INT                : 'Int';
-DECIMAL            : 'Decimal';
-BOOL               : 'Bool';
 
 // Literals
 INTLIT             : '0'|[1-9][0-9]* ;
@@ -65,4 +61,10 @@ AND : '&&' ;
 XOR : '^'  ;
 
 // Identifiers
+TYPEID             : [A-Z][A-Za-z]* ;
 ID                 : [_]*[A-Za-z0-9_]+ ;
+
+// Defined Types
+INT                : 'Int';
+DECIMAL            : 'Decimal';
+BOOL               : 'Bool';

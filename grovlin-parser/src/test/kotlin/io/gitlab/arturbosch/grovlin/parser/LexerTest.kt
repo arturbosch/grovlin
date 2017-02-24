@@ -10,6 +10,14 @@ import kotlin.test.assertEquals
 class LexerTest {
 
 	@Test
+	fun parseTypeDeclarations() {
+		val actual = tokens("type Node {}")
+		val expected = listOf("TYPE", "TYPEID", "LBRACE", "RBRACE")
+
+		assertEquals(actual, expected)
+	}
+
+	@Test
 	fun parsesVarDeclaration() {
 		val actual = tokens("val a = 5")
 		val expected = listOf("VAL", "ID", "ASSIGN", "INTLIT")

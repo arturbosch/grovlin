@@ -12,6 +12,8 @@ abstract class PrimitiveType : Type {
 	override fun toString(): String = name
 }
 
+class ObjectOrTypeType(override val name: String) : Type
+
 object BoolType : PrimitiveType() {
 	override val name: String
 		get() = "Bool"
