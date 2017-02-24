@@ -12,3 +12,4 @@ data class Program(override val name: String,
 				   override val statements: MutableList<Statement>,
 				   override val position: Position? = null) : Statement, NodeWithStatements, TopLevelDeclarable, NodeWithName
 
+fun GrovlinFile.findTypeByName(name: String): TypeDeclaration? = statements.filterIsInstance<TypeDeclaration>().find { it.name == name }
