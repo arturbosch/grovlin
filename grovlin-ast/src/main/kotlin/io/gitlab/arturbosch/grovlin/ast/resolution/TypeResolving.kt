@@ -2,6 +2,7 @@ package io.gitlab.arturbosch.grovlin.ast.resolution
 
 import io.gitlab.arturbosch.grovlin.ast.BinaryExpression
 import io.gitlab.arturbosch.grovlin.ast.BoolLit
+import io.gitlab.arturbosch.grovlin.ast.BoolType
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.Expression
@@ -12,9 +13,11 @@ import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.Node
 import io.gitlab.arturbosch.grovlin.ast.NodeWithType
 import io.gitlab.arturbosch.grovlin.ast.NotExpression
+import io.gitlab.arturbosch.grovlin.ast.NumberType
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.Position
 import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
+import io.gitlab.arturbosch.grovlin.ast.RelationExpression
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
@@ -54,18 +57,7 @@ private fun VarDeclaration.resolveVarDeclaration(): Type {
 
 private fun Expression.resolveType(): Type = when (this) {
 	is ParenExpression -> expression.resolveType()
-	is BinaryExpression -> {
-		val leftType = left.resolveType()
-		val rightType = right.resolveType()
-		val type = if (rightType.name == leftType.name) {
-			rightType
-		} else if (rightType is PrimitiveType && leftType is PrimitiveType) {
-			resolvePrimitiveType(leftType, rightType)
-		} else {
-			null
-		}
-		type ?: throw TypeMissMatchError(leftType, rightType, position)
-	}
+	is BinaryExpression -> resolveBinaryExpression()
 	is TypeConversion -> targetType
 	is MinusExpression -> value.resolveType()
 	is NotExpression -> value.resolveType()
@@ -76,13 +68,33 @@ private fun Expression.resolveType(): Type = when (this) {
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }
 
-private fun VarReference.safeDeclaration() = this.reference.source ?: throw RelationsNotResolvedError(this)
+private fun BinaryExpression.resolveBinaryExpression(): Type {
+	val leftType = left.resolveType()
+	val rightType = right.resolveType()
+	val type = if (this is RelationExpression) {
+		resolveRelationTypes(leftType, rightType)
+	} else if (rightType.name == leftType.name) {
+		rightType
+	} else if (rightType is PrimitiveType && leftType is PrimitiveType) {
+		resolvePrimitiveType(leftType, rightType)
+	} else {
+		null
+	}
+	return type ?: throw TypeMissMatchError(leftType, rightType, position)
+}
+
+private fun resolveRelationTypes(leftType: Type, rightType: Type): Type? = when {
+	leftType is NumberType && rightType is NumberType -> BoolType
+	else -> null
+}
 
 private fun resolvePrimitiveType(leftType: Type, rightType: Type): Type? = when {
 	leftType is IntType && rightType is DecimalType -> rightType
 	leftType is DecimalType && rightType is IntType -> leftType
 	else -> null
 }
+
+private fun VarReference.safeDeclaration() = this.reference.source ?: throw RelationsNotResolvedError(this)
 
 class TypeMissMatchError(leftType: Type, rightType: Type, point: Position?) :
 		IllegalStateException("Type mismatch at ${point?.start} - left=${leftType.name} and right=${rightType.name}")

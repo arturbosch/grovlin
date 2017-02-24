@@ -9,6 +9,8 @@ interface BinaryExpression : Expression {
 	val right: Expression
 }
 
+interface RelationExpression : BinaryExpression
+
 data class SumExpression(override val left: Expression,
 						 override val right: Expression,
 						 override val position: Position? = null) : BinaryExpression
@@ -39,24 +41,24 @@ data class XorExpression(override val left: Expression,
 
 data class EqualExpression(override val left: Expression,
 						   override val right: Expression,
-						   override val position: Position? = null) : BinaryExpression
+						   override val position: Position? = null) : RelationExpression
 
 data class UnequalExpression(override val left: Expression,
 							 override val right: Expression,
-							 override val position: Position? = null) : BinaryExpression
+							 override val position: Position? = null) : RelationExpression
 
 data class LessEqualExpression(override val left: Expression,
 							   override val right: Expression,
-							   override val position: Position? = null) : BinaryExpression
+							   override val position: Position? = null) : RelationExpression
 
 data class LessExpression(override val left: Expression,
 						  override val right: Expression,
-						  override val position: Position? = null) : BinaryExpression
+						  override val position: Position? = null) : RelationExpression
 
 data class GreaterExpression(override val left: Expression,
 							 override val right: Expression,
-							 override val position: Position? = null) : BinaryExpression
+							 override val position: Position? = null) : RelationExpression
 
 data class GreaterEqualExpression(override val left: Expression,
 								  override val right: Expression,
-								  override val position: Position? = null) : BinaryExpression
+								  override val position: Position? = null) : RelationExpression

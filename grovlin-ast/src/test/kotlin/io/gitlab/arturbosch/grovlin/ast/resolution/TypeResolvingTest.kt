@@ -3,6 +3,7 @@ package io.gitlab.arturbosch.grovlin.ast.resolution
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
+import io.gitlab.arturbosch.grovlin.ast.BoolType
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.UnknownType
@@ -13,6 +14,7 @@ import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import io.gitlab.arturbosch.grovlin.ast.parseFromTestResource
 import io.gitlab.arturbosch.grovlin.ast.resolved
 import org.junit.Test
+import kotlin.test.assertTrue
 
 /**
  * @author Artur Bosch
@@ -64,5 +66,13 @@ class TypeResolvingTest {
 		val errors = grovlinFile.resolveTypes()
 
 		assertThat(errors, hasSize(equalTo(1)))
+	}
+
+	@Test
+	fun resolveRelationOperations() {
+		val grovlinFile = "var b = 5 > 4\nvar b2 = 5.0 > 4".asGrovlinFile().resolved()
+
+		val vars = grovlinFile.collectByType<VarDeclaration>()
+		vars.forEach { assertTrue(it.type is BoolType, "Should be BoolType but was ${it.type.javaClass}") }
 	}
 }

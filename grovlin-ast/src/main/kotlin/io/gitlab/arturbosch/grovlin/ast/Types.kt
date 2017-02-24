@@ -6,6 +6,8 @@ package io.gitlab.arturbosch.grovlin.ast
 
 interface Type : Named
 
+interface NumberType : Type
+
 abstract class PrimitiveType : Type {
 	override fun toString(): String = name
 }
@@ -15,12 +17,12 @@ object BoolType : PrimitiveType() {
 		get() = "Bool"
 }
 
-object IntType : PrimitiveType() {
+object IntType : PrimitiveType(), NumberType {
 	override val name: String
 		get() = "Int"
 }
 
-object DecimalType : PrimitiveType() {
+object DecimalType : PrimitiveType(), NumberType {
 	override val name: String
 		get() = "Decimal"
 }
