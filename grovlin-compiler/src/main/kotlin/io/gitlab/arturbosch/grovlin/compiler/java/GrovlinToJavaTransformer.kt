@@ -16,6 +16,7 @@ import com.github.javaparser.ast.expr.FieldAccessExpr
 import com.github.javaparser.ast.expr.IntegerLiteralExpr
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.expr.NameExpr
+import com.github.javaparser.ast.expr.ObjectCreationExpr
 import com.github.javaparser.ast.expr.SimpleName
 import com.github.javaparser.ast.expr.ThisExpr
 import com.github.javaparser.ast.expr.UnaryExpr
@@ -52,6 +53,7 @@ import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
 import io.gitlab.arturbosch.grovlin.ast.NotExpression
+import io.gitlab.arturbosch.grovlin.ast.ObjectCreation
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
 import io.gitlab.arturbosch.grovlin.ast.OrExpression
@@ -121,7 +123,11 @@ private fun Program.toJava(): ClassOrInterfaceDeclaration {
 }
 
 private fun ObjectDeclaration.transformToClassDeclaration(): ClassOrInterfaceDeclaration {
-	return ClassOrInterfaceDeclaration()
+	val extends = extendedTypes.mapTo(ArrayList()) { it.toJava() as ClassOrInterfaceType }
+	val superclass = extendedObject?.let { ClassOrInterfaceType(extendedObject?.name) }
+	return ClassOrInterfaceDeclaration(EnumSet.of(Modifier.PUBLIC), true, name)
+			.setImplementedTypes(NodeList.nodeList(extends))
+			.addExtendedType(superclass)
 }
 
 private fun TypeDeclaration.transformToInterfaceDeclaration(): ClassOrInterfaceDeclaration {
@@ -153,6 +159,7 @@ fun transformElifsToElseIfConstructs(elifs: MutableList<ElifStatement>, elseStat
 
 private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = when (this) {
 	is ParenExpression -> EnclosedExpr(expression.toJava())
+	is ObjectCreation -> ObjectCreationExpr(null, ClassOrInterfaceType(type.name), NodeList())
 	is SumExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.PLUS)
 	is SubtractionExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.MINUS)
 	is MultiplicationExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.MULTIPLY)
