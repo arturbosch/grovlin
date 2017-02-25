@@ -93,11 +93,16 @@ fun GrovlinFile.toJava(): CUnit {
 			.filter { it.isTopLevelDeclaration() }
 			.map { it.toJava() }
 
+	val additionalUnits = topLevelDeclarations.filter { it is ClassOrInterfaceDeclaration }
+			.map { CompilationUnit().apply { addType(it as ClassOrInterfaceDeclaration) } }
+
+	val membersOfProgram = topLevelDeclarations.filterNot { it is ClassOrInterfaceDeclaration }
+
 	val clazz = program.toJava()
-	topLevelDeclarations.forEach { clazz.addMember(it) }
+	membersOfProgram.forEach { clazz.addMember(it) }
 	unit.addType(clazz)
 
-	return CUnit(clazz.nameAsString, clazz, unit)
+	return CUnit(clazz.nameAsString, clazz, unit, additionalUnits)
 }
 
 private fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
@@ -125,9 +130,11 @@ private fun Program.toJava(): ClassOrInterfaceDeclaration {
 private fun ObjectDeclaration.transformToClassDeclaration(): ClassOrInterfaceDeclaration {
 	val extends = extendedTypes.mapTo(ArrayList()) { it.toJava() as ClassOrInterfaceType }
 	val superclass = extendedObject?.let { ClassOrInterfaceType(extendedObject?.name) }
-	return ClassOrInterfaceDeclaration(EnumSet.of(Modifier.PUBLIC), true, name)
-			.setImplementedTypes(NodeList.nodeList(extends))
-			.addExtendedType(superclass)
+	return ClassOrInterfaceDeclaration(EnumSet.of(Modifier.PUBLIC), false, name)
+			.setImplementedTypes(NodeList.nodeList(extends)).apply {
+		superclass?.let { addExtendedType(superclass) }
+	}
+
 }
 
 private fun TypeDeclaration.transformToInterfaceDeclaration(): ClassOrInterfaceDeclaration {

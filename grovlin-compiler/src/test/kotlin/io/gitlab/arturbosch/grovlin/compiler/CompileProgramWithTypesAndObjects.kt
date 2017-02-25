@@ -14,10 +14,11 @@ class CompileProgramWithTypesAndObjects {
 	@Test
 	fun threeTypesOneObject() {
 		val grovlinFile = parseFromTestResource("TypesAndObjects.grovlin")
-//		println(grovlinFile.asString())
+		println(grovlinFile.asString())
 		val cUnit = grovlinFile.toJava()
 		val clazz = cUnit.mainClass
 		println(clazz)
+		cUnit.additionalUnits.forEach(::println)
 		assertThat(clazz, present())
 
 	}
