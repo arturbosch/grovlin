@@ -14,6 +14,7 @@ import io.gitlab.arturbosch.grovlin.ast.Node
 import io.gitlab.arturbosch.grovlin.ast.NodeWithType
 import io.gitlab.arturbosch.grovlin.ast.NotExpression
 import io.gitlab.arturbosch.grovlin.ast.NumberType
+import io.gitlab.arturbosch.grovlin.ast.ObjectCreation
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.Position
 import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
@@ -62,6 +63,7 @@ private fun Expression.resolveType(): Type = when (this) {
 	is MinusExpression -> value.resolveType()
 	is NotExpression -> value.resolveType()
 	is VarReference -> safeDeclaration().resolveVarDeclaration()
+	is ObjectCreation -> type
 	is IntLit -> type
 	is DecLit -> type
 	is BoolLit -> type

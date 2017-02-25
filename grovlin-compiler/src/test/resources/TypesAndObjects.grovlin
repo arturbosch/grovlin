@@ -1,0 +1,19 @@
+type Node
+type Leaf extends Node {
+    Node data
+}
+type Tree extends Node {
+    Node left
+    Node right
+    Node parent
+}
+
+object BinaryTree as Tree {
+    override Node left
+    override Node right
+    override Node parent
+}
+
+program {
+    var tree = BinaryTree()
+}

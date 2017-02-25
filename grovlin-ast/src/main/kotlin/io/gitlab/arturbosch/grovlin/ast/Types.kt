@@ -12,26 +12,23 @@ abstract class PrimitiveType : Type {
 	override fun toString(): String = name
 }
 
-class ObjectOrTypeType(override val name: String) : Type
+class ObjectOrTypeType(override val name: String) : Type {
+	override fun toString(): String = name
+}
 
 object BoolType : PrimitiveType() {
-	override val name: String
-		get() = "Bool"
+	override val name: String = "Bool"
 }
 
 object IntType : PrimitiveType(), NumberType {
-	override val name: String
-		get() = "Int"
+	override val name: String = "Int"
 }
 
 object DecimalType : PrimitiveType(), NumberType {
-	override val name: String
-		get() = "Decimal"
+	override val name: String = "Decimal"
 }
 
 object UnknownType : Type {
-	override val name: String
-		get() = "Unknown"
-
+	override val name: String = "Unknown"
 	override fun toString(): String = name
 }

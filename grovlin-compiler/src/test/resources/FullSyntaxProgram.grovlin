@@ -11,7 +11,7 @@ program { args ->
 
 @Data
 type Node {
-    has name
+    String name
 }
 
 def lambda: (Node) -> Unit { node ->
