@@ -13,3 +13,4 @@ data class Program(override val name: String,
 				   override val position: Position? = null) : Statement, NodeWithStatements, TopLevelDeclarable, NodeWithName
 
 fun GrovlinFile.findTypeByName(name: String): TypeDeclaration? = statements.filterIsInstance<TypeDeclaration>().find { it.name == name }
+fun GrovlinFile.findObjectByName(name: String): ObjectDeclaration? = statements.filterIsInstance<ObjectDeclaration>().find { it.name == name }

@@ -23,6 +23,7 @@ class TypeTest {
 	fun parseTypeCreation() {
 		val grovlinFile = parseFromTestResource("TypesAndObjects.grovlin")
 
+		assertThat(grovlinFile.findObjectByName("BinaryTree"), present())
 		assertThat(grovlinFile.collectByType<TypeDeclaration>(), hasSize(equalTo(3)))
 	}
 }
