@@ -57,7 +57,7 @@ memberDeclaration
 ;
 
 propertyDeclaration
-: TYPEID (ID nls|assignment nls)
+: (OVERRIDE)? TYPEID (ID nls|assignment nls)
 ;
 
 defDeclaration
@@ -91,6 +91,7 @@ assignment
 
 expression
 : LPAREN expression RPAREN                                      # parenExpression
+| TYPEID LPAREN RPAREN                                          # objectCreationExpression
 | THIS                                                          # thisExpression
 | container=expression POINT methodName=ID LPAREN RPAREN        # callExpression
 | methodName=ID LPAREN RPAREN                                   # callExpression

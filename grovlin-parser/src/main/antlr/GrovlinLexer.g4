@@ -17,6 +17,7 @@ IS                 : 'is';
 PRINT              : 'print';
 PROGRAM            : 'program';
 EXTENDS            : 'extends';
+OVERRIDE           : 'override';
 
 IF                 : 'if';
 ELSE               : 'else';

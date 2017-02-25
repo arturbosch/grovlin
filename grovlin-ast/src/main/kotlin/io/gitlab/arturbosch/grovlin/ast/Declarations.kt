@@ -12,7 +12,7 @@ data class TypeDeclaration(val type: ObjectOrTypeType,
 }
 
 data class ObjectDeclaration(val type: ObjectOrTypeType,
-							 val extendedObject: ObjectOrTypeType,
+							 val extendedObject: ObjectOrTypeType?,
 							 val extendedTypes: MutableList<ObjectOrTypeType>,
 							 override val statements: MutableList<Statement>,
 							 override val position: Position? = null) : Statement, Named, NodeWithStatements, TopLevelDeclarable {
@@ -27,8 +27,9 @@ data class LambdaDeclaration(override val name: String,
 							 override val statements: MutableList<Statement>,
 							 override val position: Position? = null) : Statement, NodeWithStatements, NodeWithName, TopLevelDeclarable
 
-data class PropertyDeclaration(override val name: String,
-							   val value: Expression,
+data class PropertyDeclaration(val type: ObjectOrTypeType,
+							   override val name: String,
+							   val value: Expression?,
 							   override val position: Position? = null) : Statement, NodeWithName
 
 data class VarDeclaration(override val name: String,

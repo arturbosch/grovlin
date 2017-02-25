@@ -23,17 +23,28 @@ fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this
 }
 
 fun MemberDeclarationContext.toAst(): Statement = when (this) {
-	is PropertyMemberDeclarationContext -> PropertyDeclaration(propertyDeclaration().assignment().ID().text,
-			propertyDeclaration().assignment().expression().toAst(), toPosition())
+	is PropertyMemberDeclarationContext -> transformToProperty()
 	is TypeMemberDeclarationContext -> TypeDeclaration(ObjectOrTypeType(typeDeclaration().typeName.text),
 			typeDeclaration().extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) },
 			typeDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() }, toPosition())
-	is ObjectMemberDeclarationContext -> ObjectDeclaration(ObjectOrTypeType(objectDeclaration().objectName.text),
-			ObjectOrTypeType(objectDeclaration().extendObject.text),
-			objectDeclaration().extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) },
-			objectDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() }, toPosition())
+	is ObjectMemberDeclarationContext -> transformToObjectDeclaration()
 	is DefMemberDeclarationContext -> defDeclaration().toAst()
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
+}
+
+private fun ObjectMemberDeclarationContext.transformToObjectDeclaration(): ObjectDeclaration {
+	val extendObject = objectDeclaration().extendObject
+	return ObjectDeclaration(ObjectOrTypeType(objectDeclaration().objectName.text),
+			extendObject?.let { ObjectOrTypeType(it.text) },
+			objectDeclaration().extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) },
+			objectDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() }, toPosition())
+}
+
+private fun PropertyMemberDeclarationContext.transformToProperty(): PropertyDeclaration {
+	val assignment = propertyDeclaration().assignment()
+	return PropertyDeclaration(ObjectOrTypeType(propertyDeclaration().TYPEID().text),
+			assignment?.ID()?.text ?: propertyDeclaration().ID().text,
+			assignment?.expression()?.toAst(), toPosition())
 }
 
 fun DefDeclarationContext.toAst(): Statement = when (this) {
@@ -47,6 +58,7 @@ fun DefDeclarationContext.toAst(): Statement = when (this) {
 fun ExpressionContext.toAst(): Expression = when (this) {
 	is ParenExpressionContext -> ParenExpression(expression().toAst(), toPosition())
 	is ThisExpressionContext -> ThisReference(Reference("this"), toPosition())
+	is ObjectCreationExpressionContext -> ObjectCreation(ObjectOrTypeType(TYPEID().text), toPosition())
 	is CallExpressionContext -> CallExpression(container?.toAst(), methodName.text, toPosition())
 	is BinaryOperationContext -> toAst()
 	is MinusExpressionContext -> MinusExpression(expression().toAst(), toPosition())
