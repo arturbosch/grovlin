@@ -52,6 +52,8 @@ import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
 import io.gitlab.arturbosch.grovlin.ast.NotExpression
+import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
+import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
 import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.Print
@@ -63,10 +65,12 @@ import io.gitlab.arturbosch.grovlin.ast.ThisReference
 import io.gitlab.arturbosch.grovlin.ast.TopLevelDeclarable
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
+import io.gitlab.arturbosch.grovlin.ast.TypeDeclaration
 import io.gitlab.arturbosch.grovlin.ast.UnequalExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
+import java.util.ArrayList
 import java.util.EnumSet
 import com.github.javaparser.ast.body.MethodDeclaration as JavaParserMethod
 import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
@@ -98,6 +102,8 @@ private fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
 	is MethodDeclaration -> JavaParserMethod(EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), VoidType(), name).apply {
 		setBody(BlockStmt(NodeList.nodeList(this@toJava.statements.map { it.toJava() })))
 	}
+	is TypeDeclaration -> transformToInterfaceDeclaration()
+	is ObjectDeclaration -> transformToClassDeclaration()
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
@@ -112,6 +118,16 @@ private fun Program.toJava(): ClassOrInterfaceDeclaration {
 		val statements = statementsOfProgram.mapTo(NodeList<JavaParserStatement>()) { it.toJava() }
 		main.setBody(BlockStmt(statements))
 	}
+}
+
+private fun ObjectDeclaration.transformToClassDeclaration(): ClassOrInterfaceDeclaration {
+	return ClassOrInterfaceDeclaration()
+}
+
+private fun TypeDeclaration.transformToInterfaceDeclaration(): ClassOrInterfaceDeclaration {
+	val extends = extendedTypes.mapTo(ArrayList()) { it.toJava() as ClassOrInterfaceType }
+	return ClassOrInterfaceDeclaration(EnumSet.of(Modifier.PUBLIC), true, name)
+			.setExtendedTypes(NodeList.nodeList(extends))
 }
 
 private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {
@@ -169,5 +185,6 @@ private fun Type.toJava(): com.github.javaparser.ast.type.Type = when (this) {
 	is IntType -> PrimitiveType.intType()
 	is DecimalType -> PrimitiveType.doubleType()
 	is BoolType -> PrimitiveType.booleanType()
+	is ObjectOrTypeType -> ClassOrInterfaceType(name)
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }

@@ -1,6 +1,9 @@
 package io.gitlab.arturbosch.grovlin.compiler
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.present
 import io.gitlab.arturbosch.grovlin.ast.operations.asString
+import io.gitlab.arturbosch.grovlin.compiler.java.toJava
 import org.junit.Test
 
 /**
@@ -11,6 +14,11 @@ class CompileProgramWithTypesAndObjects {
 	@Test
 	fun threeTypesOneObject() {
 		val grovlinFile = parseFromTestResource("TypesAndObjects.grovlin")
-		println(grovlinFile.asString())
+//		println(grovlinFile.asString())
+		val cUnit = grovlinFile.toJava()
+		val clazz = cUnit.mainClass
+		println(clazz)
+		assertThat(clazz, present())
+
 	}
 }
