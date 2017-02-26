@@ -61,16 +61,16 @@ propertyDeclaration
 ;
 
 defDeclaration
-: DEF methodDeclaration #MethodDefinition
-| DEF lambdaDeclaration #LambdaDefinition
+: methodDeclaration #MethodDefinition
+| lambdaDeclaration #LambdaDefinition
 ;
 
 methodDeclaration
-: ID LPAREN RPAREN nls LBRACE nls statements RBRACE nls
+: DEF ID LPAREN RPAREN nls (LBRACE nls statements RBRACE nls)?
 ;
 
 lambdaDeclaration
-: ID ASSIGN LBRACE nls statements RBRACE nls
+: DEF ID ASSIGN LBRACE nls statements RBRACE nls
 ;
 
 print
