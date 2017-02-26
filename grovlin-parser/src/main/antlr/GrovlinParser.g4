@@ -93,7 +93,9 @@ expression
 : LPAREN expression RPAREN                                      # parenExpression
 | TYPEID LPAREN RPAREN                                          # objectCreationExpression
 | THIS                                                          # thisExpression
-| container=expression POINT methodName=ID LPAREN RPAREN        # callExpression
+| scope=expression POINT fieldName=ID                           # getterAccessExpression
+| scope=expression POINT assignment                             # setterAccessExpression
+| scope=expression POINT methodName=ID LPAREN RPAREN            # callExpression
 | methodName=ID LPAREN RPAREN                                   # callExpression
 | left=expression operator=(EQUAL|INEQUAL|LESS|LESSEQUAL|GREATER|GREATEREQUAL) right=expression       # binaryOperation
 | left=expression operator=(PLUS|MINUS) right=expression        # binaryOperation

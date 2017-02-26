@@ -64,7 +64,10 @@ fun ExpressionContext.toAst(): Expression = when (this) {
 	is ParenExpressionContext -> ParenExpression(expression().toAst(), toPosition())
 	is ThisExpressionContext -> ThisReference(Reference("this"), toPosition())
 	is ObjectCreationExpressionContext -> ObjectCreation(ObjectOrTypeType(TYPEID().text), toPosition())
-	is CallExpressionContext -> CallExpression(container?.toAst(), methodName.text, toPosition())
+	is CallExpressionContext -> CallExpression(scope?.toAst(), methodName.text, toPosition())
+	is GetterAccessExpressionContext -> GetterAccessExpression(scope?.toAst(), fieldName.text, toPosition())
+	is SetterAccessExpressionContext -> SetterAccessExpression(scope?.toAst(), assignment().ID().text, assignment().expression().toAst(),
+			toPosition())
 	is BinaryOperationContext -> toAst()
 	is MinusExpressionContext -> MinusExpression(expression().toAst(), toPosition())
 	is NotExpressionContext -> NotExpression(expression().toAst(), toPosition())

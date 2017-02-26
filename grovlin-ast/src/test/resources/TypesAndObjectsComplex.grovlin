@@ -32,7 +32,10 @@ program {
     tree.left = LeafImpl()
     tree.left.data = 5
     var tree2 = BinaryTree()
+    tree2.parent = tree
     tree.right = tree2
     tree2.left = LeafImpl()
     tree2.right = LeafImpl()
+
+    tree.traverse()
 }
