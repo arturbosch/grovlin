@@ -26,7 +26,7 @@ fun MemberDeclarationContext.toAst(): Statement = when (this) {
 	is PropertyMemberDeclarationContext -> transformToProperty()
 	is TypeMemberDeclarationContext -> TypeDeclaration(ObjectOrTypeType(typeDeclaration().typeName.text),
 			typeDeclaration().extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) },
-			typeDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() }, toPosition())
+			typeDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() as MemberDeclaration }, toPosition())
 	is ObjectMemberDeclarationContext -> transformToObjectDeclaration()
 	is DefMemberDeclarationContext -> defDeclaration().toAst()
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
@@ -37,7 +37,7 @@ private fun ObjectMemberDeclarationContext.transformToObjectDeclaration(): Objec
 	return ObjectDeclaration(ObjectOrTypeType(objectDeclaration().objectName.text),
 			extendObject?.let { ObjectOrTypeType(it.text) },
 			objectDeclaration().extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) },
-			objectDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() }, toPosition())
+			objectDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() as MemberDeclaration }, toPosition())
 }
 
 private fun PropertyMemberDeclarationContext.transformToProperty(): PropertyDeclaration {

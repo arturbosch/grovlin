@@ -5,6 +5,7 @@ import com.github.javaparser.ast.Modifier
 import com.github.javaparser.ast.NodeList
 import com.github.javaparser.ast.body.BodyDeclaration
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
+import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.VariableDeclarator
 import com.github.javaparser.ast.expr.AssignExpr
 import com.github.javaparser.ast.expr.BinaryExpr
@@ -50,6 +51,7 @@ import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.LessEqualExpression
 import io.gitlab.arturbosch.grovlin.ast.LessExpression
+import io.gitlab.arturbosch.grovlin.ast.MemberDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
@@ -61,6 +63,7 @@ import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.Program
+import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
@@ -135,17 +138,61 @@ private fun Program.toJava(): ClassOrInterfaceDeclaration {
 private fun ObjectDeclaration.transformToClassDeclaration(): ClassOrInterfaceDeclaration {
 	val extends = extendedTypes.mapTo(ArrayList()) { it.toJava() as ClassOrInterfaceType }
 	val superclass = extendedObject?.let { ClassOrInterfaceType(extendedObject?.name) }
+	val members = memberDeclarationsToJava(declarations, false)
 	return ClassOrInterfaceDeclaration(EnumSet.of(Modifier.PUBLIC), false, name)
-			.setImplementedTypes(NodeList.nodeList(extends)).apply {
+			.setImplementedTypes(NodeList.nodeList(extends))
+			.setMembers(NodeList.nodeList(members)).apply {
 		superclass?.let { addExtendedType(superclass) }
+		fields.forEach {
+			it.createGetter()
+			it.createSetter()
+		}
 	}
 
 }
 
 private fun TypeDeclaration.transformToInterfaceDeclaration(): ClassOrInterfaceDeclaration {
 	val extends = extendedTypes.mapTo(ArrayList()) { it.toJava() as ClassOrInterfaceType }
+	val members = memberDeclarationsToJava(declarations, true)
 	return ClassOrInterfaceDeclaration(EnumSet.of(Modifier.PUBLIC), true, name)
 			.setExtendedTypes(NodeList.nodeList(extends))
+			.setMembers(NodeList.nodeList(members))
+}
+
+private fun memberDeclarationsToJava(declarations: List<MemberDeclaration>, isType: Boolean = false): MutableList<BodyDeclaration<*>> {
+	val members = mutableListOf<BodyDeclaration<*>>()
+	declarations.forEach {
+		when (it) {
+			is MethodDeclaration -> if (it.mustBeOverriden()) {
+				members.add(JavaParserMethod().setName(it.name)
+						.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
+						.setBody(null)
+						.setType(VoidType()))
+			} else {
+				members.add(JavaParserMethod().setName(it.name)
+						.setModifiers(EnumSet.of(Modifier.PUBLIC))
+						.setBody(it.block!!.toJava() as BlockStmt)
+						.setType(VoidType()))
+			}
+			is PropertyDeclaration -> if (isType) {
+				val fieldType = it.type.toJava()
+				members.add(JavaParserMethod().setName("get" + it.name[0].toUpperCase() + it.name.substring(1))
+						.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
+						.setBody(null)
+						.setType(fieldType))
+				members.add(JavaParserMethod().setName("set" + it.name[0].toUpperCase() + it.name.substring(1))
+						.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
+						.setBody(null)
+						.setType(VoidType()))
+			} else {
+				val fieldType = it.type.toJava()
+				val field = FieldDeclaration(EnumSet.of(Modifier.PRIVATE), VariableDeclarator(fieldType, it.name)
+						.setInitializer(it.value?.toJava()))
+				members.add(field)
+			}
+		}
+	}
+	return members
 }
 
 private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {

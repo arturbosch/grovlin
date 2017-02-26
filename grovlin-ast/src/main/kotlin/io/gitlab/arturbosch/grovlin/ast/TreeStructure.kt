@@ -18,6 +18,10 @@ interface NodeWithStatements : Node {
 	val statements: MutableList<Statement>
 }
 
+interface NodeWithMemberDeclarations : Node {
+	val declarations: MutableList<MemberDeclaration>
+}
+
 interface NodeWithType : Node {
 	var type: Type
 	fun isUnsolved() = type is UnknownType
@@ -30,6 +34,8 @@ interface NodeWithBlock : Node {
 interface Expression : Node
 
 interface Statement : Node
+
+interface MemberDeclaration : Statement
 
 interface TopLevelDeclarable {
 	fun isTopLevelDeclaration(): Boolean = true
