@@ -48,8 +48,13 @@ private fun PropertyMemberDeclarationContext.transformToProperty(): PropertyDecl
 }
 
 fun DefDeclarationContext.toAst(): Statement = when (this) {
-	is MethodDefinitionContext -> MethodDeclaration(methodDeclaration().ID().text,
-			methodDeclaration().statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
+	is MethodDefinitionContext -> {
+		val context = methodDeclaration().statements()
+		val block = if (context != null) {
+			BlockStatement(context.statement().mapTo(ArrayList()) { it.toAst() }, context.toPosition())
+		} else null
+		MethodDeclaration(methodDeclaration().ID().text, block, toPosition())
+	}
 	is LambdaDefinitionContext -> LambdaDeclaration(lambdaDeclaration().ID().text,
 			lambdaDeclaration().statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")

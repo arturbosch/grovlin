@@ -23,6 +23,10 @@ interface NodeWithType : Node {
 	fun isUnsolved() = type is UnknownType
 }
 
+interface NodeWithBlock : Node {
+	val block: BlockStatement?
+}
+
 interface Expression : Node
 
 interface Statement : Node

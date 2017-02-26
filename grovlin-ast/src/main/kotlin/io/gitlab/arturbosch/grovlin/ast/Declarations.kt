@@ -20,8 +20,10 @@ data class ObjectDeclaration(val type: ObjectOrTypeType,
 }
 
 data class MethodDeclaration(override val name: String,
-							 override val statements: MutableList<Statement>,
-							 override val position: Position? = null) : Statement, NodeWithStatements, NodeWithName, TopLevelDeclarable
+							 override val block: BlockStatement?,
+							 override val position: Position? = null) : Statement, NodeWithBlock, NodeWithName, TopLevelDeclarable {
+	fun mustBeOverriden() = block == null
+}
 
 data class LambdaDeclaration(override val name: String,
 							 override val statements: MutableList<Statement>,

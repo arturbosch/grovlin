@@ -106,8 +106,11 @@ fun GrovlinFile.toJava(): CUnit {
 }
 
 private fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
-	is MethodDeclaration -> JavaParserMethod(EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), VoidType(), name).apply {
-		setBody(BlockStmt(NodeList.nodeList(this@toJava.statements.map { it.toJava() })))
+	is MethodDeclaration -> {
+		val statements = block?.statements?.map { it.toJava() } ?: emptyList()
+		JavaParserMethod(EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), VoidType(), name).apply {
+			setBody(BlockStmt(NodeList.nodeList(statements)))
+		}
 	}
 	is TypeDeclaration -> transformToInterfaceDeclaration()
 	is ObjectDeclaration -> transformToClassDeclaration()
