@@ -163,36 +163,42 @@ private fun memberDeclarationsToJava(declarations: List<MemberDeclaration>, isTy
 	val members = mutableListOf<BodyDeclaration<*>>()
 	declarations.forEach {
 		when (it) {
-			is MethodDeclaration -> if (it.mustBeOverriden()) {
-				members.add(JavaParserMethod().setName(it.name)
-						.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
-						.setBody(null)
-						.setType(VoidType()))
-			} else {
-				members.add(JavaParserMethod().setName(it.name)
-						.setModifiers(EnumSet.of(Modifier.PUBLIC))
-						.setBody(it.block!!.toJava() as BlockStmt)
-						.setType(VoidType()))
-			}
+			is MethodDeclaration -> members.add(it.toJava())
 			is PropertyDeclaration -> if (isType) {
-				val fieldType = it.type.toJava()
-				members.add(JavaParserMethod().setName("get" + it.name[0].toUpperCase() + it.name.substring(1))
-						.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
-						.setBody(null)
-						.setType(fieldType))
-				members.add(JavaParserMethod().setName("set" + it.name[0].toUpperCase() + it.name.substring(1))
-						.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
-						.setBody(null)
-						.setType(VoidType()))
+				it.typePropertyToJava(members)
 			} else {
-				val fieldType = it.type.toJava()
-				val field = FieldDeclaration(EnumSet.of(Modifier.PRIVATE), VariableDeclarator(fieldType, it.name)
-						.setInitializer(it.value?.toJava()))
-				members.add(field)
+				members.add(it.toJava())
 			}
 		}
 	}
 	return members
+}
+
+private fun PropertyDeclaration.toJava(): BodyDeclaration<*> = FieldDeclaration(EnumSet.of(Modifier.PRIVATE),
+		VariableDeclarator(type.toJava(), name).setInitializer(value?.toJava()))
+
+private fun PropertyDeclaration.typePropertyToJava(members: MutableList<BodyDeclaration<*>>) {
+	val fieldType = type.toJava()
+	members.add(JavaParserMethod().setName("get" + name[0].toUpperCase() + name.substring(1))
+			.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
+			.setBody(null)
+			.setType(fieldType))
+	members.add(JavaParserMethod().setName("set" + name[0].toUpperCase() + name.substring(1))
+			.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
+			.setBody(null)
+			.setType(VoidType()))
+}
+
+private fun MethodDeclaration.toJava(): BodyDeclaration<*> = if (mustBeOverriden()) {
+	JavaParserMethod().setName(name)
+			.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
+			.setBody(null)
+			.setType(VoidType())
+} else {
+	JavaParserMethod().setName(name)
+			.setModifiers(EnumSet.of(Modifier.PUBLIC))
+			.setBody(block!!.toJava() as BlockStmt)
+			.setType(VoidType())
 }
 
 private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {
