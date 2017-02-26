@@ -21,3 +21,49 @@ program {
 ```
 
 `java -jar grovlin-compiler/build/libs/grovlin-compiler-0.1.0.jar run [path/to/program.grovlin]`
+
+##### Upcoming Type&Object Support
+
+```
+type Node {
+    def traverse()
+}
+type Leaf extends Node {
+    Int data
+    def traverse() {
+        print(data)
+    }
+}
+type Tree extends Node {
+    Node left
+    Node right
+    Node parent
+    def traverse() {
+        left.traverse()
+        right.traverse()
+    }
+}
+
+object TreeImpl as Tree {
+    override Node left
+    override Node right
+    override Node parent
+}
+
+object LeafImpl as Leaf {
+    override Int data = 1
+}
+
+program {
+    var tree = TreeImpl()
+    tree.left = LeafImpl()
+    tree.left.data = 5
+    var tree2 = TreeImpl()
+    tree2.parent = tree
+    tree.right = tree2
+    tree2.left = LeafImpl()
+    tree2.right = LeafImpl()
+
+    tree.traverse()
+}
+```
