@@ -11,7 +11,7 @@ import org.junit.Test
 /**
  * @author Artur Bosch
  */
-class CompileProgramWithTypesAndObjects {
+class CompileProgramWithTypesAndObjectsTest {
 
 	@Test
 	fun threeTypesOneObject() {
@@ -22,7 +22,7 @@ class CompileProgramWithTypesAndObjects {
 		println(clazz)
 		cUnit.additionalUnits.forEach(::println)
 		assertThat(clazz, present())
-		assertThat(cUnit.additionalUnits, hasSize(equalTo(4)))
+		assertThat(cUnit.additionalUnits, hasSize(equalTo(5)))
 	}
 
 }

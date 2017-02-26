@@ -41,6 +41,7 @@ import io.gitlab.arturbosch.grovlin.ast.ElifStatement
 import io.gitlab.arturbosch.grovlin.ast.EqualExpression
 import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
+import io.gitlab.arturbosch.grovlin.ast.GetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.GreaterEqualExpression
 import io.gitlab.arturbosch.grovlin.ast.GreaterExpression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
@@ -60,6 +61,7 @@ import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.Program
+import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
 import io.gitlab.arturbosch.grovlin.ast.SumExpression
@@ -193,6 +195,15 @@ private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = whe
 	is ThisReference -> ThisExpr()
 	is CallExpression -> MethodCallExpr().apply {
 		setName(this@toJava.name)
+		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
+	}
+	is SetterAccessExpression -> MethodCallExpr().apply {
+		setName("set" + this@toJava.name[0].toUpperCase() + this@toJava.name.substring(1))
+		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
+		arguments = NodeList(this@toJava.expression.toJava())
+	}
+	is GetterAccessExpression -> MethodCallExpr().apply {
+		setName("get" + this@toJava.name[0].toUpperCase() + this@toJava.name.substring(1))
 		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
 	}
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
