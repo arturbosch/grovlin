@@ -200,7 +200,7 @@ private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = whe
 	is SetterAccessExpression -> MethodCallExpr().apply {
 		setName("set" + this@toJava.name[0].toUpperCase() + this@toJava.name.substring(1))
 		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
-		arguments = NodeList(this@toJava.expression.toJava())
+		arguments = NodeList.nodeList(this@toJava.expression.toJava())
 	}
 	is GetterAccessExpression -> MethodCallExpr().apply {
 		setName("get" + this@toJava.name[0].toUpperCase() + this@toJava.name.substring(1))
