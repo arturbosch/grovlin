@@ -119,7 +119,7 @@ private fun Program.toJava(): ClassOrInterfaceDeclaration {
 	val statementsOfProgram = this@toJava.statements
 	return ClassOrInterfaceDeclaration().apply {
 		setName(clazzName + "Gv") // #20
-		addModifier(Modifier.PUBLIC)
+		addModifier(Modifier.PUBLIC, Modifier.FINAL)
 		val main = addMethod("main", Modifier.PUBLIC, Modifier.STATIC)
 		main.addParameter(ArrayType(ClassOrInterfaceType("String")), "args")
 		val statements = statementsOfProgram.mapTo(NodeList<JavaParserStatement>()) { it.toJava() }

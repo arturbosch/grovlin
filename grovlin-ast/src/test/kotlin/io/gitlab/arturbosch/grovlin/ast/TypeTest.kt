@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.present
+import io.gitlab.arturbosch.grovlin.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import org.junit.Test
 
@@ -25,5 +26,11 @@ class TypeTest {
 
 		assertThat(grovlinFile.findObjectByName("BinaryTree"), present())
 		assertThat(grovlinFile.collectByType<TypeDeclaration>(), hasSize(equalTo(3)))
+	}
+
+	@Test
+	fun parseTypeObjectHierarchies() {
+		val grovlinFile = parseFromTestResource("TypesAndObjectsComplex.grovlin")
+		println(grovlinFile.asString())
 	}
 }
