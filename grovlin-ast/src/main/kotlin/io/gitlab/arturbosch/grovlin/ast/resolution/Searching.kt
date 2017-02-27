@@ -5,6 +5,7 @@ package io.gitlab.arturbosch.grovlin.ast.resolution
 import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.Node
+import io.gitlab.arturbosch.grovlin.ast.NodeWithStatements
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
@@ -49,9 +50,22 @@ fun GrovlinFile.resolveSymbols() {
 	val childParentMap = this.childParentMap()
 
 	processNodesOfType<VarReference> {
-		val statement = it.ancestor(Statement::class.java, childParentMap)
-		val valueDeclarations = statements.preceding(statement).filterIsInstance<VarDeclaration>()
-		it.reference.tryToResolve(valueDeclarations.reversed())
+		val statementContainingRefernce = it.ancestor(Statement::class.java, childParentMap)
+		var currentNode = it.ancestor(NodeWithStatements::class.java, childParentMap)
+		do {
+			val valueDeclarations = currentNode?.statements?.preceding(statementContainingRefernce)
+					?.filterIsInstance<VarDeclaration>() ?: emptyList()
+			it.reference.tryToResolve(valueDeclarations.reversed())
+			if (it.reference.isResolved()) {
+				return@processNodesOfType
+			}
+			currentNode = currentNode?.ancestor(NodeWithStatements::class.java, childParentMap)
+		} while (it.reference.source == null && currentNode != null)
+//		if (it.reference.source == null) {
+//			val declaration = it.ancestor(MemberDeclaration::class.java, childParentMap)
+//			val valueDeclarations = statements.preceding(statement).filterIsInstance<VarDeclaration>()
+//			it.reference.tryToResolve(valueDeclarations.reversed())
+//		}
 	}
 
 	processNodesOfType<Assignment> {
@@ -60,7 +74,7 @@ fun GrovlinFile.resolveSymbols() {
 	}
 }
 
-private fun List<Statement>.preceding(statement: Statement?): List<Statement> {
-	if (statement == null) emptyList<Statement>()
-	return filter { it.isBefore(statement!!) }
+private fun List<Statement>.preceding(node: Node?): List<Node> {
+	if (node == null) emptyList<Statement>()
+	return filter { it.isBefore(node!!) }
 }

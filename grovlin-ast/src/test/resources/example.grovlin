@@ -4,5 +4,8 @@ type Example {
         print(age)
     }
 }
-var a = 4
-print(a)
+program {
+    var a = 4
+    print(a)
+}
+

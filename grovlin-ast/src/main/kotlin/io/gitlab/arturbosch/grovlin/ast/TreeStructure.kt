@@ -58,4 +58,5 @@ data class Reference<N : Named>(val name: String, var source: N? = null) {
 		return res != null
 	}
 
+	fun isResolved() = source != null
 }

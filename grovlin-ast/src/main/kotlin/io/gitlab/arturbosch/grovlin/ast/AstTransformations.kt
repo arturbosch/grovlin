@@ -24,20 +24,31 @@ fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this
 
 fun MemberDeclarationContext.toAst(): Statement = when (this) {
 	is PropertyMemberDeclarationContext -> transformToProperty()
-	is TypeMemberDeclarationContext -> TypeDeclaration(ObjectOrTypeType(typeDeclaration().typeName.text),
-			typeDeclaration().extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) },
-			typeDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() as MemberDeclaration }, toPosition())
-	is ObjectMemberDeclarationContext -> transformToObjectDeclaration()
+	is TypeMemberDeclarationContext -> typeDeclaration().transformToTypeDeclaration()
+	is ObjectMemberDeclarationContext -> objectDeclaration().transformToObjectDeclaration()
 	is DefMemberDeclarationContext -> defDeclaration().toAst()
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }
 
-private fun ObjectMemberDeclarationContext.transformToObjectDeclaration(): ObjectDeclaration {
-	val extendObject = objectDeclaration().extendObject
-	return ObjectDeclaration(ObjectOrTypeType(objectDeclaration().objectName.text),
-			extendObject?.let { ObjectOrTypeType(it.text) },
-			objectDeclaration().extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) },
-			objectDeclaration().memberDeclaration().mapTo(ArrayList()) { it.toAst() as MemberDeclaration }, toPosition())
+private fun TypeDeclarationContext.transformToTypeDeclaration(): TypeDeclaration {
+	val type = ObjectOrTypeType(typeName.text)
+	val extendedTypes = extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) }
+	val statements: ArrayList<Statement> = memberDeclaration().mapTo(ArrayList()) { it.toAst() as MemberDeclaration }
+	val blockStatement = if (statements.isNotEmpty()) {
+		BlockStatement(statements, Position(LBRACE().symbol.startPoint(), RBRACE().symbol.endPoint()))
+	} else null
+	return TypeDeclaration(type, extendedTypes, blockStatement, toPosition())
+}
+
+private fun ObjectDeclarationContext.transformToObjectDeclaration(): ObjectDeclaration {
+	val type = ObjectOrTypeType(objectName.text)
+	val extendedObject = extendObject?.let { ObjectOrTypeType(it.text) }
+	val extendedTypes = extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) }
+	val statements: ArrayList<Statement> = memberDeclaration().mapTo(ArrayList()) { it.toAst() as MemberDeclaration }
+	val blockStatement = if (statements.isNotEmpty()) {
+		BlockStatement(statements, Position(LBRACE().symbol.startPoint(), RBRACE().symbol.endPoint()))
+	} else null
+	return ObjectDeclaration(type, extendedObject, extendedTypes, blockStatement, toPosition())
 }
 
 private fun PropertyMemberDeclarationContext.transformToProperty(): PropertyDeclaration {
