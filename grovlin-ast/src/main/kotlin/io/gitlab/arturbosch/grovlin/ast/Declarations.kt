@@ -29,13 +29,13 @@ data class LambdaDeclaration(override val name: String,
 							 override val statements: MutableList<Statement>,
 							 override val position: Position? = null) : Statement, NodeWithStatements, NodeWithName, TopLevelDeclarable
 
-data class PropertyDeclaration(val type: ObjectOrTypeType,
+data class PropertyDeclaration(override var type: Type,
 							   override val name: String,
 							   val value: Expression?,
-							   override val position: Position? = null) : MemberDeclaration, NodeWithName
+							   override val position: Position? = null) : MemberDeclaration, VariableDeclaration
 
 data class VarDeclaration(override val name: String,
 						  val value: Expression,
-						  override val position: Position? = null) : Statement, NodeWithName, NodeWithType {
+						  override val position: Position? = null) : VariableDeclaration {
 	override var type: Type = UnknownType
 }

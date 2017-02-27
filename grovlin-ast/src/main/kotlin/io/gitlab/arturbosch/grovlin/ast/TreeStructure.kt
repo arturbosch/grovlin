@@ -35,6 +35,8 @@ interface Expression : Node
 
 interface Statement : Node
 
+interface VariableDeclaration : Statement, NodeWithType, Named
+
 interface MemberDeclaration : Statement
 
 interface TopLevelDeclarable {

@@ -18,6 +18,7 @@ import io.gitlab.arturbosch.grovlin.ast.ObjectCreation
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.Position
 import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
+import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.RelationExpression
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
@@ -47,13 +48,14 @@ fun GrovlinFile.resolveTypes(): List<SemanticError> {
 	return errors
 }
 
-private fun NodeWithType.tryToSolve() = when (this) {
-	is VarDeclaration -> type = resolveVarDeclaration()
-	else -> throw UnsupportedOperationException("")
-}
-
-private fun VarDeclaration.resolveVarDeclaration(): Type {
-	return if (!isUnsolved()) type else value.resolveType()
+private fun NodeWithType.tryToSolve(): Type {
+	if (!isUnsolved()) return type
+	when (this) {
+		is VarDeclaration -> type = value.resolveType()
+		is PropertyDeclaration -> type
+		else -> throw UnsupportedOperationException("")
+	}
+	return type
 }
 
 private fun Expression.resolveType(): Type = when (this) {
@@ -62,7 +64,7 @@ private fun Expression.resolveType(): Type = when (this) {
 	is TypeConversion -> targetType
 	is MinusExpression -> value.resolveType()
 	is NotExpression -> value.resolveType()
-	is VarReference -> safeDeclaration().resolveVarDeclaration()
+	is VarReference -> safeDeclaration().tryToSolve()
 	is ObjectCreation -> type
 	is IntLit -> type
 	is DecLit -> type

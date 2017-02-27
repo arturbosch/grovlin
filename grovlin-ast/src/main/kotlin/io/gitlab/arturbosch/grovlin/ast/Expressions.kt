@@ -21,6 +21,6 @@ data class ThisReference(val reference: Reference<TypeDeclaration>, override val
 
 data class TypeConversion(val value: Expression, val targetType: Type, override val position: Position? = null) : Expression
 
-data class VarReference(val reference: Reference<VarDeclaration>, override val position: Position? = null) : Expression
+data class VarReference(val reference: Reference<VariableDeclaration>, override val position: Position? = null) : Expression
 
 data class ObjectCreation(val type: ObjectOrTypeType, override val position: Position?) : Expression

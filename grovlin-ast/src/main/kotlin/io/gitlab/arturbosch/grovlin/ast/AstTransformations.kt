@@ -42,7 +42,7 @@ private fun ObjectMemberDeclarationContext.transformToObjectDeclaration(): Objec
 
 private fun PropertyMemberDeclarationContext.transformToProperty(): PropertyDeclaration {
 	val assignment = propertyDeclaration().assignment()
-	return PropertyDeclaration(ObjectOrTypeType(propertyDeclaration().TYPEID().text),
+	return PropertyDeclaration(Type.of(propertyDeclaration().TYPEID().text),
 			assignment?.ID()?.text ?: propertyDeclaration().ID().text,
 			assignment?.expression()?.toAst(), toPosition())
 }
