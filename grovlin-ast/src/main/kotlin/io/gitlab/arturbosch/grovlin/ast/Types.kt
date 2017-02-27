@@ -4,7 +4,16 @@ package io.gitlab.arturbosch.grovlin.ast
  * @author Artur Bosch
  */
 
-interface Type : Named
+interface Type : Named {
+	companion object {
+		fun of(type: String) = when (type) {
+			"Bool" -> BoolType
+			"Int" -> IntType
+			"Decimal" -> DecimalType
+			else -> ObjectOrTypeType(type)
+		}
+	}
+}
 
 interface NumberType : Type
 
