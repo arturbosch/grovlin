@@ -51,7 +51,6 @@ import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.LessEqualExpression
 import io.gitlab.arturbosch.grovlin.ast.LessExpression
-import io.gitlab.arturbosch.grovlin.ast.MemberDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MinusExpression
 import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
@@ -88,12 +87,13 @@ import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
 
 fun GrovlinFile.toJava(): CUnit {
 	if (name.isNullOrBlank()) throw IllegalStateException("You cannot convert a grovlin file with no file name to java!")
+	if (block == null) throw IllegalStateException("Empty files are no valid grovlin files!")
 
 	val unit = CompilationUnit()
 
-	val program = (statements.find { it is Program } ?: throw IllegalStateException("No program statement found!")) as Program
+	val program = (block!!.statements.find { it is Program } ?: throw IllegalStateException("No program statement found!")) as Program
 
-	val topLevelDeclarations = statements.filterIsInstance(TopLevelDeclarable::class.java)
+	val topLevelDeclarations = block!!.statements.filterIsInstance(TopLevelDeclarable::class.java)
 			.filterNot { it is Program }
 			.filter { it.isTopLevelDeclaration() }
 			.map { it.toJava() }
@@ -124,13 +124,13 @@ private fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
 
 private fun Program.toJava(): ClassOrInterfaceDeclaration {
 	val clazzName = name[0].toUpperCase() + name.substring(1)
-	val statementsOfProgram = this@toJava.statements
+	val statementsOfProgram = this@toJava.block?.statements
 	return ClassOrInterfaceDeclaration().apply {
 		setName(clazzName + "Gv") // #20
 		addModifier(Modifier.PUBLIC, Modifier.FINAL)
 		val main = addMethod("main", Modifier.PUBLIC, Modifier.STATIC)
 		main.addParameter(ArrayType(ClassOrInterfaceType("String")), "args")
-		val statements = statementsOfProgram.mapTo(NodeList<JavaParserStatement>()) { it.toJava() }
+		val statements = statementsOfProgram?.mapTo(NodeList<JavaParserStatement>()) { it.toJava() } ?: NodeList()
 		main.setBody(BlockStmt(statements))
 	}
 }
@@ -138,7 +138,7 @@ private fun Program.toJava(): ClassOrInterfaceDeclaration {
 private fun ObjectDeclaration.transformToClassDeclaration(): ClassOrInterfaceDeclaration {
 	val extends = extendedTypes.mapTo(ArrayList()) { it.toJava() as ClassOrInterfaceType }
 	val superclass = extendedObject?.let { ClassOrInterfaceType(extendedObject?.name) }
-	val members = memberDeclarationsToJava(declarations, false)
+	val members = memberDeclarationsToJava(block, false)
 	return ClassOrInterfaceDeclaration(EnumSet.of(Modifier.PUBLIC), false, name)
 			.setImplementedTypes(NodeList.nodeList(extends))
 			.setMembers(NodeList.nodeList(members)).apply {
@@ -153,15 +153,15 @@ private fun ObjectDeclaration.transformToClassDeclaration(): ClassOrInterfaceDec
 
 private fun TypeDeclaration.transformToInterfaceDeclaration(): ClassOrInterfaceDeclaration {
 	val extends = extendedTypes.mapTo(ArrayList()) { it.toJava() as ClassOrInterfaceType }
-	val members = memberDeclarationsToJava(declarations, true)
+	val members = memberDeclarationsToJava(block, true)
 	return ClassOrInterfaceDeclaration(EnumSet.of(Modifier.PUBLIC), true, name)
 			.setExtendedTypes(NodeList.nodeList(extends))
 			.setMembers(NodeList.nodeList(members))
 }
 
-private fun memberDeclarationsToJava(declarations: List<MemberDeclaration>, isType: Boolean = false): MutableList<BodyDeclaration<*>> {
+private fun memberDeclarationsToJava(declarations: BlockStatement?, isType: Boolean = false): MutableList<BodyDeclaration<*>> {
 	val members = mutableListOf<BodyDeclaration<*>>()
-	declarations.forEach {
+	declarations?.statements?.forEach {
 		when (it) {
 			is MethodDeclaration -> members.add(it.toJava())
 			is PropertyDeclaration -> if (isType) {

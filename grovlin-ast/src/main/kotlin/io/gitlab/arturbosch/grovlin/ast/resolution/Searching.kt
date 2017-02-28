@@ -5,10 +5,11 @@ package io.gitlab.arturbosch.grovlin.ast.resolution
 import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.Node
-import io.gitlab.arturbosch.grovlin.ast.NodeWithStatements
+import io.gitlab.arturbosch.grovlin.ast.NodeWithBlock
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
+import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
 import io.gitlab.arturbosch.grovlin.ast.isBefore
 import io.gitlab.arturbosch.grovlin.ast.operations.processNodesOfType
 import java.util.IdentityHashMap
@@ -50,27 +51,22 @@ fun GrovlinFile.resolveSymbols() {
 	val childParentMap = this.childParentMap()
 
 	processNodesOfType<VarReference> {
-		val statementContainingRefernce = it.ancestor(Statement::class.java, childParentMap)
-		var currentNode = it.ancestor(NodeWithStatements::class.java, childParentMap)
+		val statementContainingReference = it.ancestor(Statement::class.java, childParentMap)
+		var currentNode = it.ancestor(NodeWithBlock::class.java, childParentMap)
 		do {
-			val valueDeclarations = currentNode?.statements?.preceding(statementContainingRefernce)
-					?.filterIsInstance<VarDeclaration>() ?: emptyList()
+			val valueDeclarations = currentNode?.block?.statements?.preceding(statementContainingReference)
+					?.filterIsInstance<VariableDeclaration>() ?: emptyList()
 			it.reference.tryToResolve(valueDeclarations.reversed())
 			if (it.reference.isResolved()) {
 				return@processNodesOfType
 			}
-			currentNode = currentNode?.ancestor(NodeWithStatements::class.java, childParentMap)
+			currentNode = currentNode?.ancestor(NodeWithBlock::class.java, childParentMap)
 		} while (it.reference.source == null && currentNode != null)
-//		if (it.reference.source == null) {
-//			val declaration = it.ancestor(MemberDeclaration::class.java, childParentMap)
-//			val valueDeclarations = statements.preceding(statement).filterIsInstance<VarDeclaration>()
-//			it.reference.tryToResolve(valueDeclarations.reversed())
-//		}
 	}
 
 	processNodesOfType<Assignment> {
-		val varDeclarations = statements.preceding(it).filterIsInstance<VarDeclaration>()
-		it.reference.tryToResolve(varDeclarations.reversed())
+		val varDeclarations = block?.statements?.preceding(it)?.filterIsInstance<VarDeclaration>()
+		it.reference.tryToResolve(varDeclarations?.reversed() ?: emptyList())
 	}
 }
 

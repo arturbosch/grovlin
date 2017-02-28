@@ -8,10 +8,8 @@ data class TypeDeclaration(val type: ObjectOrTypeType,
 						   val extendedTypes: MutableList<ObjectOrTypeType>,
 						   override val block: BlockStatement?,
 						   override val position: Position? = null) :
-		NodeWithBlock, Statement, Named, NodeWithMemberDeclarations, TopLevelDeclarable {
+		NodeWithBlock, Statement, Named, TopLevelDeclarable {
 
-	override val declarations: MutableList<MemberDeclaration> = block?.statements?.filterIsInstance<MemberDeclaration>()
-			?.toMutableList() ?: mutableListOf()
 	override val name: String = type.name
 }
 
@@ -19,11 +17,9 @@ data class ObjectDeclaration(val type: ObjectOrTypeType,
 							 val extendedObject: ObjectOrTypeType?,
 							 val extendedTypes: MutableList<ObjectOrTypeType>,
 							 override val block: BlockStatement?,
-							 override val position: Position? = null) : NodeWithBlock, Statement, Named, NodeWithMemberDeclarations,
-		TopLevelDeclarable {
+							 override val position: Position? = null) :
+		NodeWithBlock, Statement, Named, TopLevelDeclarable {
 
-	override val declarations: MutableList<MemberDeclaration> = block?.statements?.filterIsInstance<MemberDeclaration>()
-			?.toMutableList() ?: mutableListOf()
 	override val name: String = type.name
 }
 

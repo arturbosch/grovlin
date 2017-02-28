@@ -18,10 +18,6 @@ interface NodeWithStatements : Node {
 	val statements: MutableList<Statement>
 }
 
-interface NodeWithMemberDeclarations : Node {
-	val declarations: MutableList<MemberDeclaration>
-}
-
 interface NodeWithType : Node {
 	var type: Type
 	fun isUnsolved() = type is UnknownType

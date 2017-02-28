@@ -6,7 +6,6 @@ import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
-import io.gitlab.arturbosch.grovlin.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import io.gitlab.arturbosch.grovlin.ast.parseFromTestResource
 import io.gitlab.arturbosch.grovlin.ast.resolved
@@ -66,7 +65,9 @@ class ResolveVariablesTest {
 	fun resolveVarToPropertyDeclaration() {
 		val grovlinFile = ("type Box { Int data def theData() { print(data) } }" +
 				"\nobject BoxImpl as Box { override Int data }\nprogram { print(BoxImpl().data) }").asGrovlinFile().resolved()
-		println(grovlinFile.asString())
-		assertThat(grovlinFile.collectByType<VarReference>()[0].reference.source, present())
+		
+		val collectByType = grovlinFile.collectByType<VarReference>()
+
+		assertThat(collectByType[0].reference.source, present())
 	}
 }

@@ -7,8 +7,13 @@ import java.util.LinkedList
 /**
  * @author Artur Bosch
  */
-fun GrovlinFileContext.toAsT(fileName: String = "Program"): GrovlinFile = GrovlinFile(fileName,
-		statements().statement().mapTo(ArrayList()) { it.toAst(fileName) }, toPosition())
+fun GrovlinFileContext.toAsT(fileName: String = "Program"): GrovlinFile {
+	val statements = statements().statement().mapTo(ArrayList()) { it.toAst(fileName) }
+	val blockStatement = if (statements.isNotEmpty()) {
+		BlockStatement(statements, toPosition())
+	} else null
+	return GrovlinFile(fileName, blockStatement, toPosition())
+}
 
 fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this) {
 	is ExpressionStatementContext -> ExpressionStatement(expressionStmt().expression().toAst(), toPosition())
@@ -17,9 +22,17 @@ fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this
 			varDeclaration().assignment().expression().toAst(), toPosition())
 	is AssignmentStatementContext -> Assignment(Reference(assignment().ID().text), assignment().expression().toAst(), toPosition())
 	is PrintStatementContext -> Print(print().expression().toAst(), toPosition())
-	is ProgramStatementContext -> Program(fileName, program().statements().statement().mapTo(ArrayList()) { it.toAst() }, toPosition())
+	is ProgramStatementContext -> program().transformToBlockStatement(fileName)
 	is IfStatementContext -> transformToIfStatement()
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
+}
+
+private fun ProgramContext.transformToBlockStatement(fileName: String): Program {
+	val statements = statements().statement().mapTo(ArrayList()) { it.toAst() }
+	val blockStatement = if (statements.isNotEmpty()) {
+		BlockStatement(statements, Position(LBRACE().symbol.startPoint(), RBRACE().symbol.endPoint()))
+	} else null
+	return Program(fileName, blockStatement, toPosition())
 }
 
 fun MemberDeclarationContext.toAst(): Statement = when (this) {
