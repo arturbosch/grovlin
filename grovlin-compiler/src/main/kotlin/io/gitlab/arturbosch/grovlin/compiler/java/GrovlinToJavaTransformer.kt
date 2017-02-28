@@ -63,6 +63,7 @@ import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
+import io.gitlab.arturbosch.grovlin.ast.Reference
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
@@ -75,10 +76,12 @@ import io.gitlab.arturbosch.grovlin.ast.TypeDeclaration
 import io.gitlab.arturbosch.grovlin.ast.UnequalExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
+import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
 import java.util.ArrayList
 import java.util.EnumSet
 import com.github.javaparser.ast.body.MethodDeclaration as JavaParserMethod
+import com.github.javaparser.ast.expr.Expression as JavaParserExpression
 import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
 
 /**
@@ -205,12 +208,21 @@ private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when 
 	is VarDeclaration -> ExpressionStmt(VariableDeclarationExpr(VariableDeclarator(type.toJava(), name, value.toJava())))
 	is Print -> ExpressionStmt(MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
 			SimpleName("println"), NodeList.nodeList(value.toJava())))
-	is Assignment -> ExpressionStmt(AssignExpr(NameExpr(reference.name), value.toJava(), AssignExpr.Operator.ASSIGN))
+	is Assignment -> ExpressionStmt(AssignExpr(reference.toJava(), value.toJava(), AssignExpr.Operator.ASSIGN))
 	is ExpressionStatement -> ExpressionStmt(expression.toJava())
 	is IfStatement -> IfStmt(condition.toJava(), thenStatement.toJava(), transformElifsToElseIfConstructs(elifs, elseStatement))
 	is BlockStatement -> BlockStmt(NodeList.nodeList(statements.map { it.toJava() }))
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
+
+private fun Reference<VariableDeclaration>.toJava(): JavaParserExpression = when (this.source) {
+	is PropertyDeclaration -> MethodCallExpr(null, name.toGetter())
+	is VarDeclaration -> NameExpr(name)
+	else -> throw UnsupportedOperationException(javaClass.canonicalName)
+}
+
+private fun String.toGetter() = "get" + get(0).toUpperCase() + substring(1)
+private fun String.toSetter() = "set" + get(0).toUpperCase() + substring(1)
 
 fun transformElifsToElseIfConstructs(elifs: MutableList<ElifStatement>, elseStatement: BlockStatement?): JavaParserStatement? {
 	return if (elifs.isNotEmpty()) {
@@ -222,7 +234,7 @@ fun transformElifsToElseIfConstructs(elifs: MutableList<ElifStatement>, elseStat
 	}
 }
 
-private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = when (this) {
+private fun Expression.toJava(): JavaParserExpression = when (this) {
 	is ParenExpression -> EnclosedExpr(expression.toJava())
 	is ObjectCreation -> ObjectCreationExpr(null, ClassOrInterfaceType(type.name), NodeList())
 	is SumExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.PLUS)
@@ -244,19 +256,19 @@ private fun Expression.toJava(): com.github.javaparser.ast.expr.Expression = whe
 	is IntLit -> IntegerLiteralExpr(value)
 	is DecLit -> DoubleLiteralExpr(value)
 	is BoolLit -> BooleanLiteralExpr(value)
-	is VarReference -> NameExpr(reference.name)
+	is VarReference -> reference.toJava()
 	is ThisReference -> ThisExpr()
 	is CallExpression -> MethodCallExpr().apply {
 		setName(this@toJava.name)
 		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
 	}
 	is SetterAccessExpression -> MethodCallExpr().apply {
-		setName("set" + this@toJava.name[0].toUpperCase() + this@toJava.name.substring(1))
+		setName(this@toJava.name.toSetter())
 		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
 		arguments = NodeList.nodeList(this@toJava.expression.toJava())
 	}
 	is GetterAccessExpression -> MethodCallExpr().apply {
-		setName("get" + this@toJava.name[0].toUpperCase() + this@toJava.name.substring(1))
+		setName(this@toJava.name.toGetter())
 		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
 	}
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)

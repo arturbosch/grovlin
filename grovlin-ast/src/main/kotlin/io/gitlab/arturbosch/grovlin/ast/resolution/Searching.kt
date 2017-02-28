@@ -69,9 +69,7 @@ private fun resolveReference(it: NodeWithReference<VariableDeclaration>,
 		val valueDeclarations = currentNode?.block?.statements?.preceding(statementContainingReference)
 				?.filterIsInstance<VariableDeclaration>() ?: emptyList()
 		it.reference.tryToResolve(valueDeclarations.reversed())
-		if (it.reference.isResolved()) {
-			return
-		}
+		if (it.reference.isResolved()) return
 		currentNode = currentNode?.ancestor(NodeWithBlock::class.java, childParentMap)
 	} while (it.reference.source == null && currentNode != null)
 }
