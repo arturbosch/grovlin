@@ -24,6 +24,8 @@ data class BlockStatement(override val statements: MutableList<Statement>,
 
 data class ExpressionStatement(val expression: Expression, override val position: Position?) : Statement
 
-data class Assignment(val reference: Reference<VariableDeclaration>, val value: Expression, override val position: Position? = null) : Statement
+data class Assignment(override val reference: Reference<VariableDeclaration>,
+					  val value: Expression,
+					  override val position: Position? = null) : Statement, NodeWithReference<VariableDeclaration>
 
 data class Print(val value: Expression, override val position: Position? = null) : Statement

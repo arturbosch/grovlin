@@ -6,8 +6,8 @@ import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.Node
 import io.gitlab.arturbosch.grovlin.ast.NodeWithBlock
+import io.gitlab.arturbosch.grovlin.ast.NodeWithReference
 import io.gitlab.arturbosch.grovlin.ast.Statement
-import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
 import io.gitlab.arturbosch.grovlin.ast.isBefore
@@ -52,22 +52,28 @@ fun GrovlinFile.resolveSymbols() {
 
 	processNodesOfType<VarReference> {
 		val statementContainingReference = it.ancestor(Statement::class.java, childParentMap)
-		var currentNode = it.ancestor(NodeWithBlock::class.java, childParentMap)
-		do {
-			val valueDeclarations = currentNode?.block?.statements?.preceding(statementContainingReference)
-					?.filterIsInstance<VariableDeclaration>() ?: emptyList()
-			it.reference.tryToResolve(valueDeclarations.reversed())
-			if (it.reference.isResolved()) {
-				return@processNodesOfType
-			}
-			currentNode = currentNode?.ancestor(NodeWithBlock::class.java, childParentMap)
-		} while (it.reference.source == null && currentNode != null)
+		resolveReference(it, statementContainingReference, childParentMap)
 	}
 
 	processNodesOfType<Assignment> {
-		val varDeclarations = block?.statements?.preceding(it)?.filterIsInstance<VarDeclaration>()
-		it.reference.tryToResolve(varDeclarations?.reversed() ?: emptyList())
+		resolveReference(it, it, childParentMap)
 	}
+}
+
+private fun resolveReference(it: NodeWithReference<VariableDeclaration>,
+							 statementContainingReference: Statement?,
+							 childParentMap: Map<Node, Node>) {
+
+	var currentNode = it.ancestor(NodeWithBlock::class.java, childParentMap)
+	do {
+		val valueDeclarations = currentNode?.block?.statements?.preceding(statementContainingReference)
+				?.filterIsInstance<VariableDeclaration>() ?: emptyList()
+		it.reference.tryToResolve(valueDeclarations.reversed())
+		if (it.reference.isResolved()) {
+			return
+		}
+		currentNode = currentNode?.ancestor(NodeWithBlock::class.java, childParentMap)
+	} while (it.reference.source == null && currentNode != null)
 }
 
 private fun List<Statement>.preceding(node: Node?): List<Node> {

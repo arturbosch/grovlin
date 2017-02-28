@@ -39,6 +39,10 @@ interface TopLevelDeclarable {
 	fun isTopLevelDeclaration(): Boolean = true
 }
 
+interface NodeWithReference<N : Named> : Node {
+	val reference: Reference<N>
+}
+
 data class Reference<N : Named>(val name: String, var source: N? = null) {
 	override fun toString(): String {
 		if (source == null) {

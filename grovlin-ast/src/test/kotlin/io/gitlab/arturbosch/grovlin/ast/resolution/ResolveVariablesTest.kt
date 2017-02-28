@@ -62,10 +62,24 @@ class ResolveVariablesTest {
 	}
 
 	@Test
+	fun resolveAssignment() {
+		val grovlinFile = "var a = 5\na = 10".asGrovlinFile().resolved()
+
+		assertThat(grovlinFile.collectByType<Assignment>()[0].reference.source, present())
+	}
+
+	@Test
+	fun resolveAssignmentInMethod() {
+		val grovlinFile = "object Node { def method() { var a = 5\na = 10 } }".asGrovlinFile().resolved()
+
+		assertThat(grovlinFile.collectByType<Assignment>()[0].reference.source, present())
+	}
+
+	@Test
 	fun resolveVarToPropertyDeclaration() {
 		val grovlinFile = ("type Box { Int data def theData() { print(data) } }" +
 				"\nobject BoxImpl as Box { override Int data }\nprogram { print(BoxImpl().data) }").asGrovlinFile().resolved()
-		
+
 		val collectByType = grovlinFile.collectByType<VarReference>()
 
 		assertThat(collectByType[0].reference.source, present())
