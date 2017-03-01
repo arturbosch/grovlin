@@ -8,5 +8,10 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
  */
 data class CUnit(val fileName: String,
 				 val mainClass: ClassOrInterfaceDeclaration,
-				 val unit: CompilationUnit,
-				 val additionalUnits: List<CompilationUnit> = emptyList())
+				 val unit: CompilationUnit) {
+	val javaFileName = fileName + ".java"
+}
+
+data class CPackage(val main: CUnit, val cus: List<CUnit>) {
+	fun all() = cus + main
+}

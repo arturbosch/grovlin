@@ -6,11 +6,11 @@ import io.gitlab.arturbosch.grovlin.compiler.args.Args
 import io.gitlab.arturbosch.grovlin.compiler.args.failWithErrorMessage
 import io.gitlab.arturbosch.grovlin.compiler.args.jCommander
 import io.gitlab.arturbosch.grovlin.compiler.args.parseArguments
+import io.gitlab.arturbosch.grovlin.compiler.java.run
 import io.gitlab.arturbosch.grovlin.compiler.java.toFile
 import io.gitlab.arturbosch.grovlin.compiler.java.toJava
 import io.gitlab.arturbosch.grovlin.compiler.parser.Parser
 import java.io.File
-import java.nio.file.Files
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -42,13 +42,7 @@ fun main(args: Array<String>) {
 }
 
 private fun runJvm(grovlinFile: GrovlinFile) {
-	val tempFile = Files.createTempDirectory("grovlin_run")
-	val cUnit = grovlinFile.toJava()
-	cUnit.toFile(tempFile.toFile())
-	val process = ProcessBuilder("java", "-classpath", tempFile.toString(), cUnit.fileName).start()
-	process.waitFor()
-	println(String(process.inputStream.buffered().readBytes()))
-	println(String(process.errorStream.buffered().readBytes()))
+	grovlinFile.toJava().run()
 }
 
 private fun runCompiler(grovlinFile: GrovlinFile) {

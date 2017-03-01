@@ -8,8 +8,9 @@ import javax.tools.ToolProvider;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * In-memory compile Java source code as String.
@@ -28,18 +29,19 @@ public class JavaStringCompiler {
 	}
 
 	/**
-	 * Compile a Java source file in memory.
+	 * Compile Java sources in memory.
 	 *
-	 * @param fileName Java file name, e.g. "Test.java"
-	 * @param source   The source code as String.
+	 * @param fileNameToSources A map of sources with their class names.
 	 * @return The compiled results as Map that contains class name as key,
 	 * class binary as value.
 	 * @throws IOException If compile error.
 	 */
-	public Map<String, byte[]> compile(String fileName, String source) throws IOException {
+	public Map<String, byte[]> compile(Map<String, String> fileNameToSources) throws IOException {
 		try (MemoryJavaFileManager manager = new MemoryJavaFileManager(stdManager)) {
-			JavaFileObject javaFileObject = manager.makeStringSource(fileName, source);
-			CompilationTask task = compiler.getTask(null, manager, null, null, null, Collections.singletonList(javaFileObject));
+			List<JavaFileObject> fileObjects = fileNameToSources.entrySet().stream()
+					.map(it -> manager.makeStringSource(it.getKey(), it.getValue()))
+					.collect(Collectors.toList());
+			CompilationTask task = compiler.getTask(null, manager, null, null, null, fileObjects);
 			Boolean result = task.call();
 			if (result == null || !result) {
 				throw new RuntimeException("Compilation failed.");

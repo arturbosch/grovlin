@@ -88,7 +88,7 @@ import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
  * @author Artur Bosch
  */
 
-fun GrovlinFile.toJava(): CUnit {
+fun GrovlinFile.toJava(): CPackage {
 	if (name.isNullOrBlank()) throw IllegalStateException("You cannot convert a grovlin file with no file name to java!")
 	if (block == null) throw IllegalStateException("Empty files are no valid grovlin files!")
 
@@ -101,8 +101,8 @@ fun GrovlinFile.toJava(): CUnit {
 			.filter { it.isTopLevelDeclaration() }
 			.map { it.toJava() }
 
-	val additionalUnits = topLevelDeclarations.filter { it is ClassOrInterfaceDeclaration }
-			.map { CompilationUnit().apply { addType(it as ClassOrInterfaceDeclaration) } }
+	val additionalUnits = topLevelDeclarations.filterIsInstance<ClassOrInterfaceDeclaration>()
+			.map { CUnit(it.nameAsString, it, CompilationUnit().apply { addType(it) }) }
 
 	val membersOfProgram = topLevelDeclarations.filterNot { it is ClassOrInterfaceDeclaration }
 
@@ -110,7 +110,7 @@ fun GrovlinFile.toJava(): CUnit {
 	membersOfProgram.forEach { clazz.addMember(it) }
 	unit.addType(clazz)
 
-	return CUnit(clazz.nameAsString, clazz, unit, additionalUnits)
+	return CPackage(CUnit(clazz.nameAsString, clazz, unit), additionalUnits)
 }
 
 private fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {

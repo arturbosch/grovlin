@@ -19,12 +19,13 @@ class CompileProgramWithTypesAndObjectsTest {
 	fun threeTypesOneObject() {
 		val grovlinFile = parseFromTestResource("TypesAndObjects.grovlin")
 		println(grovlinFile.asString())
-		val cUnit = grovlinFile.toJava()
+		val cPackage = grovlinFile.toJava()
+		val cUnit = cPackage.main
 		val clazz = cUnit.mainClass
 		println(clazz)
-		cUnit.additionalUnits.forEach(::println)
+		cPackage.cus.forEach(::println)
 		assertThat(clazz, present())
-		assertThat(cUnit.additionalUnits, hasSize(equalTo(5)))
+		assertThat(cPackage.cus, hasSize(equalTo(5)))
 	}
 
 
@@ -34,8 +35,8 @@ class CompileProgramWithTypesAndObjectsTest {
 				.root!!.toAsT()
 		println(grovlinFile.asString())
 		val java = grovlinFile.toJava()
-		java.additionalUnits.forEach(::println)
-		println(java.unit)
+		java.cus.forEach(::println)
+		println(java.main)
 	}
 
 }
