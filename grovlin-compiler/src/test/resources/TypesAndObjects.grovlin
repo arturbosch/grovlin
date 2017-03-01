@@ -29,8 +29,9 @@ object LeafImpl as Leaf {
 
 program {
     var tree = BinaryTree()
-    tree.left = LeafImpl()
-    tree.left.data = 5
+    var leaf = LeafImpl()
+    leaf.data = 5
+    tree.left = leaf
     var tree2 = BinaryTree()
     tree2.parent = tree
     tree.right = tree2
