@@ -6,6 +6,7 @@ import com.github.javaparser.ast.NodeList
 import com.github.javaparser.ast.body.BodyDeclaration
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
+import com.github.javaparser.ast.body.Parameter
 import com.github.javaparser.ast.body.VariableDeclarator
 import com.github.javaparser.ast.expr.AssignExpr
 import com.github.javaparser.ast.expr.BinaryExpr
@@ -189,6 +190,7 @@ private fun PropertyDeclaration.typePropertyToJava(members: MutableList<BodyDecl
 	members.add(JavaParserMethod().setName("set" + name[0].toUpperCase() + name.substring(1))
 			.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
 			.setBody(null)
+			.setParameters(NodeList.nodeList(Parameter(fieldType, name)))
 			.setType(VoidType()))
 }
 
