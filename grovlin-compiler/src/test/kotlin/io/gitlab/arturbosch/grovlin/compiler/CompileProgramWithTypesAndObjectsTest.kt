@@ -23,7 +23,7 @@ class CompileProgramWithTypesAndObjectsTest {
 		val cUnit = cPackage.main
 		val clazz = cUnit.mainClass
 		println(clazz)
-		cPackage.cus.forEach(::println)
+		cPackage.cus.forEach { print(it.unit) }
 		assertThat(clazz, present())
 		assertThat(cPackage.cus, hasSize(equalTo(5)))
 	}

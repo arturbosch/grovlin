@@ -166,7 +166,7 @@ private fun memberDeclarationsToJava(declarations: BlockStatement?, isType: Bool
 	val members = mutableListOf<BodyDeclaration<*>>()
 	declarations?.statements?.forEach {
 		when (it) {
-			is MethodDeclaration -> members.add(it.toJava())
+			is MethodDeclaration -> members.add(it.toJava(isType))
 			is PropertyDeclaration -> if (isType) {
 				it.typePropertyToJava(members)
 			} else {
@@ -192,7 +192,7 @@ private fun PropertyDeclaration.typePropertyToJava(members: MutableList<BodyDecl
 			.setType(VoidType()))
 }
 
-private fun MethodDeclaration.toJava(): BodyDeclaration<*> = if (mustBeOverriden()) {
+private fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*> = if (mustBeOverriden()) {
 	JavaParserMethod().setName(name)
 			.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
 			.setBody(null)
@@ -202,6 +202,7 @@ private fun MethodDeclaration.toJava(): BodyDeclaration<*> = if (mustBeOverriden
 			.setModifiers(EnumSet.of(Modifier.PUBLIC))
 			.setBody(block!!.toJava() as BlockStmt)
 			.setType(VoidType())
+			.setDefault(isType)
 }
 
 private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {
