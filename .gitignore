@@ -1,6 +1,5 @@
 # Created by .ignore support plugin (hsz.mobi)
 .gradle
-/build/
 gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
@@ -24,3 +23,6 @@ fabric.properties
 /grovlin-parser/src/antlr/
 /grovlin-parser/src/main/antlr/GrovlinLexer.tokens
 /grovlin-compiler/out/
+build
+grovlin-ast/out/
+grovlin-parser/out/
