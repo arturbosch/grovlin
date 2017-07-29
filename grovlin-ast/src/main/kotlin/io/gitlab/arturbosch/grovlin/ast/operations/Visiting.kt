@@ -14,7 +14,7 @@ fun Node.process(operation: (Node) -> Unit) {
 private fun Any?.processIfPropertyIsFromTypeNode(operation: (Node) -> Unit) {
 	when (this) {
 		is Node -> process(operation)
-		is Collection<*> -> this.forEach { if (it is Node) it.process(operation) }
+		is Collection<*> -> this.forEach { (it as? Node)?.process(operation) }
 	}
 }
 

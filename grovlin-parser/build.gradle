@@ -1,11 +1,12 @@
 configurations {
-	compile.extendsFrom kotlin
+	compile.extendsFrom kotlinCompile
 	testCompile.extendsFrom kotlinTest
 }
 
 dependencies {
 	antlr "org.antlr:antlr4:4.6"
 	compile "org.antlr:antlr4-runtime:4.6"
+	testCompile 'junit:junit:4.12'
 }
 
 generateGrammarSource {
@@ -13,7 +14,9 @@ generateGrammarSource {
 	arguments += ['-package', 'io.gitlab.arturbosch.grovlin']
 	outputDirectory = new File("src/antlr/main/io/gitlab/arturbosch/grovlin".toString())
 }
+
 compileJava.dependsOn generateGrammarSource
+compileKotlin.dependsOn generateGrammarSource
 
 sourceSets {
 	generated {
