@@ -7,15 +7,29 @@ import java.nio.file.Path
 
 object Args {
 
-	@Parameter(names = arrayOf("--mode", "-m"), description = "Specifies if the compiler should only 'compile' and also 'run' the file. Default is 'run'.")
+	@Parameter(
+			names = arrayOf("--mode", "-m"),
+			description = "Specifies if the compiler should only 'compile' and also 'run' the file. Default is 'run'.")
 	var mode: String = "run"
-	@Parameter(names = arrayOf("--input", "-i"), description = "The input grovlin file.", converter = ExistingPathConverter::class)
+	@Parameter(
+			required = true,
+			names = arrayOf("--input", "-i"),
+			description = "The input grovlin file.",
+			converter = ExistingPathConverter::class)
 	var input: Path? = null
-	@Parameter(names = arrayOf("--output", "-o"), description = "The input grovlin file.", converter = ExistingPathConverter::class)
+	@Parameter(
+			names = arrayOf("--output", "-o"),
+			description = "The input grovlin file.",
+			converter = ExistingPathConverter::class)
 	var output: Path? = null
-	@Parameter(names = arrayOf("--show-tree", "-st"), description = "Prints the grovlin file tree.")
+	@Parameter(
+			names = arrayOf("--show-tree", "-st"),
+			description = "Prints the grovlin file tree.")
 	var showTree = false
-	@Parameter(names = arrayOf("--help", "-h"), help = true, description = "Prints the help message.")
+	@Parameter(
+			names = arrayOf("--help", "-h"),
+			help = true,
+			description = "Prints the help message.")
 	var help = false
 
 }
