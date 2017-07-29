@@ -31,7 +31,7 @@ fun Node.processRelations(parent: Node? = null, operation: (Node, Node?) -> Unit
 		val value = property.get(this)
 		when (value) {
 			is Node -> value.processRelations(this, operation)
-			is Collection<*> -> value.forEach { if (it is Node) it.processRelations(this, operation) }
+			is Collection<*> -> value.forEach { (it as? Node)?.processRelations(this, operation) }
 		}
 	}
 }

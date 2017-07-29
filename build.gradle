@@ -29,24 +29,27 @@ allprojects {
 	}
 
 	configurations {
-		kotlin
+		kotlinCompile
 		kotlinTest
 	}
 
 	dependencies {
-		kotlin "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-		kotlin "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+		kotlinCompile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+		kotlinCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 		kotlinTest "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
 		kotlinTest "com.natpryce:hamkrest:$hamkrestVersion"
 		kotlinTest "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 		kotlinTest 'junit:junit:4.12'
 	}
 
+	sourceSets {
+		main.java.srcDirs += 'src/main/kotlin'
+	}
 }
 
 configurations {
 	detekt
-	compile.extendsFrom kotlin
+	compile.extendsFrom kotlinCompile
 	testCompile.extendsFrom kotlinTest
 }
 
