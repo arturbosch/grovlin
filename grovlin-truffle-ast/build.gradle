@@ -1,0 +1,22 @@
+apply plugin: "org.jetbrains.kotlin.kapt"
+apply plugin: "org.jetbrains.kotlin.plugin.allopen"
+
+allOpen {
+	annotation("com.oracle.truffle.api.nodes.Child")
+	annotation("com.oracle.truffle.api.dsl.TypeSystem")
+}
+
+configurations {
+	compile.extendsFrom kotlinCompile
+	testCompile.extendsFrom kotlinTest
+}
+
+dependencies {
+	compile project(":grovlin-parser")
+	compile project(":grovlin-ast")
+	compile "com.oracle.truffle:truffle-api:0.24"
+	kapt "com.oracle.truffle:truffle-api:0.24"
+	compile "com.oracle.truffle:truffle-tck:0.24"
+	compile "com.oracle.truffle:truffle-dsl-processor:0.24"
+	kapt "com.oracle.truffle:truffle-dsl-processor:0.24"
+}
