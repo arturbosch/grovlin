@@ -1,5 +1,6 @@
 package io.gitlab.arturbosch.grovlin.ast.operations
 
+import io.gitlab.arturbosch.grovlin.ast.AstNode
 import io.gitlab.arturbosch.grovlin.ast.Node
 import java.lang.reflect.ParameterizedType
 import kotlin.reflect.KProperty1
@@ -8,7 +9,7 @@ import kotlin.reflect.memberProperties
 
 const val TAB = "\t"
 
-fun Node.asString(indent: String = ""): String {
+fun AstNode.asString(indent: String = ""): String {
 	val sb = StringBuilder()
 	sb.append("$indent${javaClass.simpleName}\n")
 	javaClass.kotlin.memberProperties.filter { it.name != "position" }.forEach {
@@ -17,7 +18,7 @@ fun Node.asString(indent: String = ""): String {
 	return sb.toString()
 }
 
-private fun KProperty1<Node, *>.propertyToString(value: Any?, indent: String, sb: StringBuilder) {
+private fun KProperty1<AstNode, *>.propertyToString(value: Any?, indent: String, sb: StringBuilder) {
 	val type = returnType.javaType
 	if (type is ParameterizedType && type.rawType == List::class.java) {
 		val paramType = type.actualTypeArguments[0]

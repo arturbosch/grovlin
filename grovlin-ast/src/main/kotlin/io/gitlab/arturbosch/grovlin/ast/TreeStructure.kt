@@ -8,38 +8,45 @@ interface Named {
 	val name: String
 }
 
-interface Node {
-	val position: Position?
+
+interface AstNode {
+	var position: Position?
+	var parent: Node?
 }
 
-interface NodeWithName : Node, Named
+abstract class Node : AstNode {
+	override var position: Position? = null
+	override var parent: Node? = null
+}
 
-interface NodeWithStatements : Node {
+interface NodeWithName : AstNode, Named
+
+interface NodeWithStatements : AstNode {
 	val statements: MutableList<Statement>
 }
 
-interface NodeWithType : Node {
+interface NodeWithType : AstNode {
 	var type: Type
 	fun isUnsolved() = type is UnknownType
 }
 
-interface NodeWithBlock : Node {
+interface NodeWithBlock : AstNode {
 	val block: BlockStatement?
 }
 
-interface Expression : Node
+abstract class Expression : Node()
 
-interface Statement : Node
+abstract class Statement : Node()
 
-interface VariableDeclaration : Statement, NodeWithType, Named
+interface VariableDeclaration : NodeWithType, Named
 
-interface MemberDeclaration : Statement
+interface MemberDeclaration : AstNode
 
 interface TopLevelDeclarable {
 	fun isTopLevelDeclaration(): Boolean = true
 }
 
-interface NodeWithReference<N : Named> : Node {
+interface NodeWithReference<N : Named> : AstNode {
 	val reference: Reference<N>
 }
 
