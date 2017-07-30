@@ -3,6 +3,7 @@
 package io.gitlab.arturbosch.grovlin.ast.resolution
 
 import io.gitlab.arturbosch.grovlin.ast.Assignment
+import io.gitlab.arturbosch.grovlin.ast.AstNode
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.Node
 import io.gitlab.arturbosch.grovlin.ast.NodeWithBlock
@@ -19,24 +20,24 @@ import kotlin.reflect.memberProperties
  * @author Artur Bosch
  */
 
-fun Node.childParentMap(): Map<Node, Node> {
-	val map = IdentityHashMap<Node, Node>()
+fun AstNode.childParentMap(): Map<AstNode, AstNode> {
+	val map = IdentityHashMap<AstNode, AstNode>()
 	processRelations { child, parent -> if (parent != null) map[child] = parent }
 	return map
 }
 
-fun Node.processRelations(parent: Node? = null, operation: (Node, Node?) -> Unit) {
+fun AstNode.processRelations(parent: AstNode? = null, operation: (AstNode, AstNode?) -> Unit) {
 	operation(this, parent)
 	this.javaClass.kotlin.memberProperties.forEach { property ->
 		val value = property.get(this)
 		when (value) {
-			is Node -> value.processRelations(this, operation)
-			is Collection<*> -> value.forEach { (it as? Node)?.processRelations(this, operation) }
+			is AstNode -> value.processRelations(this, operation)
+			is Collection<*> -> value.forEach { (it as? AstNode)?.processRelations(this, operation) }
 		}
 	}
 }
 
-fun <T : Node> Node.ancestor(klass: Class<T>, childParentMap: Map<Node, Node>): T? {
+fun <T : AstNode> AstNode.ancestor(klass: Class<T>, childParentMap: Map<AstNode, AstNode>): T? {
 	if (childParentMap.containsKey(this)) {
 		val parent = childParentMap[this]
 		if (klass.isInstance(parent)) {
@@ -62,7 +63,7 @@ fun GrovlinFile.resolveSymbols() {
 
 private fun resolveReference(it: NodeWithReference<VariableDeclaration>,
 							 statementContainingReference: Statement?,
-							 childParentMap: Map<Node, Node>) {
+							 childParentMap: Map<AstNode, AstNode>) {
 
 	var currentNode = it.ancestor(NodeWithBlock::class.java, childParentMap)
 	do {

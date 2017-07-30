@@ -4,24 +4,24 @@ package io.gitlab.arturbosch.grovlin.ast
  * @author Artur Bosch
  */
 
-data class ParenExpression(val expression: Expression, override val position: Position?) : Expression
+class ParenExpression(val expression: Expression) : Expression()
 
-data class CallExpression(val scope: Expression?, override val name: String, override val position: Position?) : Expression, NodeWithName
+class CallExpression(val scope: Expression?,
+					 override val name: String) : Expression(), NodeWithName
 
-data class GetterAccessExpression(val scope: Expression?,
-								  override val name: String,
-								  override val position: Position?) : Expression, NodeWithName
+class GetterAccessExpression(val scope: Expression?,
+							 override val name: String) : Expression(), NodeWithName
 
-data class SetterAccessExpression(val scope: Expression?,
-								  override val name: String,
-								  val expression: Expression,
-								  override val position: Position?) : Expression, NodeWithName
+class SetterAccessExpression(val scope: Expression?,
+							 override val name: String,
+							 val expression: Expression) : Expression(), NodeWithName
 
-data class ThisReference(val reference: Reference<TypeDeclaration>, override val position: Position?) : Expression
+class ThisReference(val reference: Reference<TypeDeclaration>) : Expression()
 
-data class TypeConversion(val value: Expression, val targetType: Type, override val position: Position? = null) : Expression
+class TypeConversion(val value: Expression,
+					 val targetType: Type) : Expression()
 
-data class VarReference(override val reference: Reference<VariableDeclaration>,
-						override val position: Position? = null) : Expression, NodeWithReference<VariableDeclaration>
+class VarReference(override val reference: Reference<VariableDeclaration>)
+	: Expression(), NodeWithReference<VariableDeclaration>
 
-data class ObjectCreation(val type: ObjectOrTypeType, override val position: Position?) : Expression
+class ObjectCreation(val type: ObjectOrTypeType) : Expression()

@@ -4,28 +4,26 @@ package io.gitlab.arturbosch.grovlin.ast
  * @author Artur Bosch
  */
 
-interface ConditionalStatement : Statement {
-	val condition: Expression
-	val thenStatement: BlockStatement
-}
+abstract class ConditionalStatement(val condition: Expression,
+									val thenStatement: BlockStatement) : Statement()
 
-data class IfStatement(override val condition: Expression,
-					   override val thenStatement: BlockStatement,
-					   val elifs: MutableList<ElifStatement>,
-					   val elseStatement: BlockStatement?,
-					   override val position: Position?) : ConditionalStatement
+class IfStatement(condition: Expression,
+				  thenStatement: BlockStatement,
+				  val elifs: MutableList<ElifStatement>,
+				  val elseStatement: BlockStatement?)
+	: ConditionalStatement(condition, thenStatement)
 
-data class ElifStatement(override val condition: Expression,
-						 override val thenStatement: BlockStatement,
-						 override val position: Position?) : ConditionalStatement
+class ElifStatement(condition: Expression,
+					thenStatement: BlockStatement)
+	: ConditionalStatement(condition, thenStatement)
 
-data class BlockStatement(override val statements: MutableList<Statement>,
-						  override val position: Position?) : Statement, NodeWithStatements
+class BlockStatement(override val statements: MutableList<Statement>)
+	: Statement(), NodeWithStatements
 
-data class ExpressionStatement(val expression: Expression, override val position: Position?) : Statement
+class ExpressionStatement(val expression: Expression) : Statement()
 
-data class Assignment(override val reference: Reference<VariableDeclaration>,
-					  val value: Expression,
-					  override val position: Position? = null) : Statement, NodeWithReference<VariableDeclaration>
+class Assignment(override val reference: Reference<VariableDeclaration>,
+				 val value: Expression)
+	: Statement(), NodeWithReference<VariableDeclaration>
 
-data class Print(val value: Expression, override val position: Position? = null) : Statement
+class Print(val value: Expression) : Statement()

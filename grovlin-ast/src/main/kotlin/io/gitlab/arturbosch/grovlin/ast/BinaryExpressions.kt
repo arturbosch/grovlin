@@ -4,61 +4,48 @@ package io.gitlab.arturbosch.grovlin.ast
  * @author Artur Bosch
  */
 
-interface BinaryExpression : Expression {
-	val left: Expression
-	val right: Expression
-}
+abstract class BinaryExpression(val left: Expression,
+								val right: Expression) : Expression()
 
-interface RelationExpression : BinaryExpression
+abstract class RelationExpression(left: Expression,
+								  right: Expression)
+	: BinaryExpression(left, right)
 
-data class SumExpression(override val left: Expression,
-						 override val right: Expression,
-						 override val position: Position? = null) : BinaryExpression
+class SumExpression(left: Expression,
+					right: Expression) : BinaryExpression(left, right)
 
-data class SubtractionExpression(override val left: Expression,
-								 override val right: Expression,
-								 override val position: Position? = null) : BinaryExpression
+class SubtractionExpression(left: Expression,
+							right: Expression) : BinaryExpression(left, right)
 
-data class MultiplicationExpression(override val left: Expression,
-									override val right: Expression,
-									override val position: Position? = null) : BinaryExpression
+class MultiplicationExpression(left: Expression,
+							   right: Expression) : BinaryExpression(left, right)
 
-data class DivisionExpression(override val left: Expression,
-							  override val right: Expression,
-							  override val position: Position? = null) : BinaryExpression
+class DivisionExpression(left: Expression,
+						 right: Expression) : BinaryExpression(left, right)
 
-data class AndExpression(override val left: Expression,
-						 override val right: Expression,
-						 override val position: Position? = null) : BinaryExpression
+class AndExpression(left: Expression,
+					right: Expression) : BinaryExpression(left, right)
 
-data class OrExpression(override val left: Expression,
-						override val right: Expression,
-						override val position: Position? = null) : BinaryExpression
+class OrExpression(left: Expression,
+				   right: Expression) : BinaryExpression(left, right)
 
-data class XorExpression(override val left: Expression,
-						 override val right: Expression,
-						 override val position: Position? = null) : BinaryExpression
+class XorExpression(left: Expression,
+					right: Expression) : BinaryExpression(left, right)
 
-data class EqualExpression(override val left: Expression,
-						   override val right: Expression,
-						   override val position: Position? = null) : RelationExpression
+class EqualExpression(left: Expression,
+					  right: Expression) : RelationExpression(left, right)
 
-data class UnequalExpression(override val left: Expression,
-							 override val right: Expression,
-							 override val position: Position? = null) : RelationExpression
+class UnequalExpression(left: Expression,
+						right: Expression) : RelationExpression(left, right)
 
-data class LessEqualExpression(override val left: Expression,
-							   override val right: Expression,
-							   override val position: Position? = null) : RelationExpression
+class LessEqualExpression(left: Expression,
+						  right: Expression) : RelationExpression(left, right)
 
-data class LessExpression(override val left: Expression,
-						  override val right: Expression,
-						  override val position: Position? = null) : RelationExpression
+class LessExpression(left: Expression,
+					 right: Expression) : RelationExpression(left, right)
 
-data class GreaterExpression(override val left: Expression,
-							 override val right: Expression,
-							 override val position: Position? = null) : RelationExpression
+class GreaterExpression(left: Expression,
+						right: Expression) : RelationExpression(left, right)
 
-data class GreaterEqualExpression(override val left: Expression,
-								  override val right: Expression,
-								  override val position: Position? = null) : RelationExpression
+class GreaterEqualExpression(left: Expression,
+							 right: Expression) : RelationExpression(left, right)

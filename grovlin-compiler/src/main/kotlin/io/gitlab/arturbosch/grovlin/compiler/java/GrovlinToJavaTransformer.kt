@@ -194,7 +194,7 @@ private fun PropertyDeclaration.typePropertyToJava(members: MutableList<BodyDecl
 			.setType(VoidType()))
 }
 
-private fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*> = if (mustBeOverriden()) {
+private fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*> = if (mustBeOverridden()) {
 	JavaParserMethod().setName(name)
 			.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
 			.setBody(null)

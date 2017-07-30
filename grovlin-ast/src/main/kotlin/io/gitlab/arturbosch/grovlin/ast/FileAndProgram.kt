@@ -4,13 +4,13 @@ package io.gitlab.arturbosch.grovlin.ast
  * @author Artur Bosch
  */
 
-data class GrovlinFile(override val name: String,
-					   override val block: BlockStatement?,
-					   override val position: Position? = null) : NodeWithBlock, NodeWithName
+class GrovlinFile(override val name: String,
+				  override val block: BlockStatement?)
+	: Node(), NodeWithBlock, NodeWithName
 
-data class Program(override val name: String,
-				   override val block: BlockStatement?,
-				   override val position: Position? = null) : Statement, NodeWithBlock, TopLevelDeclarable, NodeWithName
+class Program(override val name: String,
+			  override val block: BlockStatement?)
+	: Statement(), NodeWithBlock, TopLevelDeclarable, NodeWithName
 
 fun GrovlinFile.findTypeByName(name: String): TypeDeclaration? = block?.statements
 		?.filterIsInstance<TypeDeclaration>()
