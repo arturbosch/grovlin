@@ -1,7 +1,7 @@
 lexer grammar GrovlinLexer;
 
 // Whitespace
-NL            : '\r\n' | 'r' | '\n' ;
+NL                 : '\r\n' | 'r' | '\n' ;
 WS                 : [\t ]+ -> skip ;
 
 // Keywords
@@ -56,10 +56,10 @@ MOD                : '%' ;
 ASSIGN             : '=' ;
 
 // Bool operators
-NOT : '!'  ;
-OR  : '||' ;
-AND : '&&' ;
-XOR : '^'  ;
+NOT                : '!'  ;
+OR                 : '||' ;
+AND                : '&&' ;
+XOR                : '^'  ;
 
 // Identifiers
 TYPEID             : [A-Z][A-Za-z]* ;
