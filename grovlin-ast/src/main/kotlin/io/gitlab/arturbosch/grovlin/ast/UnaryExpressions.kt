@@ -4,6 +4,8 @@ package io.gitlab.arturbosch.grovlin.ast
  * @author Artur Bosch
  */
 
-class MinusExpression(val value: Expression) : Expression()
+abstract class UnaryExpression(val value: Expression) : Expression()
 
-class NotExpression(val value: Expression) : Expression()
+class MinusExpression(value: Expression) : UnaryExpression(value)
+
+class NotExpression(value: Expression) : UnaryExpression(value)
