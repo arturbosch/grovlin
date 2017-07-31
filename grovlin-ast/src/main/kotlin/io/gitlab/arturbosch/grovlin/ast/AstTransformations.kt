@@ -89,8 +89,10 @@ fun DefDeclarationContext.toAst(): Statement = when (this) {
 		MethodDeclaration(methodDeclaration().ID().text, block) as Statement
 	}
 	is LambdaDefinitionContext -> {
-		LambdaDeclaration(lambdaDeclaration().ID().text,
-				lambdaDeclaration().statements().statement().mapTo(ArrayList()) { it.toAst() })
+		val context = lambdaDeclaration().statements()
+		val statements = context.statement().mapTo(ArrayList()) { it.toAst() }
+		val blockStatement = BlockStatement(statements).apply { position = context.toPosition() }
+		LambdaDeclaration(lambdaDeclaration().ID().text, blockStatement)
 	}
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }.apply { position = toPosition() }

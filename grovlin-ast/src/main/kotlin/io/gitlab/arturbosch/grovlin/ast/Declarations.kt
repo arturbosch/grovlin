@@ -29,8 +29,8 @@ class MethodDeclaration(override val name: String,
 }
 
 class LambdaDeclaration(override val name: String,
-						override val statements: MutableList<Statement>)
-	: Statement(), NodeWithStatements, NodeWithName, TopLevelDeclarable
+						override val block: BlockStatement)
+	: Statement(), NodeWithBlock, NodeWithName, TopLevelDeclarable
 
 class PropertyDeclaration(override var type: Type,
 						  override val name: String,
