@@ -110,10 +110,12 @@ expression
 | INTLIT                                                        # intLiteral
 | DECLIT                                                        # decimalLiteral
 | BOOLLIT                                                       # boolLiteral
+| STRINGLIT                                                     # stringLiteral
 ;
 
 type
 : INT     # integer
 | DECIMAL # decimal
 | BOOL    # bool
+| STRING  # string
 ;
