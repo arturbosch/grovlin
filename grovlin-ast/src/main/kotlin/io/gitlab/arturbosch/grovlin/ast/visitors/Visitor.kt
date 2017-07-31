@@ -8,7 +8,6 @@ import io.gitlab.arturbosch.grovlin.ast.BoolType
 import io.gitlab.arturbosch.grovlin.ast.CallExpression
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
-import io.gitlab.arturbosch.grovlin.ast.DivisionExpression
 import io.gitlab.arturbosch.grovlin.ast.ElifStatement
 import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
@@ -19,9 +18,6 @@ import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.LambdaDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
-import io.gitlab.arturbosch.grovlin.ast.MinusExpression
-import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
-import io.gitlab.arturbosch.grovlin.ast.NotExpression
 import io.gitlab.arturbosch.grovlin.ast.ObjectCreation
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
@@ -32,8 +28,6 @@ import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
-import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
-import io.gitlab.arturbosch.grovlin.ast.SumExpression
 import io.gitlab.arturbosch.grovlin.ast.ThisReference
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
