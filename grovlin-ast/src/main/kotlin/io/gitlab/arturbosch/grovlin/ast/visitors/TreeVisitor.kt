@@ -40,7 +40,7 @@ import io.gitlab.arturbosch.grovlin.ast.VarReference
 /**
  * @author Artur Bosch
  */
-open class VoidTreeVisitor : Visitor<Any, Unit> {
+open class TreeVisitor : Visitor<Any, Unit> {
 
 	override fun visit(file: GrovlinFile, data: Any) {
 		file.block?.let { visit(it, data) }
