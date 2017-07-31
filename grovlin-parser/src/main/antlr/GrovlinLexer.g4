@@ -27,6 +27,16 @@ ELIF               : 'elif';
 INTLIT             : '0'|[1-9][0-9]* ;
 DECLIT             : '0'|[1-9][0-9]* '.' [0-9]+ ;
 BOOLLIT            : 'true' | 'false';
+STRINGLIT          : '"' StringCharacters* '"' ;
+
+fragment
+StringCharacters   : StringCharacter+;
+fragment
+StringCharacter    : ~["\\]
+                   | EscapeSequence
+                   ;
+fragment
+EscapeSequence     :  '\\' [btnfr"'\\];
 
 // Misc
 POINT              : '.';
@@ -69,3 +79,4 @@ ID                 : [_]*[A-Za-z0-9_]+ ;
 INT                : 'Int';
 DECIMAL            : 'Decimal';
 BOOL               : 'Bool';
+STRING             : 'String';
