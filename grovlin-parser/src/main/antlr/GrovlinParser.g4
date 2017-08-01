@@ -80,7 +80,7 @@ defDeclaration
 ;
 
 methodDeclaration
-: DEF ID LPAREN parameterList? RPAREN nls (LBRACE nls statements RBRACE nls)?
+: DEF ID LPAREN parameterList? RPAREN (SEMICOLON TYPEID)? nls (LBRACE nls statements RBRACE nls)?
 ;
 
 parameterList
