@@ -3,7 +3,7 @@ parser grammar GrovlinParser;
 options { tokenVocab=GrovlinLexer; }
 
 grovlinFile
-: statements EOF
+: nls statements EOF
 ;
 
 nls
@@ -22,6 +22,8 @@ statement
 | print             #printStatement
 | program           #programStatement
 | ifStmt            #ifStatement
+| forStmt           #forStatement
+| whileStmt         #whileStatement
 ;
 
 expressionStmt
@@ -38,6 +40,14 @@ elifStmt
 
 elseStmt
 : ELSE nls LBRACE nls statements nls RBRACE nls (elifStmt|elseStmt)? nls
+;
+
+forStmt
+: FOR ID SEMICOLON expression LBRACE nls statements nls RBRACE nls
+;
+
+whileStmt
+: WHILE expression LBRACE nls statements nls RBRACE nls
 ;
 
 typeDeclaration
@@ -104,6 +114,7 @@ expression
 | left=expression operator=OR right=expression                  # binaryOperation
 | value=expression AS targetType=type                           # typeConversion
 | LPAREN expression RPAREN                                      # parenExpression
+| INTLIT POINT POINT INTLIT                                     # intRangeExpression
 | ID                                                            # varReference
 | MINUS expression                                              # minusExpression
 | NOT expression                                                # notExpression

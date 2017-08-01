@@ -22,6 +22,8 @@ OVERRIDE           : 'override';
 IF                 : 'if';
 ELSE               : 'else';
 ELIF               : 'elif';
+FOR                : 'for';
+WHILE              : 'while';
 
 // Literals
 INTLIT             : '0'|[1-9][0-9]* ;

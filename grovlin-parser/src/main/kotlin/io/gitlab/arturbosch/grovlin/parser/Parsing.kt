@@ -53,6 +53,8 @@ fun parseFromResource(resourceName: String): GrovlinParser.GrovlinFileContext {
 fun lexerFromResource(resourceName: String) =
 		GrovlinLexer(ANTLRInputStream(Parsing.javaClass.getResourceAsStream("/$resourceName")))
 
+fun String.tokenize(): List<String> = tokens(this)
+
 fun tokens(code: String): List<String> {
 	val lexer = lexer(code)
 	val vocabulary = lexer.vocabulary
