@@ -25,3 +25,6 @@ class VarReference(override val reference: Reference<VariableDeclaration>)
 	: Expression(), NodeWithReference<VariableDeclaration>
 
 class ObjectCreation(val type: ObjectOrTypeType) : Expression()
+
+class IntRangeExpression(val start: String,
+						 val endExclusive: String) : Expression()
