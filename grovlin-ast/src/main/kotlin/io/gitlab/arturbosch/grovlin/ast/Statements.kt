@@ -27,3 +27,12 @@ class Assignment(override val reference: Reference<VariableDeclaration>,
 	: Statement(), NodeWithReference<VariableDeclaration>
 
 class Print(val value: Expression) : Statement()
+
+class ForStatement(val varName: String,
+				   val expression: Expression,
+				   override val block: BlockStatement)
+	: Statement(), NodeWithBlock
+
+class WhileStatement(condition: Expression,
+					 thenStatement: BlockStatement)
+	: ConditionalStatement(condition, thenStatement)

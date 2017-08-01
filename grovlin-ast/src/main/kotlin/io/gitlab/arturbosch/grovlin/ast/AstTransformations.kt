@@ -24,6 +24,8 @@ fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this
 	is PrintStatementContext -> Print(print().expression().toAst())
 	is ProgramStatementContext -> program().transformToBlockStatement(fileName)
 	is IfStatementContext -> transformToIfStatement()
+	is ForStatementContext -> transformToForStatement()
+	is WhileStatementContext -> transformToWhileStatement()
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }.apply { position = toPosition() }
 
@@ -113,6 +115,7 @@ fun ExpressionContext.toAst(): Expression = when (this) {
 	is BoolLiteralContext -> BoolLit(text.toBoolean())
 	is VarReferenceContext -> VarReference(Reference(text))
 	is TypeConversionContext -> TypeConversion(expression().toAst(), targetType.toAst())
+	is IntRangeExpressionContext -> IntRangeExpression(INTLIT(0).text, INTLIT(1).text)
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
 }.apply { position = toPosition() }
 
@@ -140,10 +143,11 @@ fun TypeContext.toAst(): Type = when (this) {
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
 }
 
-private fun IfStatementContext.transformToIfStatement(): IfStatement = IfStatement(condition = ifStmt().expression().toAst(),
-		thenStatement = transformThenBlock(),
-		elifs = transformElifStatements(),
-		elseStatement = transformElseBlock()).apply { position = toPosition() }
+private fun IfStatementContext.transformToIfStatement(): IfStatement =
+		IfStatement(condition = ifStmt().expression().toAst(),
+				thenStatement = transformThenBlock(),
+				elifs = transformElifStatements(),
+				elseStatement = transformElseBlock()).apply { position = toPosition() }
 
 private fun IfStatementContext.transformThenBlock() = BlockStatement(
 		ifStmt().statements().statement().mapTo(ArrayList()) { it.toAst() }
@@ -166,3 +170,13 @@ private fun IfStatementContext.transformElifStatements(): MutableList<ElifStatem
 	} ?: mutableListOf()
 }
 
+private fun ForStatementContext.transformToForStatement() = ForStatement(
+		forStmt().ID().text,
+		forStmt().expression().toAst(),
+		BlockStatement(forStmt().statements().statement().mapTo(ArrayList()) { it.toAst() })
+				.apply { position = toPosition() })
+
+private fun WhileStatementContext.transformToWhileStatement() = WhileStatement(
+		whileStmt().expression().toAst(),
+		BlockStatement(whileStmt().statements().statement().mapTo(ArrayList()) { it.toAst() })
+				.apply { position = toPosition() })
