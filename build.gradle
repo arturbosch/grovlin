@@ -38,6 +38,7 @@ allprojects {
 		kotlinCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 		kotlinTest "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
 		kotlinTest "com.natpryce:hamkrest:$hamkrestVersion"
+		kotlinTest "org.assertj:assertj-core:$assertjVersion"
 		kotlinTest "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 		kotlinTest 'junit:junit:4.12'
 	}
