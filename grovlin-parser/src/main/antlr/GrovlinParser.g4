@@ -10,6 +10,10 @@ nls
 : NL*
 ;
 
+commaNL
+: COMMA nls
+;
+
 statements
 : (statement nls) *
 ;
@@ -76,7 +80,15 @@ defDeclaration
 ;
 
 methodDeclaration
-: DEF ID LPAREN RPAREN nls (LBRACE nls statements RBRACE nls)?
+: DEF ID LPAREN parameterList? RPAREN nls (LBRACE nls statements RBRACE nls)?
+;
+
+parameterList
+: parameter (commaNL parameter)*
+;
+
+parameter
+: TYPEID ID
 ;
 
 lambdaDeclaration
@@ -99,15 +111,23 @@ assignment
 : ID ASSIGN expression
 ;
 
+argumentList
+: argument (commaNL argument)*
+;
+
+argument
+: ID
+;
+
 expression
 : LPAREN expression RPAREN                                      # parenExpression
 | TYPEID LPAREN RPAREN                                          # objectCreationExpression
 | THIS                                                          # thisExpression
 | scope=expression POINT fieldName=ID                           # getterAccessExpression
 | scope=expression POINT assignment                             # setterAccessExpression
-| scope=expression POINT methodName=ID LPAREN RPAREN            # callExpression
-| methodName=ID LPAREN RPAREN                                   # callExpression
-| left=expression operator=(EQUAL|INEQUAL|LESS|LESSEQUAL|GREATER|GREATEREQUAL) right=expression       # binaryOperation
+| scope=expression POINT methodName=ID LPAREN argumentList? RPAREN  # callExpression
+| methodName=ID LPAREN argumentList? RPAREN                  # callExpression
+| left=expression operator=(EQUAL|INEQUAL|LESS|LESSEQUAL|GREATER|GREATEREQUAL) right=expression # binaryOperation
 | left=expression operator=(PLUS|MINUS) right=expression        # binaryOperation
 | left=expression operator=XOR right=expression                 # binaryOperation
 | left=expression operator=(DIV|MUL|AND) right=expression       # binaryOperation
