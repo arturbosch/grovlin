@@ -30,6 +30,23 @@ class MethodTest {
 	}
 
 	@Test
+	fun declareMethodWithZeroParameterAndReturnType() {
+		val stmt = "def main(): String { }".parseMethod()
+
+		Assertions.assertThat(stmt.parameterList()).isNull()
+		Assertions.assertThat(stmt.TYPEID()).isNotNull()
+		Assertions.assertThat(stmt.TYPEID().text).isEqualTo("String")
+	}
+
+	@Test
+	fun declareMethodParametersAndReturnType() {
+		val stmt = "def main(String a, String b, Int c): Boolean { }".parseMethod()
+
+		Assertions.assertThat(stmt.parameterList().parameter()).hasSize(3)
+		Assertions.assertThat(stmt.TYPEID().text).isEqualTo("Boolean")
+	}
+
+	@Test
 	fun methodCallZeroArguments() {
 		val zeroArgs = "main()".parseMethodCall()
 		val oneArgs = "main(a)".parseMethodCall()
