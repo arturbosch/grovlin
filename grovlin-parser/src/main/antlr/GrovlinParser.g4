@@ -28,11 +28,11 @@ expressionStmt
 ;
 
 ifStmt
-: IF LPAREN expression RPAREN LBRACE statements RBRACE (elifs=elifStmt)* (elseStmt)?
+: IF expression LBRACE statements RBRACE (elifs=elifStmt)* (elseStmt)?
 ;
 
 elifStmt
-: ELIF LPAREN expression RPAREN LBRACE statements RBRACE
+: ELIF expression LBRACE statements RBRACE
 ;
 
 elseStmt

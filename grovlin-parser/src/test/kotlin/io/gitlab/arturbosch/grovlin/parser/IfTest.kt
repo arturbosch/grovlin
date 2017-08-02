@@ -11,10 +11,10 @@ class IfTest {
 
 	@Test
 	fun parseIfElifElseStatements() {
-		val actual = tokens("if (true) { print(5)if(false){} else {}if(true){}elif(false){}else{} } ")
-		val expected = listOf("IF", "LPAREN", "BOOLLIT", "RPAREN", "LBRACE", "PRINT", "LPAREN", "INTLIT", "RPAREN", "IF", "LPAREN", "BOOLLIT",
-				"RPAREN", "LBRACE", "RBRACE", "ELSE", "LBRACE", "RBRACE", "IF", "LPAREN", "BOOLLIT", "RPAREN", "LBRACE", "RBRACE",
-				"ELIF", "LPAREN", "BOOLLIT", "RPAREN", "LBRACE", "RBRACE", "ELSE", "LBRACE", "RBRACE", "RBRACE")
+		val actual = tokens("if true { print(5)if false {} else {}if true {}elif false {}else{} } ")
+		val expected = listOf("IF", "BOOLLIT", "LBRACE", "PRINT", "LPAREN", "INTLIT", "RPAREN", "IF", "BOOLLIT",
+				"LBRACE", "RBRACE", "ELSE", "LBRACE", "RBRACE", "IF", "BOOLLIT", "LBRACE", "RBRACE",
+				"ELIF", "BOOLLIT", "LBRACE", "RBRACE", "ELSE", "LBRACE", "RBRACE", "RBRACE")
 
 		assertThat(actual, equalTo(expected))
 	}
