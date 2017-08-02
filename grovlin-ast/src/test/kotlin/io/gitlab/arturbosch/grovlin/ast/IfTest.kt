@@ -15,7 +15,7 @@ class IfTest {
 
 	@Test
 	fun parseEasyIf() {
-		val grovlinFile = "if (true) { print(5) }".asGrovlinFile()
+		val grovlinFile = "if true { print(5) }".asGrovlinFile()
 
 		val ifStatement = grovlinFile.collectByType<IfStatement>()[0]
 
@@ -26,7 +26,7 @@ class IfTest {
 
 	@Test
 	fun parseIfElse() {
-		val grovlinFile = "if (true) { print(5) } else {}".asGrovlinFile()
+		val grovlinFile = "if true { print(5) } else {}".asGrovlinFile()
 
 		val ifStatement = grovlinFile.collectByType<IfStatement>()[0]
 
@@ -36,7 +36,7 @@ class IfTest {
 
 	@Test
 	fun parseIfElifElifElse() {
-		val grovlinFile = "if (true) { print(5) } elif (true) {} elif (false) {} else {}".asGrovlinFile()
+		val grovlinFile = "if true { print(5) } elif true {} elif false {} else {}".asGrovlinFile()
 
 		val ifStatement = grovlinFile.collectByType<IfStatement>()[0]
 
@@ -47,7 +47,8 @@ class IfTest {
 
 	@Test
 	fun parseNestedIfs() {
-		val grovlinFile = "if (true) { if (true) { if(true) {}} } elif (true) { if (true) {} elif (false) {}} else {}".asGrovlinFile()
+		val grovlinFile = "if true { if true { if true {}} } elif true { if true {} elif false {}} else {}"
+				.asGrovlinFile()
 
 		val ifStatements = grovlinFile.collectByType<IfStatement>()
 
