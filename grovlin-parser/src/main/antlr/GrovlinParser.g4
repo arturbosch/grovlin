@@ -3,19 +3,11 @@ parser grammar GrovlinParser;
 options { tokenVocab=GrovlinLexer; }
 
 grovlinFile
-: nls statements EOF
-;
-
-nls
-: NL*
-;
-
-commaNL
-: COMMA nls
+:   statements EOF
 ;
 
 statements
-: (statement nls) *
+: (statement  ) *
 ;
 
 statement
@@ -28,39 +20,44 @@ statement
 | ifStmt            #ifStatement
 | forStmt           #forStatement
 | whileStmt         #whileStatement
+| returnStmt        #returnStatement
 ;
 
 expressionStmt
-: expression nls
+: expression
 ;
 
 ifStmt
-: IF nls LPAREN expression RPAREN nls LBRACE nls statements nls RBRACE nls (elifs=elifStmt)* (elseStmt)?
+: IF LPAREN expression RPAREN LBRACE statements RBRACE (elifs=elifStmt)* (elseStmt)?
 ;
 
 elifStmt
-: ELIF nls LPAREN expression RPAREN nls LBRACE nls statements nls RBRACE nls
+: ELIF LPAREN expression RPAREN LBRACE statements RBRACE
 ;
 
 elseStmt
-: ELSE nls LBRACE nls statements nls RBRACE nls (elifStmt|elseStmt)? nls
+: ELSE LBRACE statements RBRACE (elifStmt|elseStmt)?
 ;
 
 forStmt
-: FOR ID SEMICOLON expression LBRACE nls statements nls RBRACE nls
+: FOR ID SEMICOLON expression LBRACE statements RBRACE
 ;
 
 whileStmt
-: WHILE expression LBRACE nls statements nls RBRACE nls
+: WHILE expression LBRACE statements RBRACE
+;
+
+returnStmt
+: RETURN expression
 ;
 
 typeDeclaration
-: TYPE typeName=TYPEID (EXTENDS extendTypes+=TYPEID (COMMA extendTypes+=TYPEID)*)? (LBRACE nls memberDeclaration* RBRACE nls)?
+: TYPE typeName=TYPEID (EXTENDS extendTypes+=TYPEID (COMMA extendTypes+=TYPEID)*)? (LBRACE memberDeclaration* RBRACE)?
 ;
 
 objectDeclaration
-: OBJECT objectName=TYPEID (EXTENDS extendObject=TYPEID)? (AS extendTypes+=TYPEID (COMMA extendTypes+=TYPEID)*)? (LBRACE nls
-memberDeclaration* RBRACE nls)?
+: OBJECT objectName=TYPEID (EXTENDS extendObject=TYPEID)? (AS extendTypes+=TYPEID (COMMA extendTypes+=TYPEID)*)? (LBRACE
+memberDeclaration* RBRACE)?
 ;
 
 memberDeclaration
@@ -71,7 +68,7 @@ memberDeclaration
 ;
 
 propertyDeclaration
-: (OVERRIDE)? TYPEID (ID nls|assignment nls)
+: (OVERRIDE)? TYPEID (ID|assignment)
 ;
 
 defDeclaration
@@ -80,11 +77,11 @@ defDeclaration
 ;
 
 methodDeclaration
-: DEF ID LPAREN parameterList? RPAREN (SEMICOLON TYPEID)? nls (LBRACE nls statements RBRACE nls)?
+: DEF ID LPAREN parameterList? RPAREN (SEMICOLON TYPEID)? (LBRACE statements RBRACE)?
 ;
 
 parameterList
-: parameter (commaNL parameter)*
+: parameter (COMMA parameter)*
 ;
 
 parameter
@@ -92,7 +89,7 @@ parameter
 ;
 
 lambdaDeclaration
-: DEF ID ASSIGN LBRACE nls statements RBRACE nls
+: DEF ID ASSIGN LBRACE statements RBRACE
 ;
 
 print
@@ -100,11 +97,11 @@ print
 ;
 
 program
-: PROGRAM LBRACE nls statements RBRACE nls
+: PROGRAM LBRACE statements RBRACE
 ;
 
 varDeclaration
-: (VAR | VAL) assignment nls
+: (VAR | VAL) assignment
 ;
 
 assignment
@@ -112,7 +109,7 @@ assignment
 ;
 
 argumentList
-: argument (commaNL argument)*
+: argument (COMMA argument)*
 ;
 
 argument
@@ -133,7 +130,6 @@ expression
 | left=expression operator=(DIV|MUL|AND) right=expression       # binaryOperation
 | left=expression operator=OR right=expression                  # binaryOperation
 | value=expression AS targetType=type                           # typeConversion
-| LPAREN expression RPAREN                                      # parenExpression
 | INTLIT POINT POINT INTLIT                                     # intRangeExpression
 | ID                                                            # varReference
 | MINUS expression                                              # minusExpression
