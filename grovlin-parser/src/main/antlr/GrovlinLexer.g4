@@ -1,8 +1,8 @@
 lexer grammar GrovlinLexer;
 
 // Whitespace
-NL                 : '\r\n' | 'r' | '\n' ;
-WS                 : [\t ]+ -> skip ;
+fragment NL        : '\r\n' | '\r' | '\n' ;
+WS                 : ( ' ' | '\t' | NL) -> skip;
 
 // Keywords
 TYPE               : 'type';
@@ -18,6 +18,7 @@ PRINT              : 'print';
 PROGRAM            : 'program';
 EXTENDS            : 'extends';
 OVERRIDE           : 'override';
+RETURN             : 'return';
 
 IF                 : 'if';
 ELSE               : 'else';

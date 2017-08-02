@@ -28,4 +28,10 @@ class ForTest {
 		val rangeExpr = (forStmt as GrovlinParser.ForStatementContext).forStmt().expression()
 		Assertions.assertThat(rangeExpr).isInstanceOf(GrovlinParser.IntRangeExpressionContext::class.java)
 	}
+
+	@Test
+	fun parseTwoForLoopsAfterEachOther() {
+		val statements = "for x : 1..10 {} for x : 20..100 {}".parse().root?.statements()?.statement()
+		Assertions.assertThat(statements).hasSize(2)
+	}
 }
