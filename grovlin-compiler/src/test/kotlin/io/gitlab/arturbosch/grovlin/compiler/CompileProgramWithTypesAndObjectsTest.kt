@@ -31,8 +31,11 @@ class CompileProgramWithTypesAndObjectsTest {
 
 	@Test
 	fun correctResolutionOfPropertyGetter() {
-		val grovlinFile = "type Box { Int data }\nobject BoxImpl as Box { override Int data }\nprogram { print(BoxImpl().data) }".parse()
-				.root!!.toAsT()
+		val grovlinFile = """
+			type Box { Int data }
+			object BoxImpl as Box { override Int data }
+			program { print(BoxImpl().data) }
+		""".parse().root!!.toAsT()
 		println(grovlinFile.asString())
 		val java = grovlinFile.toJava()
 		java.cus.forEach(::println)
