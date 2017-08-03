@@ -26,6 +26,7 @@ fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this
 	is IfStatementContext -> transformToIfStatement()
 	is ForStatementContext -> transformToForStatement()
 	is WhileStatementContext -> transformToWhileStatement()
+	is ReturnStatementContext -> ReturnStatement(returnStmt().expression().toAst())
 	else -> throw UnsupportedOperationException("not implemented ${javaClass.canonicalName}")
 }.apply { position = toPosition() }
 
@@ -79,6 +80,7 @@ private fun PropertyMemberDeclarationContext.transformToProperty(): PropertyDecl
 			assignment?.expression()?.toAst()).apply { position = toPosition() }
 }
 
+@Suppress("USELESS_CAST")
 fun DefDeclarationContext.toAst(): Statement = when (this) {
 	is MethodDefinitionContext -> {
 		val context = methodDeclaration().statements()
@@ -87,8 +89,8 @@ fun DefDeclarationContext.toAst(): Statement = when (this) {
 				position = context.toPosition()
 			}
 		} else null
-		@Suppress("USELESS_CAST")
-		MethodDeclaration(methodDeclaration().ID().text, block) as Statement
+		val returnType = methodDeclaration().TYPEID()?.let { Type.of(it.text) } ?: VoidType
+		MethodDeclaration(methodDeclaration().ID().text, block, returnType) as Statement
 	}
 	is LambdaDefinitionContext -> {
 		val context = lambdaDeclaration().statements()

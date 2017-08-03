@@ -36,3 +36,6 @@ class ForStatement(val varName: String,
 class WhileStatement(condition: Expression,
 					 thenStatement: BlockStatement)
 	: ConditionalStatement(condition, thenStatement)
+
+class ReturnStatement(expression: Expression)
+	: Statement()
