@@ -7,13 +7,6 @@ import java.util.LinkedList
 /**
  * @author Artur Bosch
  */
-fun GrovlinFileContext.toAsT(fileName: String = "Program"): GrovlinFile {
-	val statements = statements().statement().mapTo(ArrayList()) { it.toAst(fileName) }
-	val blockStatement = if (statements.isNotEmpty()) {
-		BlockStatement(statements).apply { position = toPosition() }
-	} else null
-	return GrovlinFile(fileName, blockStatement).apply { position = toPosition() }
-}
 
 fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this) {
 	is ExpressionStatementContext -> ExpressionStatement(expressionStmt().expression().toAst())
