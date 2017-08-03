@@ -21,6 +21,8 @@ class GrovlinFile(override var name: String,
 	fun findMethodByName(name: String): MethodDeclaration? = block?.statements
 			?.filterIsInstance<MethodDeclaration>()
 			?.find { it.name == name }
+
+	fun topLevelStatements(): List<Statement> = block?.statements ?: emptyList()
 }
 
 const val DEFAULT_GROVLIN_FILE_NAME = "Program"

@@ -27,3 +27,14 @@ inline fun <reified T : AstNode> AstNode.collectByType(): List<T> {
 	process { if (it is T) list.add(it) }
 	return list
 }
+
+inline fun <reified T : AstNode> AstNode.findByType(): T? {
+	var result: T? = null
+	process {
+		if (it is T) {
+			result = it
+			return@process
+		}
+	}
+	return result
+}

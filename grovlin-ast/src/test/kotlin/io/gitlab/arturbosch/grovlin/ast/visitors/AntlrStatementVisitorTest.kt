@@ -1,8 +1,12 @@
 package io.gitlab.arturbosch.grovlin.ast.visitors
 
+import io.gitlab.arturbosch.grovlin.ast.CallExpression
+import io.gitlab.arturbosch.grovlin.ast.IntType
+import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
-import io.gitlab.arturbosch.grovlin.ast.operations.asString
+import io.gitlab.arturbosch.grovlin.ast.operations.findByType
 import io.gitlab.arturbosch.grovlin.parser.parse
+import org.assertj.core.api.Assertions
 import org.junit.Test
 
 /**
@@ -17,7 +21,10 @@ class AntlrStatementVisitorTest {
 			print(returny())
 		""".asGrovlinFile()
 
-		println(grovlinFile.asString())
+		val statements = grovlinFile.topLevelStatements()
+		Assertions.assertThat(statements).hasSize(2)
+		Assertions.assertThat(grovlinFile.findByType<CallExpression>()).isNotNull()
+		Assertions.assertThat(grovlinFile.findByType<Print>()).isNotNull()
 	}
 
 	@Test
@@ -52,7 +59,8 @@ class AntlrStatementVisitorTest {
 		""".parse().root
 
 		val grovlinFile = root?.asGrovlinFile()
-//		val grovlinFile = root?.toAsT()
-		println(grovlinFile?.asString())
+
+		Assertions.assertThat(grovlinFile?.topLevelStatements()).hasSize(3)
+		Assertions.assertThat(grovlinFile?.findMethodByName("returny")?.type).isEqualTo(IntType)
 	}
 }
