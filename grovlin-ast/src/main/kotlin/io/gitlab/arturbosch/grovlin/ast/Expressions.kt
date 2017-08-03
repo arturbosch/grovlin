@@ -7,7 +7,8 @@ package io.gitlab.arturbosch.grovlin.ast
 class ParenExpression(val expression: Expression) : Expression()
 
 class CallExpression(val scope: Expression?,
-					 override val name: String) : Expression(), NodeWithName
+					 override val name: String,
+					 val arguments: List<Expression> = emptyList()) : Expression(), NodeWithName
 
 class GetterAccessExpression(val scope: Expression?,
 							 override val name: String) : Expression(), NodeWithName
@@ -16,7 +17,12 @@ class SetterAccessExpression(val scope: Expression?,
 							 override val name: String,
 							 val expression: Expression) : Expression(), NodeWithName
 
-class ThisReference(val reference: Reference<TypeDeclaration>) : Expression()
+class ThisReference(val reference: Reference<TypeDeclaration>) : Expression() {
+
+	companion object {
+		fun instance() = ThisReference(Reference("this"))
+	}
+}
 
 class TypeConversion(val value: Expression,
 					 val targetType: Type) : Expression()

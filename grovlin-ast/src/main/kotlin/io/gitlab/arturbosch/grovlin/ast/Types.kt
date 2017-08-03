@@ -10,6 +10,8 @@ interface Type : Named {
 			"Bool" -> BoolType
 			"Int" -> IntType
 			"Decimal" -> DecimalType
+			"String" -> StringType
+			"Void" -> VoidType
 			else -> ObjectOrTypeType(type)
 		}
 	}
@@ -21,9 +23,13 @@ abstract class PrimitiveType : Type {
 	override fun toString(): String = name
 }
 
-class ObjectOrTypeType(override val name: String) : Type {
+abstract class BuiltinObjectType(name: String) : ObjectOrTypeType(name)
+
+open class ObjectOrTypeType(override val name: String) : Type {
 	override fun toString(): String = name
 }
+
+object StringType : BuiltinObjectType("String")
 
 object BoolType : PrimitiveType() {
 	override val name: String = "Bool"

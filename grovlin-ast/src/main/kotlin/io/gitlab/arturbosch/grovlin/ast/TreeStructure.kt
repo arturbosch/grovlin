@@ -11,13 +11,15 @@ interface Named {
 
 interface AstNode {
 	var position: Position?
-	var parent: Node?
+	var parent: AstNode?
+	var children: List<AstNode>
 	var typeReference: Type?
 }
 
 abstract class Node : AstNode {
 	override var position: Position? = null
-	override var parent: Node? = null
+	override var parent: AstNode? = null
+	override var children: List<AstNode> = emptyList()
 	override var typeReference: Type? = null
 }
 
@@ -42,7 +44,7 @@ abstract class Statement : Node()
 
 interface VariableDeclaration : NodeWithType, Named
 
-interface MemberDeclaration : AstNode
+abstract class MemberDeclaration : Statement()
 
 interface TopLevelDeclarable {
 	fun isTopLevelDeclaration(): Boolean = true

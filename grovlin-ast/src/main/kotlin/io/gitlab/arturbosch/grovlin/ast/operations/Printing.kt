@@ -12,9 +12,12 @@ const val TAB = "\t"
 fun AstNode.asString(indent: String = ""): String {
 	val sb = StringBuilder()
 	sb.append("$indent${javaClass.simpleName}\n")
-	javaClass.kotlin.memberProperties.filter { it.name != "position" }.forEach {
-		it.propertyToString(it.get(this), indent, sb)
-	}
+	javaClass.kotlin.memberProperties
+			.filterNot { it.name == "position" }
+			.filterNot { it.name == "parent" }
+			.filterNot { it.name == "children" }
+			.filterNot { it.name == "typeReference" }
+			.forEach { it.propertyToString(it.get(this), indent, sb) }
 	return sb.toString()
 }
 

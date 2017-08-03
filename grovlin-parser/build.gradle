@@ -11,7 +11,7 @@ dependencies {
 
 generateGrammarSource {
 	maxHeapSize = "64m"
-	arguments += ['-package', 'io.gitlab.arturbosch.grovlin']
+	arguments += ['-package', 'io.gitlab.arturbosch.grovlin', "-visitor"]
 	outputDirectory = new File("src/antlr/main/io/gitlab/arturbosch/grovlin".toString())
 }
 

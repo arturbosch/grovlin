@@ -7,7 +7,7 @@ package io.gitlab.arturbosch.grovlin.ast
 class TypeDeclaration(val type: ObjectOrTypeType,
 					  val extendedTypes: MutableList<ObjectOrTypeType>,
 					  override val block: BlockStatement?)
-	: Statement(), NodeWithBlock, Named, TopLevelDeclarable {
+	: MemberDeclaration(), NodeWithBlock, Named, TopLevelDeclarable {
 
 	override val name: String = type.name
 }
@@ -16,7 +16,7 @@ class ObjectDeclaration(val type: ObjectOrTypeType,
 						val extendedObject: ObjectOrTypeType?,
 						val extendedTypes: MutableList<ObjectOrTypeType>,
 						override val block: BlockStatement?)
-	: Statement(), NodeWithBlock, Named, TopLevelDeclarable {
+	: MemberDeclaration(), NodeWithBlock, Named, TopLevelDeclarable {
 
 	override val name: String = type.name
 }
@@ -24,7 +24,7 @@ class ObjectDeclaration(val type: ObjectOrTypeType,
 class MethodDeclaration(override val name: String,
 						override val block: BlockStatement?,
 						override var type: Type = VoidType)
-	: Statement(), MemberDeclaration, NodeWithType, NodeWithBlock, NodeWithName, TopLevelDeclarable {
+	: MemberDeclaration(), NodeWithType, NodeWithBlock, NodeWithName, TopLevelDeclarable {
 
 	fun mustBeOverridden() = block == null
 }
@@ -36,11 +36,12 @@ class LambdaDeclaration(override val name: String,
 class PropertyDeclaration(override var type: Type,
 						  override val name: String,
 						  val value: Expression?)
-	: Statement(), MemberDeclaration, VariableDeclaration
+	: MemberDeclaration(), VariableDeclaration
 
 class VarDeclaration(override val name: String,
-					 val value: Expression)
-	: Statement(), VariableDeclaration {
+					 val value: Expression,
+					 val isVal: Boolean = false)
+	: MemberDeclaration(), VariableDeclaration {
 
 	override var type: Type = UnknownType
 }

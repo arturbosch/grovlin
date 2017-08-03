@@ -45,216 +45,65 @@ import io.gitlab.arturbosch.grovlin.ast.WhileStatement
 /**
  * @author Artur Bosch
  */
-open class TreeVisitor : Visitor<Any, Unit> {
+interface TreeVisitor<in P, out R> {
 
-	override fun visit(file: GrovlinFile, data: Any) {
-		file.block?.let { visit(it, data) }
-	}
-
-	override fun visit(program: Program, data: Any) {
-		program.block?.let { visit(it, data) }
-	}
+	fun visit(file: GrovlinFile, data: P): R
+	fun visit(program: Program, data: P): R
 
 	// Declarations
 
-	override fun visit(typeDeclaration: TypeDeclaration, data: Any) {
-		visit(typeDeclaration.type, data)
-		for (extendedType in typeDeclaration.extendedTypes) {
-			visit(extendedType, data)
-		}
-		typeDeclaration.block?.let { visit(it, data) }
-	}
-
-	override fun visit(lambdaDeclaration: LambdaDeclaration, data: Any) {
-		visit(lambdaDeclaration.block, data)
-	}
-
-	override fun visit(methodDeclaration: MethodDeclaration, data: Any) {
-		methodDeclaration.block?.let { visit(it, data) }
-	}
-
-	override fun visit(objectDeclaration: ObjectDeclaration, data: Any) {
-		visit(objectDeclaration.type, data)
-		objectDeclaration.extendedObject?.let { visit(it, data) }
-		for (extendedType in objectDeclaration.extendedTypes) {
-			visit(extendedType, data)
-		}
-		objectDeclaration.block?.let { visit(it, data) }
-	}
-
-	override fun visit(varDeclaration: VarDeclaration, data: Any) {
-		visit(varDeclaration.value, data)
-	}
-
-	override fun visit(propertyDeclaration: PropertyDeclaration, data: Any) {
-		visit(propertyDeclaration.type, data)
-		propertyDeclaration.value?.let { visit(it, data) }
-	}
+	fun visit(typeDeclaration: TypeDeclaration, data: P): R
+	fun visit(lambdaDeclaration: LambdaDeclaration, data: P): R
+	fun visit(methodDeclaration: MethodDeclaration, data: P): R
+	fun visit(objectDeclaration: ObjectDeclaration, data: P): R
+	fun visit(varDeclaration: VarDeclaration, data: P): R
+	fun visit(propertyDeclaration: PropertyDeclaration, data: P): R
 
 	// Statements
 
-	override fun visit(statement: Statement, data: Any) {
-		when (statement) {
-			is Program -> visit(statement, data)
-			is TypeDeclaration -> visit(statement, data)
-			is ObjectDeclaration -> visit(statement, data)
-			is MethodDeclaration -> visit(statement, data)
-			is VarDeclaration -> visit(statement, data)
-			is LambdaDeclaration -> visit(statement, data)
-			is IfStatement -> visit(statement, data)
-			is ElifStatement -> visit(statement, data)
-			is Assignment -> visit(statement, data)
-			is Print -> visit(statement, data)
-			is BlockStatement -> visit(statement, data)
-			is ExpressionStatement -> visit(statement, data)
-		}
-	}
-
-	override fun visit(expressionStatement: ExpressionStatement, data: Any) {
-		visit(expressionStatement.expression, data)
-	}
-
-	override fun visit(blockStatement: BlockStatement, data: Any) {
-		for (statement in blockStatement.statements) {
-			visit(statement, data)
-		}
-	}
-
-	override fun visit(ifStatement: IfStatement, data: Any) {
-		visit(ifStatement.condition, data)
-		visit(ifStatement.thenStatement, data)
-		for (elif in ifStatement.elifs) {
-			visit(elif, data)
-		}
-		ifStatement.elseStatement?.let { visit(it, data) }
-	}
-
-	override fun visit(elifStatement: ElifStatement, data: Any) {
-		visit(elifStatement.condition, data)
-		visit(elifStatement.thenStatement, data)
-	}
-
-	override fun visit(forStatement: ForStatement, data: Any) {
-		visit(forStatement.expression, data)
-		visit(forStatement.block, data)
-	}
-
-	override fun visit(whileStatement: WhileStatement, data: Any) {
-		visit(whileStatement.condition, data)
-		visit(whileStatement.thenStatement, data)
-	}
-
-	override fun visit(assignment: Assignment, data: Any) {
-		visit(assignment.value, data)
-	}
-
-	override fun visit(print: Print, data: Any) {
-		visit(print.value, data)
-	}
-
-	override fun visit(returnStatement: ReturnStatement, data: Any) {
-		visit(returnStatement.expression, data)
-	}
+	fun visit(statement: Statement, data: Any): R
+	fun visit(expressionStatement: ExpressionStatement, data: P): R
+	fun visit(blockStatement: BlockStatement, data: P): R
+	fun visit(ifStatement: IfStatement, data: P): R
+	fun visit(elifStatement: ElifStatement, data: P): R
+	fun visit(forStatement: ForStatement, data: P): R
+	fun visit(whileStatement: WhileStatement, data: P): R
+	fun visit(assignment: Assignment, data: P): R
+	fun visit(print: Print, data: P): R
+	fun visit(returnStatement: ReturnStatement, data: Any): R
 
 	// Expressions
 
-	override fun visit(expression: Expression, data: Any) {
-		when (expression) {
-			is ParenExpression -> visit(expression, data)
-			is CallExpression -> visit(expression, data)
-			is GetterAccessExpression -> visit(expression, data)
-			is SetterAccessExpression -> visit(expression, data)
-			is ThisReference -> visit(expression, data)
-			is TypeConversion -> visit(expression, data)
-			is VarReference -> visit(expression, data)
-			is ObjectCreation -> visit(expression, data)
-			is BinaryExpression -> visit(expression, data)
-			is UnaryExpression -> visit(expression, data)
-			is IntLit -> visit(expression, data)
-			is DecLit -> visit(expression, data)
-			is BoolLit -> visit(expression, data)
-		}
-	}
+	fun visit(expression: Expression, data: P): R
 
-	override fun visit(parenExpression: ParenExpression, data: Any) {
-		visit(parenExpression.expression, data)
-	}
+	fun visit(parenExpression: ParenExpression, data: P): R
+	fun visit(callExpression: CallExpression, data: P): R
+	fun visit(getterAccessExpression: GetterAccessExpression, data: P): R
+	fun visit(setterAccessExpression: SetterAccessExpression, data: P): R
+	fun visit(thisReference: ThisReference, data: P): R
+	fun visit(typeConversion: TypeConversion, data: P): R
+	fun visit(varReference: VarReference, data: P): R
+	fun visit(objectCreation: ObjectCreation, data: P): R
 
-	override fun visit(callExpression: CallExpression, data: Any) {
-		callExpression.scope?.let { visit(it, data) }
-	}
+	fun visit(binaryExpression: BinaryExpression, data: P): R
+	fun visit(unaryExpression: UnaryExpression, data: P): R
 
-	override fun visit(getterAccessExpression: GetterAccessExpression, data: Any) {
-		getterAccessExpression.scope?.let { visit(it, data) }
-	}
+	fun visit(intRangeExpression: IntRangeExpression, data: P): R
 
-	override fun visit(setterAccessExpression: SetterAccessExpression, data: Any) {
-		setterAccessExpression.scope?.let { visit(it, data) }
-		visit(setterAccessExpression.expression, data)
-	}
+	// Literals
 
-	override fun visit(thisReference: ThisReference, data: Any) {}
-
-	override fun visit(typeConversion: TypeConversion, data: Any) {
-		visit(typeConversion.targetType, data)
-		visit(typeConversion.value, data)
-	}
-
-	override fun visit(varReference: VarReference, data: Any) {}
-
-	override fun visit(objectCreation: ObjectCreation, data: Any) {
-		visit(objectCreation.type, data)
-	}
-
-	override fun visit(binaryExpression: BinaryExpression, data: Any) {
-		visit(binaryExpression.left, data)
-		visit(binaryExpression.right, data)
-	}
-
-	override fun visit(unaryExpression: UnaryExpression, data: Any) {
-		visit(unaryExpression.value, data)
-	}
-
-	override fun visit(intRangeExpression: IntRangeExpression, data: Any) {
-		visit(intRangeExpression.start, data)
-		visit(intRangeExpression.endExclusive, data)
-	}
-
-	// Literale
-
-	override fun visit(intLit: IntLit, data: Any) {}
-
-	override fun visit(boolLit: BoolLit, data: Any) {}
-
-	override fun visit(decLit: DecLit, data: Any) {}
-
-	override fun visit(stringLit: StringLit, data: Any) {}
+	fun visit(intLit: IntLit, data: P): R
+	fun visit(boolLit: BoolLit, data: P): R
+	fun visit(decLit: DecLit, data: P): R
+	fun visit(stringLit: StringLit, data: Any): R
 
 	// Types
 
-	override fun visit(type: Type, data: Any) {
-		when (type) {
-			is ObjectOrTypeType -> visit(type, data)
-			is PrimitiveType -> visit(type, data)
-		}
-	}
-
-	override fun visit(objectOrTypeType: ObjectOrTypeType, data: Any) {}
-
-	override fun visit(primitiveType: PrimitiveType, data: Any) {
-		when (primitiveType) {
-			is BoolType -> visit(primitiveType, data)
-			is IntType -> visit(primitiveType, data)
-			is DecimalType -> visit(primitiveType, data)
-		}
-	}
-
-	override fun visit(boolType: BoolType, data: Any) {}
-
-	override fun visit(intType: IntType, data: Any) {}
-
-	override fun visit(decType: DecimalType, data: Any) {}
-
-	override fun visit(unknownType: UnknownType, data: Any) {}
-
+	fun visit(type: Type, data: Any): R
+	fun visit(objectOrTypeType: ObjectOrTypeType, data: P): R
+	fun visit(primitiveType: PrimitiveType, data: P): R
+	fun visit(boolType: BoolType, data: P): R
+	fun visit(intType: IntType, data: P): R
+	fun visit(decType: DecimalType, data: P): R
+	fun visit(unknownType: UnknownType, data: P): R
 }

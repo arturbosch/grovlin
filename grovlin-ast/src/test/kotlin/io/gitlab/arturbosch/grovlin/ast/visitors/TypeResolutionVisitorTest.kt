@@ -31,7 +31,7 @@ class TypeResolutionVisitorTest {
 	}
 }
 
-class TypeAssertionVisitor : TreeVisitor() {
+class TypeAssertionVisitor : TreeBaseVisitor() {
 
 	override fun visit(typeDeclaration: TypeDeclaration, data: Any) {
 		when (typeDeclaration.name) {

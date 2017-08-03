@@ -25,7 +25,7 @@ class VoidTreeVisitorTest {
 
 	private val file = code.parse().root!!.toAsT()
 
-	private val variableCollector = object : TreeVisitor() {
+	private val variableCollector = object : TreeBaseVisitor() {
 
 		val names = mutableListOf<String>()
 
