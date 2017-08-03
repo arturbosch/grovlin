@@ -41,3 +41,8 @@ object UnknownType : Type {
 	override val name: String = "Unknown"
 	override fun toString(): String = name
 }
+
+object VoidType : Type {
+	override val name: String = "Void"
+	override fun toString(): String = name
+}

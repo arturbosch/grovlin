@@ -37,5 +37,5 @@ class WhileStatement(condition: Expression,
 					 thenStatement: BlockStatement)
 	: ConditionalStatement(condition, thenStatement)
 
-class ReturnStatement(expression: Expression)
+class ReturnStatement(val expression: Expression)
 	: Statement()

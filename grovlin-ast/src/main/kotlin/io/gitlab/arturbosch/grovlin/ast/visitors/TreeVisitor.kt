@@ -28,6 +28,7 @@ import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
 import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
+import io.gitlab.arturbosch.grovlin.ast.ReturnStatement
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.StringLit
@@ -149,6 +150,10 @@ open class TreeVisitor : Visitor<Any, Unit> {
 
 	override fun visit(print: Print, data: Any) {
 		visit(print.value, data)
+	}
+
+	override fun visit(returnStatement: ReturnStatement, data: Any) {
+		visit(returnStatement.expression, data)
 	}
 
 	// Expressions

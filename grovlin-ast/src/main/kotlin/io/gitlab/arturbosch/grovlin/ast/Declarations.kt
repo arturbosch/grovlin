@@ -22,8 +22,9 @@ class ObjectDeclaration(val type: ObjectOrTypeType,
 }
 
 class MethodDeclaration(override val name: String,
-						override val block: BlockStatement?)
-	: Statement(), MemberDeclaration, NodeWithBlock, NodeWithName, TopLevelDeclarable {
+						override val block: BlockStatement?,
+						override var type: Type = VoidType)
+	: Statement(), MemberDeclaration, NodeWithType, NodeWithBlock, NodeWithName, TopLevelDeclarable {
 
 	fun mustBeOverridden() = block == null
 }

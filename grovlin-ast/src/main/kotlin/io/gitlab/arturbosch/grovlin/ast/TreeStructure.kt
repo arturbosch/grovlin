@@ -12,11 +12,13 @@ interface Named {
 interface AstNode {
 	var position: Position?
 	var parent: Node?
+	var typeReference: Type?
 }
 
 abstract class Node : AstNode {
 	override var position: Position? = null
 	override var parent: Node? = null
+	override var typeReference: Type? = null
 }
 
 interface NodeWithName : AstNode, Named

@@ -28,6 +28,7 @@ import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
 import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
+import io.gitlab.arturbosch.grovlin.ast.ReturnStatement
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.StringLit
@@ -69,6 +70,7 @@ interface Visitor<in P, out R> {
 	fun visit(whileStatement: WhileStatement, data: P): R
 	fun visit(assignment: Assignment, data: P): R
 	fun visit(print: Print, data: P): R
+	fun visit(returnStatement: ReturnStatement, data: Any): R
 
 	// Expressions
 
