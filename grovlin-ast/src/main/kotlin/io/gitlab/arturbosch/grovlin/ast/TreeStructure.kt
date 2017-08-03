@@ -35,7 +35,33 @@ interface NodeWithType : AstNode {
 }
 
 interface NodeWithBlock : AstNode {
+
 	val block: BlockStatement?
+
+	fun findTypeByName(name: String): TypeDeclaration? = block?.statements
+			?.filterIsInstance<TypeDeclaration>()
+			?.find { it.name == name }
+
+	fun findObjectByName(name: String): ObjectDeclaration? = block?.statements
+			?.filterIsInstance<ObjectDeclaration>()
+			?.find { it.name == name }
+
+	fun findMethodByName(name: String): MethodDeclaration? = block?.statements
+			?.filterIsInstance<MethodDeclaration>()
+			?.find { it.name == name }
+
+	fun findPropertyByName(name: String): PropertyDeclaration? = block?.statements
+			?.filterIsInstance<PropertyDeclaration>()
+			?.find { it.name == name }
+
+	fun findVariableByName(name: String): VarDeclaration? = block?.statements
+			?.filterIsInstance<VarDeclaration>()
+			?.find { it.name == name }
+
+	fun topLevelStatements(): List<Statement> = block?.statements
+			?.filter { it is TopLevelDeclarable && it.isTopLevelDeclaration() } ?: emptyList()
+
+	fun statements(): List<Statement> = block?.statements ?: emptyList()
 }
 
 abstract class Expression : Node()

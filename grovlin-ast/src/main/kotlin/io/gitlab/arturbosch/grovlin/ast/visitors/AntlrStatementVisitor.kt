@@ -45,11 +45,9 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 	}
 
 	override fun visitPropertyDeclaration(ctx: GrovlinParser.PropertyDeclarationContext): PropertyDeclaration {
-		//		PropertyDeclaration(Type.of(propertyDeclaration().TYPEID().text),
-//				assignment?.ID()?.text ?: propertyDeclaration().ID().text,
-//				assignment?.expression()?.toAst()).apply { position = toPosition() }
-		val assignment = visitAssignment(ctx.assignment())
-		return PropertyDeclaration(Type.of(ctx.TYPEID().text), ctx.ID().text, assignment.value)
+		val name = ctx.assignment()?.ID()?.text ?: ctx.ID().text
+		val initializer = ctx.assignment()?.expression()?.let { exprVisitor.visit(it) }
+		return PropertyDeclaration(Type.of(ctx.TYPEID().text), name, initializer)
 	}
 
 	override fun visitMethodDeclaration(ctx: GrovlinParser.MethodDeclarationContext): MethodDeclaration {
@@ -62,15 +60,17 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 		val extended = ctx.extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) }
 		val memberDecls = ctx.memberDeclaration().mapTo(ArrayList()) { visit(it) }
 		val block = BlockStatement(memberDecls)
-		return TypeDeclaration(ObjectOrTypeType(ctx.TYPEID.text), extended, block)
+		val type = ObjectOrTypeType(ctx.typeName.text)
+		return TypeDeclaration(type, extended, block)
 	}
 
 	override fun visitObjectDeclaration(ctx: GrovlinParser.ObjectDeclarationContext): ObjectDeclaration {
-		val extendedObject = ObjectOrTypeType(ctx.extendObject.text)
+		val extendedObject = ctx.extendObject?.let { ObjectOrTypeType(it.text) }
 		val extended = ctx.extendTypes.mapTo(ArrayList()) { ObjectOrTypeType(it.text) }
 		val memberDecls = ctx.memberDeclaration().mapTo(ArrayList()) { visit(it) }
 		val block = BlockStatement(memberDecls)
-		return ObjectDeclaration(ObjectOrTypeType(ctx.TYPEID.text), extendedObject, extended, block)
+		val type = ObjectOrTypeType(ctx.objectName.text)
+		return ObjectDeclaration(type, extendedObject, extended, block)
 	}
 
 	override fun visitVarDeclaration(ctx: GrovlinParser.VarDeclarationContext): Statement {

@@ -8,22 +8,7 @@ import java.util.ArrayList
  */
 class GrovlinFile(override var name: String,
 				  override var block: BlockStatement?)
-	: Node(), NodeWithBlock, NodeWithName {
-
-	fun findTypeByName(name: String): TypeDeclaration? = block?.statements
-			?.filterIsInstance<TypeDeclaration>()
-			?.find { it.name == name }
-
-	fun findObjectByName(name: String): ObjectDeclaration? = block?.statements
-			?.filterIsInstance<ObjectDeclaration>()
-			?.find { it.name == name }
-
-	fun findMethodByName(name: String): MethodDeclaration? = block?.statements
-			?.filterIsInstance<MethodDeclaration>()
-			?.find { it.name == name }
-
-	fun topLevelStatements(): List<Statement> = block?.statements ?: emptyList()
-}
+	: Node(), NodeWithBlock, NodeWithName
 
 const val DEFAULT_GROVLIN_FILE_NAME = "Program"
 
