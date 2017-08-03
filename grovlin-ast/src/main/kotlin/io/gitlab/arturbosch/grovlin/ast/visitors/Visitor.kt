@@ -11,10 +11,12 @@ import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.ElifStatement
 import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
+import io.gitlab.arturbosch.grovlin.ast.ForStatement
 import io.gitlab.arturbosch.grovlin.ast.GetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.IfStatement
 import io.gitlab.arturbosch.grovlin.ast.IntLit
+import io.gitlab.arturbosch.grovlin.ast.IntRangeExpression
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.LambdaDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
@@ -28,6 +30,7 @@ import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
+import io.gitlab.arturbosch.grovlin.ast.StringLit
 import io.gitlab.arturbosch.grovlin.ast.ThisReference
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
@@ -36,6 +39,7 @@ import io.gitlab.arturbosch.grovlin.ast.UnaryExpression
 import io.gitlab.arturbosch.grovlin.ast.UnknownType
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
+import io.gitlab.arturbosch.grovlin.ast.WhileStatement
 
 /**
  * @author Artur Bosch
@@ -56,10 +60,13 @@ interface Visitor<in P, out R> {
 
 	// Statements
 
+	fun visit(statement: Statement, data: Any): R
 	fun visit(expressionStatement: ExpressionStatement, data: P): R
 	fun visit(blockStatement: BlockStatement, data: P): R
 	fun visit(ifStatement: IfStatement, data: P): R
 	fun visit(elifStatement: ElifStatement, data: P): R
+	fun visit(forStatement: ForStatement, data: P): R
+	fun visit(whileStatement: WhileStatement, data: P): R
 	fun visit(assignment: Assignment, data: P): R
 	fun visit(print: Print, data: P): R
 
@@ -79,20 +86,22 @@ interface Visitor<in P, out R> {
 	fun visit(binaryExpression: BinaryExpression, data: P): R
 	fun visit(unaryExpression: UnaryExpression, data: P): R
 
+	fun visit(intRangeExpression: IntRangeExpression, data: P): R
+
 	// Literals
 
 	fun visit(intLit: IntLit, data: P): R
 	fun visit(boolLit: BoolLit, data: P): R
 	fun visit(decLit: DecLit, data: P): R
+	fun visit(stringLit: StringLit, data: Any): R
 
 	// Types
 
+	fun visit(type: Type, data: Any): R
 	fun visit(objectOrTypeType: ObjectOrTypeType, data: P): R
 	fun visit(primitiveType: PrimitiveType, data: P): R
 	fun visit(boolType: BoolType, data: P): R
 	fun visit(intType: IntType, data: P): R
 	fun visit(decType: DecimalType, data: P): R
 	fun visit(unknownType: UnknownType, data: P): R
-	fun visit(type: Type, data: Any)
-	fun visit(statement: Statement, data: Any)
 }

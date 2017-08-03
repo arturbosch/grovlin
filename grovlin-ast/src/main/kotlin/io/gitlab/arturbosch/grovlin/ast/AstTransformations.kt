@@ -115,7 +115,7 @@ fun ExpressionContext.toAst(): Expression = when (this) {
 	is BoolLiteralContext -> BoolLit(text.toBoolean())
 	is VarReferenceContext -> VarReference(Reference(text))
 	is TypeConversionContext -> TypeConversion(expression().toAst(), targetType.toAst())
-	is IntRangeExpressionContext -> IntRangeExpression(INTLIT(0).text, INTLIT(1).text)
+	is IntRangeExpressionContext -> IntRangeExpression(IntLit(INTLIT(0).text), IntLit(INTLIT(1).text))
 	else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
 }.apply { position = toPosition() }
 

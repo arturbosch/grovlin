@@ -11,10 +11,12 @@ import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.ElifStatement
 import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
+import io.gitlab.arturbosch.grovlin.ast.ForStatement
 import io.gitlab.arturbosch.grovlin.ast.GetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.IfStatement
 import io.gitlab.arturbosch.grovlin.ast.IntLit
+import io.gitlab.arturbosch.grovlin.ast.IntRangeExpression
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.LambdaDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
@@ -28,6 +30,7 @@ import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
+import io.gitlab.arturbosch.grovlin.ast.StringLit
 import io.gitlab.arturbosch.grovlin.ast.ThisReference
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
@@ -36,6 +39,7 @@ import io.gitlab.arturbosch.grovlin.ast.UnaryExpression
 import io.gitlab.arturbosch.grovlin.ast.UnknownType
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
+import io.gitlab.arturbosch.grovlin.ast.WhileStatement
 
 /**
  * @author Artur Bosch
@@ -49,6 +53,8 @@ open class TreeVisitor : Visitor<Any, Unit> {
 	override fun visit(program: Program, data: Any) {
 		program.block?.let { visit(it, data) }
 	}
+
+	// Declarations
 
 	override fun visit(typeDeclaration: TypeDeclaration, data: Any) {
 		visit(typeDeclaration.type, data)
@@ -83,6 +89,8 @@ open class TreeVisitor : Visitor<Any, Unit> {
 		visit(propertyDeclaration.type, data)
 		propertyDeclaration.value?.let { visit(it, data) }
 	}
+
+	// Statements
 
 	override fun visit(statement: Statement, data: Any) {
 		when (statement) {
@@ -125,6 +133,16 @@ open class TreeVisitor : Visitor<Any, Unit> {
 		visit(elifStatement.thenStatement, data)
 	}
 
+	override fun visit(forStatement: ForStatement, data: Any) {
+		visit(forStatement.expression, data)
+		visit(forStatement.block, data)
+	}
+
+	override fun visit(whileStatement: WhileStatement, data: Any) {
+		visit(whileStatement.condition, data)
+		visit(whileStatement.thenStatement, data)
+	}
+
 	override fun visit(assignment: Assignment, data: Any) {
 		visit(assignment.value, data)
 	}
@@ -132,6 +150,8 @@ open class TreeVisitor : Visitor<Any, Unit> {
 	override fun visit(print: Print, data: Any) {
 		visit(print.value, data)
 	}
+
+	// Expressions
 
 	override fun visit(expression: Expression, data: Any) {
 		when (expression) {
@@ -190,13 +210,22 @@ open class TreeVisitor : Visitor<Any, Unit> {
 		visit(unaryExpression.value, data)
 	}
 
+	override fun visit(intRangeExpression: IntRangeExpression, data: Any) {
+		visit(intRangeExpression.start, data)
+		visit(intRangeExpression.endExclusive, data)
+	}
+
+	// Literale
+
 	override fun visit(intLit: IntLit, data: Any) {}
 
 	override fun visit(boolLit: BoolLit, data: Any) {}
 
 	override fun visit(decLit: DecLit, data: Any) {}
 
-	override fun visit(objectOrTypeType: ObjectOrTypeType, data: Any) {}
+	override fun visit(stringLit: StringLit, data: Any) {}
+
+	// Types
 
 	override fun visit(type: Type, data: Any) {
 		when (type) {
@@ -204,6 +233,8 @@ open class TreeVisitor : Visitor<Any, Unit> {
 			is PrimitiveType -> visit(type, data)
 		}
 	}
+
+	override fun visit(objectOrTypeType: ObjectOrTypeType, data: Any) {}
 
 	override fun visit(primitiveType: PrimitiveType, data: Any) {
 		when (primitiveType) {

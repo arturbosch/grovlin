@@ -15,3 +15,7 @@ class BoolLit(val value: Boolean) : Expression(), NodeWithType {
 class DecLit(val value: String) : Expression(), NodeWithType {
 	override var type: Type = DecimalType
 }
+
+class StringLit(val value: String) : Expression(), NodeWithType {
+	override var type: Type = ObjectOrTypeType("String")
+}
