@@ -15,7 +15,6 @@ statement
 | varDeclaration    #varDeclarationStatement
 | expressionStmt    #expressionStatement
 | assignment        #assignmentStatement
-| print             #printStatement
 | program           #programStatement
 | ifStmt            #ifStatement
 | forStmt           #forStatement
@@ -92,10 +91,6 @@ lambdaDeclaration
 : DEF ID ASSIGN LBRACE statements RBRACE
 ;
 
-print
-: PRINT LPAREN expression RPAREN
-;
-
 program
 : PROGRAM LBRACE statements RBRACE
 ;
@@ -115,8 +110,6 @@ argumentList
 argument
 : expression
 ;
-
-
 
 expression
 : TYPEID LPAREN RPAREN                                          # objectCreationExpression

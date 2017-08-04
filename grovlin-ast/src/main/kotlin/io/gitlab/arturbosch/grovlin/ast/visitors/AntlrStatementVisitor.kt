@@ -14,7 +14,6 @@ import io.gitlab.arturbosch.grovlin.ast.LambdaDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
-import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.Reference
@@ -29,7 +28,8 @@ import java.util.ArrayList
 /**
  * @author Artur Bosch
  */
-fun GrovlinParser.GrovlinFileContext.asGrovlinFile(): GrovlinFile {
+fun GrovlinParser.GrovlinFileContext?.asGrovlinFile(): GrovlinFile {
+	this ?: throw AssertionError("Grovlin file context must not be null!")
 	val visitor = AntlrStatementVisitor()
 	val block = visitor.visitStatements(this.statements())
 	return GrovlinFile(DEFAULT_GROVLIN_FILE_NAME, block)
@@ -90,11 +90,6 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 
 	override fun visitAssignment(ctx: GrovlinParser.AssignmentContext): Assignment {
 		return Assignment(Reference(ctx.ID().text), exprVisitor.visit(ctx.expression()))
-	}
-
-	override fun visitPrintStatement(ctx: GrovlinParser.PrintStatementContext): Print {
-		val expression = exprVisitor.visit(ctx.print().expression())
-		return Print(expression)
 	}
 
 	override fun visitProgramStatement(ctx: GrovlinParser.ProgramStatementContext): Program {

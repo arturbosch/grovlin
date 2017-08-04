@@ -5,8 +5,8 @@ import io.gitlab.arturbosch.grovlin.GrovlinParserBaseVisitor
 import io.gitlab.arturbosch.grovlin.ast.BoolType
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.IntType
-import io.gitlab.arturbosch.grovlin.ast.StringType
 import io.gitlab.arturbosch.grovlin.ast.Type
+import io.gitlab.arturbosch.grovlin.ast.builtins.StringType
 
 /**
  * @author Artur Bosch

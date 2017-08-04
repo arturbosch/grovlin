@@ -3,8 +3,7 @@ package io.gitlab.arturbosch.grovlin.ast.visitors
 import io.gitlab.arturbosch.grovlin.ast.CallExpression
 import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
-import io.gitlab.arturbosch.grovlin.ast.Print
-import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
+import io.gitlab.arturbosch.grovlin.ast.builtins.Print
 import io.gitlab.arturbosch.grovlin.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.ast.operations.findByType
 import io.gitlab.arturbosch.grovlin.parser.parse
@@ -22,7 +21,7 @@ class AntlrStatementVisitorTest {
 		val grovlinFile = """
 			finish(1)
 			print(returny())
-		""".asGrovlinFile()
+		""".parse().root.asGrovlinFile()
 
 		val statements = grovlinFile.statements()
 

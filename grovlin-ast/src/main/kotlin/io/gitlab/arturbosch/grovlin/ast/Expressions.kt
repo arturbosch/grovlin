@@ -6,9 +6,9 @@ package io.gitlab.arturbosch.grovlin.ast
 
 class ParenExpression(val expression: Expression) : Expression()
 
-class CallExpression(val scope: Expression?,
-					 override val name: String,
-					 val arguments: List<Expression> = emptyList()) : Expression(), NodeWithName
+open class CallExpression(val scope: Expression?,
+						  override val name: String,
+						  val arguments: List<Expression> = emptyList()) : Expression(), NodeWithName
 
 class GetterAccessExpression(val scope: Expression?,
 							 override val name: String) : Expression(), NodeWithName

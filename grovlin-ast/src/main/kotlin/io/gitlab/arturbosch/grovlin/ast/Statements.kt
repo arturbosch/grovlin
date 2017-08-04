@@ -26,8 +26,6 @@ class Assignment(override val reference: Reference<VariableDeclaration>,
 				 val value: Expression)
 	: Statement(), NodeWithReference<VariableDeclaration>
 
-class Print(val value: Expression) : Statement()
-
 class ForStatement(val varName: String,
 				   val expression: Expression,
 				   override val block: BlockStatement)

@@ -14,7 +14,6 @@ fun StatementContext.toAst(fileName: String = "Program"): Statement = when (this
 	is VarDeclarationStatementContext -> VarDeclaration(varDeclaration().assignment().ID().text,
 			varDeclaration().assignment().expression().toAst())
 	is AssignmentStatementContext -> Assignment(Reference(assignment().ID().text), assignment().expression().toAst())
-	is PrintStatementContext -> Print(print().expression().toAst())
 	is ProgramStatementContext -> program().transformToBlockStatement(fileName)
 	is IfStatementContext -> transformToIfStatement()
 	is ForStatementContext -> transformToForStatement()

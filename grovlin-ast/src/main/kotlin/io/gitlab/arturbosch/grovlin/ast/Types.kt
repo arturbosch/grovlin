@@ -1,5 +1,7 @@
 package io.gitlab.arturbosch.grovlin.ast
 
+import io.gitlab.arturbosch.grovlin.ast.builtins.StringType
+
 /**
  * @author Artur Bosch
  */
@@ -23,13 +25,9 @@ abstract class PrimitiveType : Type {
 	override fun toString(): String = name
 }
 
-abstract class BuiltinObjectType(name: String) : ObjectOrTypeType(name)
-
 open class ObjectOrTypeType(override val name: String) : Type {
 	override fun toString(): String = name
 }
-
-object StringType : BuiltinObjectType("String")
 
 object BoolType : PrimitiveType() {
 	override val name: String = "Bool"

@@ -25,7 +25,6 @@ import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
-import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ReturnStatement
@@ -104,7 +103,6 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 			is IfStatement -> visit(statement, data)
 			is ElifStatement -> visit(statement, data)
 			is Assignment -> visit(statement, data)
-			is Print -> visit(statement, data)
 			is BlockStatement -> visit(statement, data)
 			is ExpressionStatement -> visit(statement, data)
 		}
@@ -146,10 +144,6 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 
 	override fun visit(assignment: Assignment, data: Any) {
 		visit(assignment.value, data)
-	}
-
-	override fun visit(print: Print, data: Any) {
-		visit(print.value, data)
 	}
 
 	override fun visit(returnStatement: ReturnStatement, data: Any) {

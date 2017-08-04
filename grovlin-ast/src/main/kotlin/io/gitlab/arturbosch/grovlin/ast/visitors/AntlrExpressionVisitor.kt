@@ -33,6 +33,12 @@ import io.gitlab.arturbosch.grovlin.ast.TypeConversion
 import io.gitlab.arturbosch.grovlin.ast.UnequalExpression
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
+import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_PRINTLN_NAME
+import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_PRINT_NAME
+import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_READLINE_NAME
+import io.gitlab.arturbosch.grovlin.ast.builtins.Print
+import io.gitlab.arturbosch.grovlin.ast.builtins.PrintLn
+import io.gitlab.arturbosch.grovlin.ast.builtins.ReadLine
 import io.gitlab.arturbosch.grovlin.ast.toPosition
 
 /**
@@ -114,8 +120,23 @@ class AntlrExpressionVisitor : GrovlinParserBaseVisitor<Expression>() {
 	override fun visitCallExpression(ctx: GrovlinParser.CallExpressionContext): Expression {
 		val scope = ctx.scope?.let { visit(it) }
 		val arguments = ctx.argumentList()?.argument()?.map { visitArgument(it) }
-		return CallExpression(scope, ctx.methodName.text, arguments ?: emptyList())
+		val methodName = ctx.methodName.text
+		return convertToCallConsiderBuiltins(scope, methodName, arguments ?: emptyList())
 	}
+
+	private fun convertToCallConsiderBuiltins(scope: Expression?,
+											  methodName: String,
+											  arguments: List<Expression>): Expression =
+			if (scope == null) {
+				when (methodName) {
+					BUILTIN_PRINTLN_NAME -> PrintLn(arguments)
+					BUILTIN_PRINT_NAME -> Print(arguments)
+					BUILTIN_READLINE_NAME -> ReadLine(arguments)
+					else -> CallExpression(scope, methodName, arguments)
+				}
+			} else {
+				CallExpression(scope, methodName, arguments)
+			}
 
 	override fun visitArgument(ctx: GrovlinParser.ArgumentContext): Expression {
 		return visit(ctx.expression())
