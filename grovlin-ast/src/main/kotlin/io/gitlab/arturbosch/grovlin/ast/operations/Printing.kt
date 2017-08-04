@@ -12,13 +12,16 @@ const val TAB = "\t"
 fun AstNode.asString(indent: String = ""): String {
 	val sb = StringBuilder()
 	sb.append("$indent${javaClass.simpleName}\n")
-	javaClass.kotlin.memberProperties
+	filteredMembers().forEach { it.propertyToString(it.get(this), indent, sb) }
+	return sb.toString()
+}
+
+fun AstNode.filteredMembers(): Sequence<KProperty1<AstNode, *>> {
+	return javaClass.kotlin.memberProperties.asSequence()
 			.filterNot { it.name == "position" }
 			.filterNot { it.name == "parent" }
 			.filterNot { it.name == "children" }
 			.filterNot { it.name == "typeReference" }
-			.forEach { it.propertyToString(it.get(this), indent, sb) }
-	return sb.toString()
 }
 
 private fun KProperty1<AstNode, *>.propertyToString(value: Any?, indent: String, sb: StringBuilder) {

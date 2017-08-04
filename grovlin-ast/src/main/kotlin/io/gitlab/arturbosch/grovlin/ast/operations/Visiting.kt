@@ -1,11 +1,10 @@
 package io.gitlab.arturbosch.grovlin.ast.operations
 
 import io.gitlab.arturbosch.grovlin.ast.AstNode
-import kotlin.reflect.memberProperties
 
 fun AstNode.process(operation: (AstNode) -> Unit) {
 	operation(this)
-	javaClass.kotlin.memberProperties.forEach { property ->
+	filteredMembers().forEach { property ->
 		val value = property.get(this)
 		value.processIfPropertyIsFromTypeNode(operation)
 	}

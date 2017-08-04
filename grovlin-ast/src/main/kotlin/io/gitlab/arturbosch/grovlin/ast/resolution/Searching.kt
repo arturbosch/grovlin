@@ -12,9 +12,9 @@ import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
 import io.gitlab.arturbosch.grovlin.ast.isBefore
+import io.gitlab.arturbosch.grovlin.ast.operations.filteredMembers
 import io.gitlab.arturbosch.grovlin.ast.operations.processNodesOfType
 import java.util.IdentityHashMap
-import kotlin.reflect.memberProperties
 
 /**
  * @author Artur Bosch
@@ -28,7 +28,7 @@ fun AstNode.childParentMap(): Map<AstNode, AstNode> {
 
 fun AstNode.processRelations(parent: AstNode? = null, operation: (AstNode, AstNode?) -> Unit) {
 	operation(this, parent)
-	this.javaClass.kotlin.memberProperties.forEach { property ->
+	this.filteredMembers().forEach { property ->
 		val value = property.get(this)
 		when (value) {
 			is AstNode -> value.processRelations(this, operation)

@@ -7,6 +7,7 @@ import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.builtins.StringType
+import io.gitlab.arturbosch.grovlin.ast.toPosition
 
 /**
  * @author Artur Bosch
@@ -14,18 +15,26 @@ import io.gitlab.arturbosch.grovlin.ast.builtins.StringType
 class AntlrTypesVisitor : GrovlinParserBaseVisitor<Type>() {
 
 	override fun visitInteger(ctx: GrovlinParser.IntegerContext): Type {
-		return IntType
+		return IntType.apply {
+			position = ctx.toPosition()
+		}
 	}
 
 	override fun visitDecimal(ctx: GrovlinParser.DecimalContext): Type {
-		return DecimalType
+		return DecimalType.apply {
+			position = ctx.toPosition()
+		}
 	}
 
 	override fun visitBool(ctx: GrovlinParser.BoolContext): Type {
-		return BoolType
+		return BoolType.apply {
+			position = ctx.toPosition()
+		}
 	}
 
 	override fun visitString(ctx: GrovlinParser.StringContext): Type {
-		return StringType
+		return StringType.apply {
+			position = ctx.toPosition()
+		}
 	}
 }

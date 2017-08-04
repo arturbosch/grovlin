@@ -49,29 +49,55 @@ class AntlrExpressionVisitor : GrovlinParserBaseVisitor<Expression>() {
 	private val typeVisitor = AntlrTypesVisitor()
 
 	override fun visitDecimalLiteral(ctx: GrovlinParser.DecimalLiteralContext): Expression {
-		return DecLit(ctx.text)
+		return DecLit(ctx.text).apply {
+			position = ctx.toPosition()
+		}
 	}
 
 	override fun visitSetterAccessExpression(ctx: GrovlinParser.SetterAccessExpressionContext): Expression {
 		val scopeExpr = ctx.scope?.let { visit(it) }
-		return SetterAccessExpression(scopeExpr, ctx.assignment().ID().text,
-				visit(ctx.assignment().expression()))
+		val expression = visit(ctx.assignment().expression())
+		return SetterAccessExpression(scopeExpr,
+				ctx.assignment().ID().text,
+				expression).apply {
+			position = ctx.toPosition()
+			expression.parent = this
+			scopeExpr?.parent = this
+			children = scopeExpr?.let { listOf(it, expression) } ?: listOf(expression)
+		}
 	}
 
 	override fun visitMinusExpression(ctx: GrovlinParser.MinusExpressionContext): Expression {
-		return MinusExpression(visit(ctx.expression()))
+		val expression = visit(ctx.expression())
+		return MinusExpression(expression).apply {
+			position = ctx.toPosition()
+			expression.parent = this
+			children = listOf(expression)
+		}
 	}
 
 	override fun visitIntLiteral(ctx: GrovlinParser.IntLiteralContext): Expression {
-		return IntLit(ctx.text)
+		return IntLit(ctx.text).apply {
+			position = ctx.toPosition()
+		}
 	}
 
 	override fun visitNotExpression(ctx: GrovlinParser.NotExpressionContext): Expression {
-		return NotExpression(visit(ctx.expression()))
+		val expression = visit(ctx.expression())
+		return NotExpression(expression).apply {
+			position = ctx.toPosition()
+			expression.parent = this
+			children = listOf(expression)
+		}
 	}
 
 	override fun visitParenExpression(ctx: GrovlinParser.ParenExpressionContext): Expression {
-		return ParenExpression(visit(ctx.expression()))
+		val expression = visit(ctx.expression())
+		return ParenExpression(expression).apply {
+			position = ctx.toPosition()
+			expression.parent = this
+			children = listOf(expression)
+		}
 	}
 
 	override fun visitBinaryOperation(ctx: GrovlinParser.BinaryOperationContext): Expression {
@@ -92,36 +118,69 @@ class AntlrExpressionVisitor : GrovlinParserBaseVisitor<Expression>() {
 			">" -> GreaterExpression(leftExpr, rightExpr)
 			"<" -> LessExpression(leftExpr, rightExpr)
 			else -> throw UnsupportedOperationException(javaClass.canonicalName)
-		}.apply { position = ctx.toPosition() }
+		}.apply {
+			position = ctx.toPosition()
+			children = listOf(left, right)
+			left.parent = this
+			right.parent = this
+		}
 	}
 
 	override fun visitTypeConversion(ctx: GrovlinParser.TypeConversionContext): Expression {
 		val type = typeVisitor.visit(ctx.targetType)
 		val expression = visit(ctx.value)
-		return TypeConversion(expression, type)
+		return TypeConversion(expression, type).apply {
+			position = ctx.toPosition()
+			children = listOf(value, targetType)
+			value.parent = this
+			targetType.parent = this
+		}
 	}
 
 	override fun visitIntRangeExpression(ctx: GrovlinParser.IntRangeExpressionContext): Expression {
-		return IntRangeExpression(IntLit(ctx.INTLIT(0).text), IntLit(ctx.INTLIT(1).text))
+		val startLit = ctx.INTLIT(0)
+		val start = IntLit(startLit.text).apply { position = startLit.toPosition() }
+		val endLit = ctx.INTLIT(1)
+		val endExclusive = IntLit(endLit.text).apply { position = endLit.toPosition() }
+		return IntRangeExpression(start, endExclusive).apply {
+			position = ctx.toPosition()
+			children = listOf(start, endExclusive)
+			start.parent = this
+			endExclusive.parent = this
+		}
 	}
 
 	override fun visitBoolLiteral(ctx: GrovlinParser.BoolLiteralContext): Expression {
-		return BoolLit(ctx.BOOLLIT().text.toBoolean())
+		return BoolLit(ctx.BOOLLIT().text.toBoolean()).apply {
+			position = ctx.toPosition()
+		}
 	}
 
 	override fun visitVarReference(ctx: GrovlinParser.VarReferenceContext): Expression {
-		return VarReference(Reference(ctx.text))
+		return VarReference(Reference(ctx.text)).apply {
+			position = ctx.toPosition()
+		}
 	}
 
 	override fun visitObjectCreationExpression(ctx: GrovlinParser.ObjectCreationExpressionContext): Expression {
-		return ObjectCreation(ObjectOrTypeType(ctx.TYPEID().text))
+		val type = ObjectOrTypeType(ctx.TYPEID().text).apply { position = ctx.TYPEID().toPosition() }
+		return ObjectCreation(type).apply {
+			position = ctx.toPosition()
+			children = listOf(type)
+			type.parent = this
+		}
 	}
 
 	override fun visitCallExpression(ctx: GrovlinParser.CallExpressionContext): Expression {
 		val scope = ctx.scope?.let { visit(it) }
 		val arguments = ctx.argumentList()?.argument()?.map { visitArgument(it) }
 		val methodName = ctx.methodName.text
-		return convertToCallConsiderBuiltins(scope, methodName, arguments ?: emptyList())
+		return convertToCallConsiderBuiltins(scope, methodName, arguments ?: emptyList()).apply {
+			position = ctx.toPosition()
+			children = (arguments?.plus(scope))?.filterNotNull() ?: emptyList()
+			scope?.parent = this
+			arguments?.forEach { it.parent = this }
+		}
 	}
 
 	private fun convertToCallConsiderBuiltins(scope: Expression?,
@@ -144,14 +203,22 @@ class AntlrExpressionVisitor : GrovlinParserBaseVisitor<Expression>() {
 
 	override fun visitGetterAccessExpression(ctx: GrovlinParser.GetterAccessExpressionContext): Expression {
 		val scope = ctx.scope?.let { visit(it) }
-		return GetterAccessExpression(scope, ctx.fieldName.text)
+		return GetterAccessExpression(scope, ctx.fieldName.text).apply {
+			position = ctx.toPosition()
+			scope?.let { children = listOf(scope) }
+			scope?.parent = this
+		}
 	}
 
 	override fun visitStringLiteral(ctx: GrovlinParser.StringLiteralContext): Expression {
-		return StringLit(ctx.text)
+		return StringLit(ctx.text).apply {
+			position = ctx.toPosition()
+		}
 	}
 
 	override fun visitThisExpression(ctx: GrovlinParser.ThisExpressionContext): Expression {
-		return ThisReference(Reference("this"))
+		return ThisReference(Reference("this")).apply {
+			position = ctx.toPosition()
+		}
 	}
 }

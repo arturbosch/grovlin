@@ -3,6 +3,7 @@ package io.gitlab.arturbosch.grovlin.ast
 import io.gitlab.arturbosch.grovlin.parser.CodePoint
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.tree.TerminalNode
 
 class Point(line: Int, column: Int) : CodePoint(line, column) {
 
@@ -38,7 +39,14 @@ data class Position(val start: Point, val end: Point) {
 	}
 }
 
-fun pos(startLine: Int, startColumn: Int, endLine: Int, endColumn: Int) = Position(Point(startLine, startColumn), Point(endLine, endColumn))
+val INVALID_POINT = Point(-1, -1)
+/**
+ * For generated or omitted nodes.
+ */
+val INVALID_POSITION = Position(INVALID_POINT, INVALID_POINT)
+
+fun pos(startLine: Int, startColumn: Int, endLine: Int, endColumn: Int) =
+		Position(Point(startLine, startColumn), Point(endLine, endColumn))
 
 // Node extensions
 
@@ -51,6 +59,10 @@ fun Node.isAfter(other: Node): Boolean = position != null && other.position != n
 fun Token.startPoint() = Point(line, charPositionInLine + 1)
 
 fun Token.endPoint() = Point(line, charPositionInLine + 1 + text.length)
+
+fun Token.toPosition() = Position(startPoint(), endPoint())
+
+fun TerminalNode.toPosition() = Position(symbol.startPoint(), symbol.endPoint())
 
 fun ParserRuleContext.toPosition(): Position? {
 	return Position(start.startPoint(), stop.endPoint())
