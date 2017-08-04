@@ -61,7 +61,6 @@ import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
 import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
-import io.gitlab.arturbosch.grovlin.ast.Print
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.Reference
@@ -79,6 +78,9 @@ import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
+import io.gitlab.arturbosch.grovlin.ast.builtins.Print
+import io.gitlab.arturbosch.grovlin.ast.builtins.PrintLn
+import io.gitlab.arturbosch.grovlin.ast.builtins.ReadLine
 import java.util.ArrayList
 import java.util.EnumSet
 import com.github.javaparser.ast.body.MethodDeclaration as JavaParserMethod
@@ -209,8 +211,6 @@ private fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*
 
 private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {
 	is VarDeclaration -> ExpressionStmt(VariableDeclarationExpr(VariableDeclarator(type.toJava(), name, value.toJava())))
-	is Print -> ExpressionStmt(MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
-			SimpleName("println"), NodeList.nodeList(value.toJava())))
 	is Assignment -> ExpressionStmt(AssignExpr(reference.toJava(), value.toJava(), AssignExpr.Operator.ASSIGN))
 	is ExpressionStatement -> ExpressionStmt(expression.toJava())
 	is IfStatement -> IfStmt(condition.toJava(), thenStatement.toJava(), transformElifsToElseIfConstructs(elifs, elseStatement))
@@ -274,6 +274,14 @@ private fun Expression.toJava(): JavaParserExpression = when (this) {
 		setName(this@toJava.name.toGetter())
 		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
 	}
+	is Print -> MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
+			SimpleName("print"), NodeList.nodeList(arguments[0].toJava()))
+	is PrintLn -> MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
+			SimpleName("println"), NodeList.nodeList(arguments[0].toJava()))
+	is ReadLine -> MethodCallExpr(
+			ObjectCreationExpr(null, ClassOrInterfaceType("java.util.Scanner"),
+					NodeList.nodeList(FieldAccessExpr(NameExpr("System"), "in"))),
+			SimpleName("next"), NodeList.nodeList(arguments[0].toJava()))
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 

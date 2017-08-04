@@ -12,7 +12,7 @@ class IfTest {
 	@Test
 	fun parseIfElifElseStatements() {
 		val actual = tokens("if true { print(5)if false {} else {}if true {}elif false {}else{} } ")
-		val expected = listOf("IF", "BOOLLIT", "LBRACE", "PRINT", "LPAREN", "INTLIT", "RPAREN", "IF", "BOOLLIT",
+		val expected = listOf("IF", "BOOLLIT", "LBRACE", "ID", "LPAREN", "INTLIT", "RPAREN", "IF", "BOOLLIT",
 				"LBRACE", "RBRACE", "ELSE", "LBRACE", "RBRACE", "IF", "BOOLLIT", "LBRACE", "RBRACE",
 				"ELIF", "BOOLLIT", "LBRACE", "RBRACE", "ELSE", "LBRACE", "RBRACE", "RBRACE")
 
