@@ -49,4 +49,4 @@ class VarDeclaration(override val name: String,
 
 class ParameterDeclaration(override val name: String,
 						   override var type: Type)
-	: Declaration(), NodeWithName, NodeWithType
+	: Node(), VariableDeclaration, NodeWithName, NodeWithType

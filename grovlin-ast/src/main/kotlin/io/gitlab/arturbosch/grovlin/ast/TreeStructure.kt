@@ -31,15 +31,15 @@ abstract class Expression : Node()
 
 abstract class Statement : Node()
 
-abstract class Declaration : Statement()
-
-abstract class MemberDeclaration : Declaration()
+interface Declaration : AstNode
 
 interface TopLevelDeclarable {
 	fun isTopLevelDeclaration(): Boolean = true
 }
 
-interface VariableDeclaration : NodeWithType, Named
+abstract class MemberDeclaration : Statement(), Declaration
+
+interface VariableDeclaration : Declaration, NodeWithType, Named
 
 interface NodeWithName : AstNode, Named
 
