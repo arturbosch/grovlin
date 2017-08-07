@@ -28,7 +28,10 @@ class TypeConversion(val value: Expression,
 					 val targetType: Type) : Expression()
 
 class VarReference(override val reference: Reference<VariableDeclaration>)
-	: Expression(), NodeWithReference<VariableDeclaration>
+	: Expression(), NodeWithReference<VariableDeclaration> {
+
+	val varName get() = reference.name
+}
 
 class ObjectCreation(val type: ObjectOrTypeType) : Expression()
 

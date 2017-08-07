@@ -15,7 +15,7 @@ class LoopsTest {
 
 		val forStmt = grovlinFile.collectByType<ForStatement>()[0]
 
-		Assertions.assertThat(forStmt.varDeclaration).isEqualTo("x")
+		Assertions.assertThat(forStmt.varDeclaration.name).isEqualTo("x")
 		Assertions.assertThat(forStmt.expression).isInstanceOf(IntRangeExpression::class.java)
 		Assertions.assertThat(forStmt.block.statements).isEmpty()
 	}

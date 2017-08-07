@@ -165,7 +165,7 @@ private fun IfStatementContext.transformElifStatements(): MutableList<ElifStatem
 }
 
 private fun ForStatementContext.transformToForStatement() = ForStatement(
-		forStmt().ID().text,
+		VarDeclaration(forStmt().ID().text, null),
 		forStmt().expression().toAst(),
 		BlockStatement(forStmt().statements().statement().mapTo(ArrayList()) { it.toAst() })
 				.apply { position = toPosition() })
