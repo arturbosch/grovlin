@@ -23,6 +23,7 @@ import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectCreation
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
+import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
 import io.gitlab.arturbosch.grovlin.ast.Program
@@ -57,6 +58,7 @@ interface TreeVisitor<in P, out R> {
 	fun visit(objectDeclaration: ObjectDeclaration, data: P): R
 	fun visit(varDeclaration: VarDeclaration, data: P): R
 	fun visit(propertyDeclaration: PropertyDeclaration, data: P): R
+	fun visit(parameterDeclaration: ParameterDeclaration, data: P): R
 
 	// Statements
 

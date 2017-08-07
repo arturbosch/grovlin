@@ -69,6 +69,8 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 	}
 
 	override fun visit(methodDeclaration: MethodDeclaration, data: Any) {
+		visit(methodDeclaration.type, data)
+		methodDeclaration.parameters.forEach { visit(it, data) }
 		methodDeclaration.block?.let { visit(it, data) }
 	}
 
