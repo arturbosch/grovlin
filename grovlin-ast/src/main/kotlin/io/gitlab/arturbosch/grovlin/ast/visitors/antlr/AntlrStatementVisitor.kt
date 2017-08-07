@@ -15,6 +15,7 @@ import io.gitlab.arturbosch.grovlin.ast.LambdaDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
+import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.Position
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
@@ -70,15 +71,27 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 		val returnType = Type.of(ctx.TYPEID()?.text ?: "Void").setPositions(ctx.TYPEID()).apply {
 			if (position == null) position = INVALID_POSITION
 		}
-		return MethodDeclaration(ctx.ID().text, block, returnType).apply {
+		val parameters = ctx.parameterList()?.parameter()?.mapTo(ArrayList()) { visitParameter(it) }
+				?: ArrayList<ParameterDeclaration>()
+		return MethodDeclaration(ctx.ID().text, block, returnType, parameters).apply {
 			position = ctx.toPosition()
+			parameters.forEach { it.parent = this }
 			returnType.parent = this
 			if (block != null) {
 				block.parent = this
-				children = listOf(returnType, block)
+				children = parameters + returnType + block
 			} else {
-				children = listOf(returnType)
+				children = parameters + returnType
 			}
+		}
+	}
+
+	override fun visitParameter(ctx: GrovlinParser.ParameterContext): ParameterDeclaration {
+		val type = Type.of(ctx.TYPEID().text).setPositions(ctx.TYPEID())
+		return ParameterDeclaration(ctx.ID().text, type).apply {
+			position = ctx.toPosition()
+			type.parent = this
+			children = listOf(type)
 		}
 	}
 
