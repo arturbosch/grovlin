@@ -1,5 +1,8 @@
 package io.gitlab.arturbosch.grovlin.ast
 
+import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
+import io.gitlab.arturbosch.grovlin.ast.symbols.Scope
+
 /**
  * @author Artur Bosch
  */
@@ -8,12 +11,12 @@ interface Named {
 	val name: String
 }
 
-
 interface AstNode {
 	var position: Position?
 	var parent: AstNode?
 	var children: List<AstNode>
 	var typeReference: Type?
+	var resolutionScope: Scope?
 }
 
 abstract class Node : AstNode {
@@ -21,6 +24,7 @@ abstract class Node : AstNode {
 	override var parent: AstNode? = null
 	override var children: List<AstNode> = emptyList()
 	override var typeReference: Type? = null
+	override var resolutionScope: Scope? = null
 }
 
 abstract class Expression : Node()
@@ -71,6 +75,10 @@ interface NodeWithBlock : AstNode {
 	fun findVariableByName(name: String): VarDeclaration? = block?.statements
 			?.filterIsInstance<VarDeclaration>()
 			?.find { it.name == name }
+
+	fun findVariableReferencesByName(name: String): List<VarReference> = block
+			?.collectByType<VarReference>()
+			?.filter { it.reference.name == name } ?: emptyList()
 
 	fun topLevelStatements(): List<Statement> = block?.statements
 			?.filter { it is TopLevelDeclarable && it.isTopLevelDeclaration() } ?: emptyList()

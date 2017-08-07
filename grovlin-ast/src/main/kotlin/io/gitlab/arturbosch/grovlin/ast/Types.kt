@@ -1,12 +1,12 @@
 package io.gitlab.arturbosch.grovlin.ast
 
 import io.gitlab.arturbosch.grovlin.ast.builtins.StringType
+import io.gitlab.arturbosch.grovlin.ast.symbols.SymbolType
 
 /**
  * @author Artur Bosch
  */
-
-abstract class Type : Node(), NodeWithName {
+abstract class Type : Node(), NodeWithName, SymbolType {
 	companion object {
 		fun of(type: String) = when (type) {
 			"Bool" -> BoolType

@@ -1,6 +1,9 @@
 package io.gitlab.arturbosch.grovlin.ast
 
 import io.gitlab.arturbosch.grovlin.GrovlinParser
+import io.gitlab.arturbosch.grovlin.ast.symbols.FileScope
+import io.gitlab.arturbosch.grovlin.ast.symbols.IdentifyVisitor
+import io.gitlab.arturbosch.grovlin.ast.symbols.ResolutionVisitor
 import java.util.ArrayList
 
 /**
@@ -18,4 +21,17 @@ fun GrovlinParser.GrovlinFileContext.toAsT(fileName: String = DEFAULT_GROVLIN_FI
 		BlockStatement(statements).apply { position = toPosition() }
 	} else null
 	return GrovlinFile(fileName, blockStatement).apply { position = toPosition() }
+}
+
+fun GrovlinFile.identify(): GrovlinFile {
+	val visitor = IdentifyVisitor(this)
+	visitor.visit(this, Unit)
+	this.resolutionScope = visitor.fileScope
+	return this
+}
+
+fun GrovlinFile.resolve(): GrovlinFile {
+	val visitor = ResolutionVisitor(this, this.resolutionScope as FileScope)
+	visitor.visit(this, Unit)
+	return this
 }
