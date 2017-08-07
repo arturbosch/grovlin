@@ -1,4 +1,4 @@
-package io.gitlab.arturbosch.grovlin.ast.visitors
+package io.gitlab.arturbosch.grovlin.ast.visitors.antlr
 
 import io.gitlab.arturbosch.grovlin.GrovlinParser
 import io.gitlab.arturbosch.grovlin.GrovlinParserBaseVisitor

@@ -23,6 +23,20 @@ abstract class Node : AstNode {
 	override var typeReference: Type? = null
 }
 
+abstract class Expression : Node()
+
+abstract class Statement : Node()
+
+abstract class Declaration : Statement()
+
+abstract class MemberDeclaration : Declaration()
+
+interface TopLevelDeclarable {
+	fun isTopLevelDeclaration(): Boolean = true
+}
+
+interface VariableDeclaration : NodeWithType, Named
+
 interface NodeWithName : AstNode, Named
 
 interface NodeWithStatements : AstNode {
@@ -64,36 +78,6 @@ interface NodeWithBlock : AstNode {
 	fun statements(): List<Statement> = block?.statements ?: emptyList()
 }
 
-abstract class Expression : Node()
-
-abstract class Statement : Node()
-
-interface VariableDeclaration : NodeWithType, Named
-
-abstract class MemberDeclaration : Statement()
-
-interface TopLevelDeclarable {
-	fun isTopLevelDeclaration(): Boolean = true
-}
-
 interface NodeWithReference<N : Named> : AstNode {
 	val reference: Reference<N>
-}
-
-data class Reference<N : Named>(val name: String, var source: N? = null) {
-	override fun toString(): String {
-		if (source == null) {
-			return "Ref($name)[Unsolved]"
-		} else {
-			return "Ref($name)[Solved]"
-		}
-	}
-
-	fun tryToResolve(candidates: List<N>): Boolean {
-		val res = candidates.find { it.name == this.name }
-		source = res
-		return res != null
-	}
-
-	fun isResolved() = source != null
 }

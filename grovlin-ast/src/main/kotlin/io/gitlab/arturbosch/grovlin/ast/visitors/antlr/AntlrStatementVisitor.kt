@@ -1,4 +1,4 @@
-package io.gitlab.arturbosch.grovlin.ast.visitors
+package io.gitlab.arturbosch.grovlin.ast.visitors.antlr
 
 import io.gitlab.arturbosch.grovlin.GrovlinParser
 import io.gitlab.arturbosch.grovlin.GrovlinParserBaseVisitor
@@ -9,7 +9,6 @@ import io.gitlab.arturbosch.grovlin.ast.DEFAULT_GROVLIN_FILE_NAME
 import io.gitlab.arturbosch.grovlin.ast.ElifStatement
 import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
 import io.gitlab.arturbosch.grovlin.ast.ForStatement
-import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.INVALID_POSITION
 import io.gitlab.arturbosch.grovlin.ast.IfStatement
 import io.gitlab.arturbosch.grovlin.ast.LambdaDeclaration
@@ -36,17 +35,6 @@ import java.util.ArrayList
 /**
  * @author Artur Bosch
  */
-fun GrovlinParser.GrovlinFileContext?.asGrovlinFile(): GrovlinFile {
-	this ?: throw AssertionError("Grovlin file context must not be null!")
-	val visitor = AntlrStatementVisitor()
-	val block = visitor.visitStatements(this.statements(), start, stop)
-	val grovlinFile = GrovlinFile(DEFAULT_GROVLIN_FILE_NAME, block)
-	grovlinFile.position = this.toPosition()
-	block?.let { grovlinFile.children = listOf(it) }
-	block?.parent = grovlinFile
-	return grovlinFile
-}
-
 class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 
 	private val exprVisitor = AntlrExpressionVisitor()

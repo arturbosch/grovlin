@@ -1,4 +1,4 @@
-package io.gitlab.arturbosch.grovlin.ast.visitors
+package io.gitlab.arturbosch.grovlin.ast.visitors.antlr
 
 import io.gitlab.arturbosch.grovlin.GrovlinParser
 import io.gitlab.arturbosch.grovlin.GrovlinParserBaseVisitor
@@ -46,7 +46,7 @@ import io.gitlab.arturbosch.grovlin.ast.toPosition
  */
 class AntlrExpressionVisitor : GrovlinParserBaseVisitor<Expression>() {
 
-	private val typeVisitor = AntlrTypesVisitor()
+	val typeVisitor = AntlrTypesVisitor()
 
 	override fun visitDecimalLiteral(ctx: GrovlinParser.DecimalLiteralContext): Expression {
 		return DecLit(ctx.text).apply {
