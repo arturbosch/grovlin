@@ -230,6 +230,7 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 		when (type) {
 			is ObjectOrTypeType -> visit(type, data)
 			is PrimitiveType -> visit(type, data)
+			is UnknownType -> visit(type, data)
 		}
 	}
 

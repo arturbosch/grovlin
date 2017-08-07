@@ -31,7 +31,7 @@ class MethodDeclaration(override val name: String,
 
 class LambdaDeclaration(override val name: String,
 						override val block: BlockStatement)
-	: Statement(), NodeWithBlock, NodeWithName, TopLevelDeclarable
+	: MemberDeclaration(), NodeWithBlock, NodeWithName, TopLevelDeclarable
 
 class PropertyDeclaration(override var type: Type,
 						  override val name: String,
