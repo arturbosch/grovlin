@@ -17,10 +17,10 @@ interface SymbolType {
 	val name: String
 }
 
-class VariableSymbol(override val name: String,
-					 override var type: SymbolType? = null) : Symbol()
+data class VariableSymbol(override val name: String,
+						  override var type: SymbolType? = null) : Symbol()
 
-class BuiltinTypeSymbol(override val name: String) : SymbolType, Symbol()
+data class BuiltinTypeSymbol(override val name: String) : SymbolType, Symbol()
 
 abstract class ScopedSymbol : Symbol(), Scope
 
@@ -29,17 +29,19 @@ class MethodSymbol(override val name: String,
 				   override var enclosingScope: Scope) : ScopedSymbol() {
 
 	private val symbols: MutableMap<String, Symbol> = HashMap()
-	override var scope: Scope? = LocalScope("<$name-parameters>", this)
-	val bodyScope: Scope = LocalScope("<$name-body>", this)
+	override var scope: Scope? = LocalScope("<$name-parameters>", enclosingScope)
+	val parameterScope get() = scope!!
 
 	override fun define(symbol: Symbol) {
 		symbols[symbol.name] = symbol
 	}
 
-	override fun resolve(name: String): Symbol? =
-			bodyScope.resolve(name)
-					?: scope?.resolve(name)
-					?: symbols[name]
+	override fun resolve(name: String): Symbol? = parameterScope.resolve(name)
+			?: enclosingScope.resolve(name)
+
+	override fun toString(): String {
+		return "${javaClass.simpleName}(name=$name, symbols=$symbols)"
+	}
 }
 
 class ClassSymbol(override val name: String) : SymbolType, ScopedSymbol() {
@@ -57,6 +59,10 @@ class ClassSymbol(override val name: String) : SymbolType, ScopedSymbol() {
 				?: parentScope?.resolve(name)
 				?: enclosingScope?.resolve(name)
 	}
+
+	override fun toString(): String {
+		return "${javaClass.simpleName}(name=$name, symbols=$symbols)"
+	}
 }
 
 interface Scope {
@@ -68,7 +74,7 @@ interface Scope {
 
 abstract class BaseScope : Scope {
 
-	private val symbols: MutableMap<String, Symbol> = HashMap()
+	protected val symbols: MutableMap<String, Symbol> = HashMap()
 
 	override val enclosingScope: Scope? = null
 
@@ -81,7 +87,7 @@ abstract class BaseScope : Scope {
 	}
 
 	override fun toString(): String {
-		return "<scope:$name>"
+		return "${javaClass.simpleName}(name=$name, symbols=$symbols)"
 	}
 }
 
@@ -89,4 +95,5 @@ class FileScope(fileName: String) : BaseScope() {
 	override val name: String = "<file:$fileName>"
 }
 
-class LocalScope(override val name: String, override val enclosingScope: Scope) : BaseScope()
+class LocalScope(override val name: String,
+				 override val enclosingScope: Scope) : BaseScope()
