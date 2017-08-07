@@ -29,8 +29,7 @@ class MethodSymbol(override val name: String,
 				   override var enclosingScope: Scope) : ScopedSymbol() {
 
 	private val symbols: MutableMap<String, Symbol> = HashMap()
-	override var scope: Scope? = LocalScope("<$name-parameters>", enclosingScope)
-	val parameterScope get() = scope!!
+	val parameterScope: Scope = LocalScope("<$name-parameters>", enclosingScope)
 
 	override fun define(symbol: Symbol) {
 		symbols[symbol.name] = symbol
@@ -44,24 +43,30 @@ class MethodSymbol(override val name: String,
 	}
 }
 
-class ClassSymbol(override val name: String) : SymbolType, ScopedSymbol() {
+class ClassSymbol(override val name: String,
+				  override var type: SymbolType?,
+				  override var enclosingScope: Scope) : SymbolType, ScopedSymbol() {
 
-	private val symbols: MutableMap<String, Symbol> = HashMap()
-	override val enclosingScope: Scope? = null
-	val parentScope: Scope? = null
+	private val members: MutableMap<String, Symbol> = HashMap()
+	val parentScope: ClassSymbol? = null
+	override var scope: Scope? = LocalScope("<$name:body", enclosingScope)
 
 	override fun define(symbol: Symbol) {
-		symbols[symbol.name] = symbol
+		members[symbol.name] = symbol
 	}
 
 	override fun resolve(name: String): Symbol? {
-		return symbols[name]
+		return members[name]
 				?: parentScope?.resolve(name)
-				?: enclosingScope?.resolve(name)
+				?: enclosingScope.resolve(name)
+	}
+
+	fun resolveMember(name: String): Symbol? {
+		return members[name] ?: parentScope?.resolveMember(name)
 	}
 
 	override fun toString(): String {
-		return "${javaClass.simpleName}(name=$name, symbols=$symbols)"
+		return "${javaClass.simpleName}(name=$name, memberSymbols=$members)"
 	}
 }
 

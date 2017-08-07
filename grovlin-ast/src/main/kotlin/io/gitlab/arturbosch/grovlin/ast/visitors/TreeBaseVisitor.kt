@@ -102,17 +102,23 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 
 	override fun visit(statement: Statement, data: Any) {
 		when (statement) {
+			is ExpressionStatement -> visit(statement, data)
 			is Program -> visit(statement, data)
 			is TypeDeclaration -> visit(statement, data)
 			is ObjectDeclaration -> visit(statement, data)
 			is MethodDeclaration -> visit(statement, data)
 			is VarDeclaration -> visit(statement, data)
+			is PropertyDeclaration -> visit(statement, data)
+			is ParameterDeclaration -> visit(statement, data)
 			is LambdaDeclaration -> visit(statement, data)
 			is IfStatement -> visit(statement, data)
 			is ElifStatement -> visit(statement, data)
+			is ForStatement -> visit(statement, data)
+			is WhileStatement -> visit(statement, data)
 			is Assignment -> visit(statement, data)
 			is BlockStatement -> visit(statement, data)
-			is ExpressionStatement -> visit(statement, data)
+			is ReturnStatement -> visit(statement, data)
+			else -> throw UnsupportedOperationException("Missing visit method for ${statement.javaClass.simpleName}")
 		}
 	}
 
@@ -173,6 +179,7 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 			is ObjectCreation -> visit(expression, data)
 			is BinaryExpression -> visit(expression, data)
 			is UnaryExpression -> visit(expression, data)
+			is StringLit -> visit(expression, data)
 			is IntLit -> visit(expression, data)
 			is DecLit -> visit(expression, data)
 			is BoolLit -> visit(expression, data)

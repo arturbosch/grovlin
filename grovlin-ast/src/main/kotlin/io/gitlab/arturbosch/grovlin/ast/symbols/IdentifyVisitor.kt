@@ -3,9 +3,13 @@ package io.gitlab.arturbosch.grovlin.ast.symbols
 import io.gitlab.arturbosch.grovlin.ast.BlockStatement
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
-import io.gitlab.arturbosch.grovlin.ast.UnknownType
+import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
+import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
+import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
+import io.gitlab.arturbosch.grovlin.ast.TypeDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
+import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
 import io.gitlab.arturbosch.grovlin.ast.visitors.TreeBaseVisitor
 
 /**
@@ -22,19 +26,33 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor() {
 	}
 
 	override fun visit(varDeclaration: VarDeclaration, data: Any) {
-		val type = if (varDeclaration.type != UnknownType) varDeclaration.type else null
-		val variableSymbol = VariableSymbol(varDeclaration.name, type)
-		variableSymbol.def = varDeclaration
+		identifyVariable(varDeclaration)
+		super.visit(varDeclaration, data)
+	}
+
+	override fun visit(propertyDeclaration: PropertyDeclaration, data: Any) {
+		identifyVariable(propertyDeclaration)
+		super.visit(propertyDeclaration, data)
+	}
+
+	override fun visit(parameterDeclaration: ParameterDeclaration, data: Any) {
+		identifyVariable(parameterDeclaration)
+		super.visit(parameterDeclaration, data)
+	}
+
+	private fun identifyVariable(variableDeclaration: VariableDeclaration) {
+		val variableSymbol = VariableSymbol(variableDeclaration.name)
+		variableSymbol.def = variableDeclaration
 		variableSymbol.scope = currentScope
 		currentScope.define(variableSymbol)
-		varDeclaration.resolutionScope = currentScope
-		super.visit(varDeclaration, data)
+		variableDeclaration.resolutionScope = currentScope
 	}
 
 	override fun visit(methodDeclaration: MethodDeclaration, data: Any) {
 		val methodSymbol = MethodSymbol(methodDeclaration.name, methodDeclaration.type, currentScope)
 		currentScope.define(methodSymbol)
 		methodSymbol.def = methodDeclaration
+		methodSymbol.scope = currentScope
 		methodDeclaration.resolutionScope = currentScope
 		currentScope = methodSymbol.parameterScope
 		super.visit(methodDeclaration, data)
@@ -46,14 +64,36 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor() {
 	}
 
 	override fun visit(blockStatement: BlockStatement, data: Any) {
-		val notFileScope = currentScope !is FileScope
-		if (notFileScope) {
+		val notClassOrFileScope = currentScope !is FileScope && currentScope !is ClassSymbol
+		if (notClassOrFileScope) {
 			val localScope = LocalScope("<block>", currentScope)
 			currentScope = localScope
 		}
 		super.visit(blockStatement, data)
-		if (notFileScope) {
+		if (notClassOrFileScope) {
 			currentScope = currentScope.enclosingScope ?: assertEnclosingScope()
 		}
+	}
+
+	override fun visit(objectDeclaration: ObjectDeclaration, data: Any) {
+		val classSymbol = ClassSymbol(objectDeclaration.name, objectDeclaration.type, currentScope)
+		currentScope.define(classSymbol)
+		classSymbol.def = objectDeclaration
+		classSymbol.scope = currentScope
+		objectDeclaration.resolutionScope = currentScope
+		currentScope = classSymbol
+		super.visit(objectDeclaration, data)
+		currentScope = currentScope.enclosingScope ?: assertEnclosingScope()
+	}
+
+	override fun visit(typeDeclaration: TypeDeclaration, data: Any) {
+		val classSymbol = ClassSymbol(typeDeclaration.name, typeDeclaration.type, currentScope)
+		currentScope.define(classSymbol)
+		classSymbol.def = typeDeclaration
+		classSymbol.scope = currentScope
+		typeDeclaration.resolutionScope = currentScope
+		currentScope = classSymbol
+		super.visit(typeDeclaration, data)
+		currentScope = currentScope.enclosingScope ?: assertEnclosingScope()
 	}
 }
