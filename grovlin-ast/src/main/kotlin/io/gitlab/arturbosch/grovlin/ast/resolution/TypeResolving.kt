@@ -22,6 +22,7 @@ import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.RelationExpression
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
+import io.gitlab.arturbosch.grovlin.ast.UnknownType
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.operations.processNodesOfType
@@ -51,7 +52,7 @@ fun GrovlinFile.resolveTypes(): List<SemanticError> {
 private fun NodeWithType.tryToSolve(): Type {
 	if (!isUnsolved()) return type
 	when (this) {
-		is VarDeclaration -> type = value.resolveType()
+		is VarDeclaration -> type = value?.resolveType() ?: UnknownType
 		is PropertyDeclaration -> type
 		else -> throw UnsupportedOperationException("")
 	}

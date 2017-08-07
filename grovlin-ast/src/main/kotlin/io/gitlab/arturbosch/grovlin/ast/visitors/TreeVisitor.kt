@@ -40,6 +40,7 @@ import io.gitlab.arturbosch.grovlin.ast.UnaryExpression
 import io.gitlab.arturbosch.grovlin.ast.UnknownType
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
+import io.gitlab.arturbosch.grovlin.ast.VoidType
 import io.gitlab.arturbosch.grovlin.ast.WhileStatement
 
 /**
@@ -106,4 +107,5 @@ interface TreeVisitor<in P, out R> {
 	fun visit(intType: IntType, data: P): R
 	fun visit(decType: DecimalType, data: P): R
 	fun visit(unknownType: UnknownType, data: P): R
+	fun visit(voidType: VoidType, data: Any)
 }

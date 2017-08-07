@@ -252,11 +252,14 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 		val condition = exprVisitor.visit(ctx.expression())
 		val block = visitStatements(ctx.statements(), ctx.LBRACE(), ctx.RBRACE())
 				?: throw AssertionError("Body is missing!")
-		return ForStatement(varName, condition, block).apply {
+		val varDeclaration = VarDeclaration(varName, null, true)
+		return ForStatement(varDeclaration, condition, block).apply {
 			position = ctx.toPosition()
-			children = listOf(condition, block)
+			children = listOf(varDeclaration, condition, block)
 			condition.parent = this
 			block.parent = this
+			varDeclaration.parent = this
+			varDeclaration.position = ctx.ID().toPosition()
 		}
 	}
 

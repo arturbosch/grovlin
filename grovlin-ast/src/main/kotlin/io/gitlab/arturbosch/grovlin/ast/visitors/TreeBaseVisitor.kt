@@ -23,6 +23,7 @@ import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectCreation
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
+import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
 import io.gitlab.arturbosch.grovlin.ast.Program
@@ -39,6 +40,7 @@ import io.gitlab.arturbosch.grovlin.ast.UnaryExpression
 import io.gitlab.arturbosch.grovlin.ast.UnknownType
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
+import io.gitlab.arturbosch.grovlin.ast.VoidType
 import io.gitlab.arturbosch.grovlin.ast.WhileStatement
 
 /**
@@ -84,12 +86,16 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 	}
 
 	override fun visit(varDeclaration: VarDeclaration, data: Any) {
-		visit(varDeclaration.value, data)
+		varDeclaration.value?.let { visit(it, data) }
 	}
 
 	override fun visit(propertyDeclaration: PropertyDeclaration, data: Any) {
 		visit(propertyDeclaration.type, data)
 		propertyDeclaration.value?.let { visit(it, data) }
+	}
+
+	override fun visit(parameterDeclaration: ParameterDeclaration, data: Any) {
+		visit(parameterDeclaration.type, data)
 	}
 
 	// Statements
@@ -136,6 +142,7 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 
 	override fun visit(forStatement: ForStatement, data: Any) {
 		visit(forStatement.expression, data)
+		visit(forStatement.varDeclaration, data)
 		visit(forStatement.block, data)
 	}
 
@@ -178,6 +185,7 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 
 	override fun visit(callExpression: CallExpression, data: Any) {
 		callExpression.scope?.let { visit(it, data) }
+		callExpression.arguments.forEach { visit(it, data) }
 	}
 
 	override fun visit(getterAccessExpression: GetterAccessExpression, data: Any) {
@@ -232,6 +240,8 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 		when (type) {
 			is ObjectOrTypeType -> visit(type, data)
 			is PrimitiveType -> visit(type, data)
+			is UnknownType -> visit(type, data)
+			is VoidType -> visit(type, data)
 		}
 	}
 
@@ -252,5 +262,7 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 	override fun visit(decType: DecimalType, data: Any) {}
 
 	override fun visit(unknownType: UnknownType, data: Any) {}
+
+	override fun visit(voidType: VoidType, data: Any) {}
 
 }

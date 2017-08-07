@@ -210,7 +210,7 @@ private fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*
 }
 
 private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {
-	is VarDeclaration -> ExpressionStmt(VariableDeclarationExpr(VariableDeclarator(type.toJava(), name, value.toJava())))
+	is VarDeclaration -> ExpressionStmt(VariableDeclarationExpr(VariableDeclarator(type.toJava(), name, value?.toJava())))
 	is Assignment -> ExpressionStmt(AssignExpr(reference.toJava(), value.toJava(), AssignExpr.Operator.ASSIGN))
 	is ExpressionStatement -> ExpressionStmt(expression.toJava())
 	is IfStatement -> IfStmt(condition.toJava(), thenStatement.toJava(), transformElifsToElseIfConstructs(elifs, elseStatement))
