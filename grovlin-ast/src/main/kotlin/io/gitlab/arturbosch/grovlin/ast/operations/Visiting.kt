@@ -4,17 +4,7 @@ import io.gitlab.arturbosch.grovlin.ast.AstNode
 
 fun AstNode.process(operation: (AstNode) -> Unit) {
 	operation(this)
-	filteredMembers().forEach { property ->
-		val value = property.get(this)
-		value.processIfPropertyIsFromTypeNode(operation)
-	}
-}
-
-private fun Any?.processIfPropertyIsFromTypeNode(operation: (AstNode) -> Unit) {
-	when (this) {
-		is AstNode -> process(operation)
-		is Collection<*> -> this.forEach { (it as? AstNode)?.process(operation) }
-	}
+	children.forEach { it.process(operation) }
 }
 
 inline fun <reified T : AstNode> AstNode.processNodesOfType(crossinline operation: (T) -> Unit) = process {
