@@ -27,7 +27,10 @@ data class BuiltinTypeSymbol(override val name: String,
 	override val isBuiltin: Boolean = true
 }
 
-abstract class ScopedSymbol : Symbol(), Scope
+abstract class ScopedSymbol : Symbol(), Scope {
+
+	override fun getParentScope(): Scope? = enclosingScope
+}
 
 class MethodSymbol(override val name: String,
 				   override var type: SymbolType?,
@@ -60,15 +63,13 @@ class ClassSymbol(override val name: String,
 		members[symbol.name] = symbol
 	}
 
-	override fun resolve(name: String): Symbol? {
-		return members[name]
-				?: parentScope?.resolve(name)
-				?: enclosingScope.resolve(name)
-	}
+	override fun resolve(name: String): Symbol? = members[name]
+			?: parentScope?.resolve(name)
+			?: enclosingScope.resolve(name)
 
-	fun resolveMember(name: String): Symbol? {
-		return members[name] ?: parentScope?.resolveMember(name)
-	}
+	fun resolveMember(name: String): Symbol? = members[name] ?: parentScope?.resolveMember(name)
+
+	override fun getParentScope(): Scope? = parentScope ?: enclosingScope
 
 	override fun toString(): String {
 		return "${javaClass.simpleName}(name=$name, memberSymbols=$members)"

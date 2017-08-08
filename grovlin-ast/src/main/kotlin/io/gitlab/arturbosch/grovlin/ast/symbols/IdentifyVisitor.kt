@@ -6,6 +6,7 @@ import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
+import io.gitlab.arturbosch.grovlin.ast.ThisReference
 import io.gitlab.arturbosch.grovlin.ast.TypeDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
@@ -22,7 +23,10 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor() {
 
 	override fun visit(varReference: VarReference, data: Any) {
 		varReference.resolutionScope = currentScope
-		super.visit(varReference, data)
+	}
+
+	override fun visit(thisReference: ThisReference, data: Any) {
+		thisReference.resolutionScope = currentScope
 	}
 
 	override fun visit(varDeclaration: VarDeclaration, data: Any) {

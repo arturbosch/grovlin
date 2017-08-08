@@ -15,6 +15,16 @@ interface Scope {
 	val enclosingScope: Scope?
 	fun define(symbol: Symbol)
 	fun resolve(name: String): Symbol?
+	fun getParentScope(): Scope?
+
+	fun getEnclosingClass(): Symbol? {
+		var current: Scope? = this
+		while (current != null) {
+			if (current is ClassSymbol) return current
+			current = getParentScope()
+		}
+		return null
+	}
 }
 
 abstract class BaseScope : Scope {
@@ -34,6 +44,8 @@ abstract class BaseScope : Scope {
 	override fun toString(): String {
 		return "${javaClass.simpleName}(name=$name, symbols=$symbols)"
 	}
+
+	override fun getParentScope() = enclosingScope
 }
 
 class FileScope(fileName: String) : BaseScope() {
