@@ -1,13 +1,10 @@
 package io.gitlab.arturbosch.grovlin.ast.symbols
 
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.present
-import io.gitlab.arturbosch.grovlin.ast.Assignment
-import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
-import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
+import io.gitlab.arturbosch.grovlin.ast.IntType
+import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
-import io.gitlab.arturbosch.grovlin.ast.parseFromTestResource
+import io.gitlab.arturbosch.grovlin.ast.operations.findByType
 import io.gitlab.arturbosch.grovlin.ast.resolved
 import org.assertj.core.api.Assertions
 import org.junit.Test
@@ -18,62 +15,50 @@ import org.junit.Test
 class VariableResolutionTest {
 
 	@Test
-	fun resolveVariableInPrintStatement() {
-		val file = parseFromTestResource("example.grovlin").resolved()
+	fun varDeclInferredFromIntLit() {
+		val grovlinFile = "var a = 5\nprint(a)".asGrovlinFile().resolved()
 
-		val varReference = file.findVariableReferencesByName("a")[0]
-
-		Assertions.assertThat(varReference.symbol?.def?.name == "a")
-		Assertions.assertThat(varReference.symbol?.def).isInstanceOf(VarDeclaration::class.java)
+		Assertions.assertThat(grovlinFile.findVariableByName("a")?.evaluationType).isEqualTo(IntType)
 	}
 
 	@Test
-	fun cantResolveInSameLine() {
-		val grovlinFile = "var a = 1 + a".asGrovlinFile().resolved()
+	fun varReferencesEvaluationTypeInferredFromVarDecl() {
+		val grovlinFile = "var a = 5\nvar b = 5\nprint(a + b)".asGrovlinFile().resolved()
 
-		Assertions.assertThat(grovlinFile.errors.find { "a" in it.message }).isNotNull()
-	}
+		val references = grovlinFile.collectByType<VarReference>()
 
-
-	@Test
-	fun cantResolveIfDeclarationIsAfterReference() {
-		val grovlinFile = "a = 5\nvar a = 1".asGrovlinFile().resolved()
-
-		Assertions.assertThat(grovlinFile.errors.find { "a" in it.message }).isNotNull()
-	}
-
-
-	@Test
-	fun cantResolveUnExistingValues() {
-		val grovlinFile = "var b = 5\nvar a = 1 + c".asGrovlinFile().resolved()
-
-		Assertions.assertThat(grovlinFile.errors.find { "c" in it.message }).isNotNull()
+		Assertions.assertThat(references).hasSize(2)
+		Assertions.assertThat(references).allMatch { it.evaluationType == IntType }
 	}
 
 	@Test
-	fun resolveAssignment() {
-		val grovlinFile = "var a = 5\na = 10".asGrovlinFile().resolved()
-
-		assertThat(grovlinFile.collectByType<Assignment>()[0].symbol?.def, present())
-	}
-
-	@Test
-	fun resolveAssignmentInMethod() {
-		val grovlinFile = "object Node { def method() { var a = 5\na = 10 } }".asGrovlinFile().resolved()
-
-		assertThat(grovlinFile.collectByType<Assignment>()[0].symbol?.def, present())
-	}
-
-	@Test
-	fun resolveVarToPropertyDeclaration() {
+	fun varReferencesEvaluationTypeInferredFromPropertyDecl() {
 		val grovlinFile = """
-			type Box { Int data def theData() { print(data) } }
-			object BoxImpl as Box { override Int data }
-			program { print(BoxImpl().data) }
-		""".asGrovlinFile().resolved()
+			type Example {
+				Int age = 5
+				def speak() {
+					print(age)
+				}
+			}
+		""".asGrovlinFile()
 
-		val reference = grovlinFile.findVariableReferencesByName("data").first()
+		val varDeclaration = grovlinFile.findByType<VarReference>()!!
 
-		Assertions.assertThat(reference.symbol?.def).isInstanceOf(PropertyDeclaration::class.java)
+		Assertions.assertThat(varDeclaration.evaluationType).isNull()
+
+		grovlinFile.resolved()
+
+		Assertions.assertThat(varDeclaration.evaluationType).isEqualTo(IntType)
+	}
+
+	@Test
+	fun unknownTypesResultsInSemanticError() {
+		val grovlinFile = "var a = b".asGrovlinFile().resolved()
+
+		val errors = grovlinFile.errors
+
+		Assertions.assertThat(errors).hasSize(2)
+		Assertions.assertThat(errors).anySatisfy { "a" in it.message }
+		Assertions.assertThat(errors).anySatisfy { "b" in it.message }
 	}
 }

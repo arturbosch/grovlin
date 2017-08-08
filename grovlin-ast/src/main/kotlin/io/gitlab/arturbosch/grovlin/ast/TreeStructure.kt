@@ -18,6 +18,7 @@ interface AstNode {
 	var children: List<AstNode>
 	var symbol: Symbol?
 	var resolutionScope: Scope?
+	var evaluationType: Type?
 }
 
 abstract class Node : AstNode {
@@ -26,6 +27,7 @@ abstract class Node : AstNode {
 	override var children: List<AstNode> = emptyList()
 	override var symbol: Symbol? = null
 	override var resolutionScope: Scope? = null
+	override var evaluationType: Type? = null
 }
 
 abstract class Expression : Node()
