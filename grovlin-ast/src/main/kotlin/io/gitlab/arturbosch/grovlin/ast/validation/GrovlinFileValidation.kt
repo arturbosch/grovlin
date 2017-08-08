@@ -10,7 +10,7 @@ import io.gitlab.arturbosch.grovlin.parser.Error
  * @author Artur Bosch
  */
 
-data class SemanticError(override val message: String, override val position: Point) : Error
+data class SemanticError(override val message: String, override val position: Point?) : Error
 
 fun GrovlinFile.validate(): List<SemanticError> {
 	val errors = mutableListOf<SemanticError>()

@@ -13,7 +13,7 @@ data class RawParsingResult(val root: GrovlinParser.GrovlinFileContext?, val pat
 
 interface Error {
 	val message: String
-	val position: CodePoint
+	val position: CodePoint?
 }
 
 data class SyntaxError(override val message: String, override val position: CodePoint) : Error
