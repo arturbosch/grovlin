@@ -25,6 +25,7 @@ import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
+import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.WhileStatement
 import io.gitlab.arturbosch.grovlin.ast.endPoint
 import io.gitlab.arturbosch.grovlin.ast.startPoint
@@ -154,7 +155,7 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 	override fun visitVarDeclaration(ctx: GrovlinParser.VarDeclarationContext): Statement {
 		val assignment = visitAssignment(ctx.assignment())
 		val isVal = ctx.VAL() != null
-		return VarDeclaration(assignment.reference.name, assignment.value, isVal).apply {
+		return VarDeclaration(assignment.varName, assignment.value, isVal).apply {
 			position = ctx.toPosition()
 			children = listOf(assignment.value)
 			assignment.value.parent = this
@@ -191,9 +192,13 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 
 	override fun visitAssignment(ctx: GrovlinParser.AssignmentContext): Assignment {
 		val expression = exprVisitor.visit(ctx.expression())
-		return Assignment(Reference(ctx.ID().text), expression).apply {
+		val varReference = VarReference(Reference(ctx.ID().text)).apply {
+			position = ctx.ID().toPosition()
+		}
+		return Assignment(varReference, expression).apply {
 			position = ctx.toPosition()
-			children = listOf(expression)
+			children = listOf(varReference, expression)
+			varReference.parent = this
 			expression.parent = this
 		}
 	}

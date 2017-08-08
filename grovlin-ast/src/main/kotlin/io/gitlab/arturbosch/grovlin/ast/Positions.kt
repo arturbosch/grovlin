@@ -37,6 +37,11 @@ data class Position(val start: Point, val end: Point) {
 		val lines = code.split("\n")
 		return end.offset(lines) - start.offset(lines)
 	}
+
+	fun contains(position: Position): Boolean {
+		return (position.start.isAfter(start) || position.start == start)
+				&& (position.end.isBefore(end) || position.end == end)
+	}
 }
 
 val INVALID_POINT = Point(-1, -1)

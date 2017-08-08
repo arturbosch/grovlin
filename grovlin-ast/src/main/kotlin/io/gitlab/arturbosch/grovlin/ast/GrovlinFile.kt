@@ -14,7 +14,7 @@ class GrovlinFile(override var name: String,
 				  override var block: BlockStatement?)
 	: Node(), NodeWithBlock, NodeWithName {
 
-	private val errors: MutableList<Error> = mutableListOf()
+	val errors: MutableList<Error> = mutableListOf()
 
 	fun addError(error: Error) {
 		errors.add(error)

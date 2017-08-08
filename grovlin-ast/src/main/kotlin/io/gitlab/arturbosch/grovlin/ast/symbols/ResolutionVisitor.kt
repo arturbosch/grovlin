@@ -1,12 +1,15 @@
 package io.gitlab.arturbosch.grovlin.ast.symbols
 
+import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.AstNode
 import io.gitlab.arturbosch.grovlin.ast.CallExpression
+import io.gitlab.arturbosch.grovlin.ast.Declaration
 import io.gitlab.arturbosch.grovlin.ast.GetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
+import io.gitlab.arturbosch.grovlin.ast.Position
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.ThisReference
@@ -22,6 +25,8 @@ import io.gitlab.arturbosch.grovlin.ast.visitors.TreeBaseVisitor
  */
 class ResolutionVisitor(val grovlinFile: GrovlinFile,
 						val fileScope: FileScope) : TreeBaseVisitor() {
+
+	// Variable declarations resolution
 
 	override fun visit(varDeclaration: VarDeclaration, data: Any) {
 		super.visit(varDeclaration, data)
@@ -47,19 +52,55 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile,
 		varType.symbol = symbol
 	}
 
+	// Variable reference resolution
+
 	override fun visit(varReference: VarReference, data: Any) {
 		super.visit(varReference, data)
 		val scope = varReference.resolutionScope ?: assertScopeResolved(varReference)
-		val symbol = scope.resolve(varReference.varName)
+		val referenceName = varReference.varName
+		val symbol = scope.resolve(referenceName)
 		varReference.symbol = symbol
-		symbol?.type = symbol?.def?.type
-		if (symbol?.def == null) {
-			grovlinFile.addError(SemanticError(
-					"Declaration for ${varReference.varName} not found.", varReference.position?.start))
-		} else {
-			varReference.reference.source = symbol.def as VariableDeclaration
+		val definition = symbol?.def
+		symbol?.type = definition?.type
+		checkSemanticVarReferenceCases(definition, varReference)
+	}
+
+	override fun visit(assignment: Assignment, data: Any) {
+		super.visit(assignment, data)
+		val scope = assignment.resolutionScope ?: assertScopeResolved(assignment)
+		val symbol = scope.resolve(assignment.varName)
+		assignment.symbol = symbol
+		val definition = symbol?.def
+		symbol?.type = definition?.type
+		checkSemanticVarReferenceCases(definition, assignment.varReference)
+	}
+
+	private fun checkSemanticVarReferenceCases(definition: Declaration?,
+											   reference: VarReference) {
+
+		val referencePositions = reference.position ?: assertPositions(reference)
+		val referenceStart = referencePositions.start
+		val referenceName = reference.varName
+		when {
+			definition == null -> grovlinFile.addError(SemanticError(
+					"Declaration for $referenceName not found.", referenceStart))
+
+			definition.position == null -> assertPositions(definition)
+
+			definition.position!!.contains(referencePositions) -> grovlinFile.addError(SemanticError(
+					"Reference is used within declaration of $referenceName!", referenceStart))
+
+			referenceStart.isBefore(definition.position!!.start) -> grovlinFile.addError(SemanticError(
+					"Reference $referenceName on $referenceStart is used before " +
+							"the declaration of $referenceName at ${definition.position!!.start}", referenceStart))
 		}
 	}
+
+	private fun assertPositions(node: AstNode): Position {
+		throw AssertionError("No positions for ${node.javaClass.simpleName}!")
+	}
+
+	// Type, Object, Method resolution
 
 	override fun visit(methodDeclaration: MethodDeclaration, data: Any) {
 		super.visit(methodDeclaration, data)
@@ -92,6 +133,8 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile,
 		}
 	}
 
+	// Member reference resolution
+
 	override fun visit(thisReference: ThisReference, data: Any) {
 		thisReference.symbol = thisReference.resolutionScope?.getEnclosingClass()
 	}
@@ -122,6 +165,4 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile,
 
 	// Computing static expression types
 	// Literals have default builtin types
-
-
 }
