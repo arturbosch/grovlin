@@ -38,7 +38,6 @@ import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
-import io.gitlab.arturbosch.grovlin.ast.validation.SemanticError
 import io.gitlab.arturbosch.grovlin.ast.visitors.TreeBaseVisitor
 
 /**

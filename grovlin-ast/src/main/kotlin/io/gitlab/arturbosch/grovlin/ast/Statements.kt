@@ -23,11 +23,9 @@ class BlockStatement(override val statements: MutableList<Statement>)
 class ExpressionStatement(val expression: Expression) : Statement()
 
 class Assignment(val varReference: VarReference,
-				 val value: Expression)
-	: Statement(), NodeWithReference<VariableDeclaration> {
+				 val value: Expression) : Statement() {
 
 	val varName: String = varReference.varName
-	override val reference: Reference<VariableDeclaration> = varReference.reference
 }
 
 class ForStatement(val varDeclaration: VarDeclaration,

@@ -23,7 +23,6 @@ import io.gitlab.arturbosch.grovlin.ast.ObjectCreation
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
 import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
-import io.gitlab.arturbosch.grovlin.ast.Reference
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.StringLit
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
@@ -157,7 +156,7 @@ class AntlrExpressionVisitor : GrovlinParserBaseVisitor<Expression>() {
 	}
 
 	override fun visitVarReference(ctx: GrovlinParser.VarReferenceContext): Expression {
-		return VarReference(Reference(ctx.text)).apply {
+		return VarReference(ctx.text).apply {
 			position = ctx.toPosition()
 		}
 	}
@@ -217,7 +216,7 @@ class AntlrExpressionVisitor : GrovlinParserBaseVisitor<Expression>() {
 	}
 
 	override fun visitThisExpression(ctx: GrovlinParser.ThisExpressionContext): Expression {
-		return ThisReference(Reference("this")).apply {
+		return ThisReference("this").apply {
 			position = ctx.toPosition()
 		}
 	}

@@ -83,7 +83,7 @@ interface NodeWithBlock : AstNode {
 
 	fun findVariableReferencesByName(name: String): List<VarReference> = block
 			?.collectByType<VarReference>()
-			?.filter { it.reference.name == name } ?: emptyList()
+			?.filter { it.reference == name } ?: emptyList()
 
 	fun topLevelStatements(): List<Statement> = block?.statements
 			?.filter { it is TopLevelDeclarable && it.isTopLevelDeclaration() } ?: emptyList()

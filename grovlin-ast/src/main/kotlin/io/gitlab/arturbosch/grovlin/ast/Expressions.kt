@@ -17,20 +17,19 @@ class SetterAccessExpression(val scope: Expression?,
 							 override val name: String,
 							 val expression: Expression) : Expression(), NodeWithName
 
-class ThisReference(val reference: Reference<TypeDeclaration>) : Expression() {
+class ThisReference(val reference: String) : Expression() {
 
 	companion object {
-		fun instance() = ThisReference(Reference("this"))
+		fun instance() = ThisReference("this")
 	}
 }
 
 class TypeConversion(val value: Expression,
 					 val targetType: Type) : Expression()
 
-class VarReference(override val reference: Reference<VariableDeclaration>)
-	: Expression(), NodeWithReference<VariableDeclaration> {
+class VarReference(val reference: String) : Expression() {
 
-	val varName get() = reference.name
+	val varName get() = reference
 }
 
 class ObjectCreation(val type: ObjectOrTypeType) : Expression()

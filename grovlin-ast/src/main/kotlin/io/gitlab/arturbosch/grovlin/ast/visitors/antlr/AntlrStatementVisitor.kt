@@ -19,7 +19,6 @@ import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.Position
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
-import io.gitlab.arturbosch.grovlin.ast.Reference
 import io.gitlab.arturbosch.grovlin.ast.ReturnStatement
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.Type
@@ -192,7 +191,7 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 
 	override fun visitAssignment(ctx: GrovlinParser.AssignmentContext): Assignment {
 		val expression = exprVisitor.visit(ctx.expression())
-		val varReference = VarReference(Reference(ctx.ID().text)).apply {
+		val varReference = VarReference(ctx.ID().text).apply {
 			position = ctx.ID().toPosition()
 		}
 		return Assignment(varReference, expression).apply {
