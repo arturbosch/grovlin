@@ -18,7 +18,7 @@ import org.junit.Test
 /**
  * @author Artur Bosch
  */
-class SymbolResolutionTest {
+class SymbolIdentificationTest {
 
 	@Test
 	fun resolveInFileScopeOnly() {

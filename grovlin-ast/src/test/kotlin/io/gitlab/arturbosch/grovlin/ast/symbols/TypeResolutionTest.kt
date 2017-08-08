@@ -1,4 +1,4 @@
-package io.gitlab.arturbosch.grovlin.ast.resolution
+package io.gitlab.arturbosch.grovlin.ast.symbols
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -12,6 +12,7 @@ import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import io.gitlab.arturbosch.grovlin.ast.parseFromTestResource
+import io.gitlab.arturbosch.grovlin.ast.resolution.resolveTypes
 import io.gitlab.arturbosch.grovlin.ast.resolved
 import org.junit.Test
 import kotlin.test.assertTrue
@@ -19,7 +20,7 @@ import kotlin.test.assertTrue
 /**
  * @author Artur Bosch
  */
-class TypeResolvingTest {
+class TypeResolutionTest {
 
 	@Test
 	fun resolveTypes() {

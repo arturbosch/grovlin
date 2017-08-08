@@ -1,4 +1,4 @@
-package io.gitlab.arturbosch.grovlin.ast.resolution
+package io.gitlab.arturbosch.grovlin.ast.symbols
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.present
@@ -15,7 +15,7 @@ import org.junit.Test
 /**
  * @author Artur Bosch
  */
-class ResolveVariablesTest {
+class VariableResolutionTest {
 
 	@Test
 	fun resolveVariableInPrintStatement() {
