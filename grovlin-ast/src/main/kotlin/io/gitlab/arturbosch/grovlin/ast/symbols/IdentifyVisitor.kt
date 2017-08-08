@@ -46,6 +46,7 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor() {
 		variableSymbol.scope = currentScope
 		currentScope.define(variableSymbol)
 		variableDeclaration.resolutionScope = currentScope
+		variableDeclaration.symbol = variableSymbol
 	}
 
 	override fun visit(methodDeclaration: MethodDeclaration, data: Any) {
@@ -54,13 +55,34 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor() {
 		methodSymbol.def = methodDeclaration
 		methodSymbol.scope = currentScope
 		methodDeclaration.resolutionScope = currentScope
+		methodDeclaration.symbol = methodSymbol
 		currentScope = methodSymbol.parameterScope
 		super.visit(methodDeclaration, data)
 		currentScope = currentScope.enclosingScope ?: assertEnclosingScope()
 	}
 
-	private fun assertEnclosingScope(): Scope {
-		throw AssertionError("Unexpected null enclosing scope of $currentScope")
+	override fun visit(objectDeclaration: ObjectDeclaration, data: Any) {
+		val classSymbol = ClassSymbol(objectDeclaration.name, objectDeclaration.objectType, currentScope)
+		currentScope.define(classSymbol)
+		classSymbol.def = objectDeclaration
+		classSymbol.scope = currentScope
+		objectDeclaration.resolutionScope = currentScope
+		objectDeclaration.symbol = classSymbol
+		currentScope = classSymbol
+		super.visit(objectDeclaration, data)
+		currentScope = currentScope.enclosingScope ?: assertEnclosingScope()
+	}
+
+	override fun visit(typeDeclaration: TypeDeclaration, data: Any) {
+		val classSymbol = ClassSymbol(typeDeclaration.name, typeDeclaration.typeType, currentScope)
+		currentScope.define(classSymbol)
+		classSymbol.def = typeDeclaration
+		classSymbol.scope = currentScope
+		typeDeclaration.resolutionScope = currentScope
+		typeDeclaration.symbol = classSymbol
+		currentScope = classSymbol
+		super.visit(typeDeclaration, data)
+		currentScope = currentScope.enclosingScope ?: assertEnclosingScope()
 	}
 
 	override fun visit(blockStatement: BlockStatement, data: Any) {
@@ -75,25 +97,7 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor() {
 		}
 	}
 
-	override fun visit(objectDeclaration: ObjectDeclaration, data: Any) {
-		val classSymbol = ClassSymbol(objectDeclaration.name, objectDeclaration.objectType, currentScope)
-		currentScope.define(classSymbol)
-		classSymbol.def = objectDeclaration
-		classSymbol.scope = currentScope
-		objectDeclaration.resolutionScope = currentScope
-		currentScope = classSymbol
-		super.visit(objectDeclaration, data)
-		currentScope = currentScope.enclosingScope ?: assertEnclosingScope()
-	}
-
-	override fun visit(typeDeclaration: TypeDeclaration, data: Any) {
-		val classSymbol = ClassSymbol(typeDeclaration.name, typeDeclaration.typeType, currentScope)
-		currentScope.define(classSymbol)
-		classSymbol.def = typeDeclaration
-		classSymbol.scope = currentScope
-		typeDeclaration.resolutionScope = currentScope
-		currentScope = classSymbol
-		super.visit(typeDeclaration, data)
-		currentScope = currentScope.enclosingScope ?: assertEnclosingScope()
+	private fun assertEnclosingScope(): Scope {
+		throw AssertionError("Unexpected null enclosing scope of $currentScope")
 	}
 }

@@ -2,6 +2,7 @@ package io.gitlab.arturbosch.grovlin.ast
 
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import io.gitlab.arturbosch.grovlin.ast.symbols.Scope
+import io.gitlab.arturbosch.grovlin.ast.symbols.Symbol
 
 /**
  * @author Artur Bosch
@@ -15,7 +16,7 @@ interface AstNode {
 	var position: Position?
 	var parent: AstNode?
 	var children: List<AstNode>
-	var typeReference: Type?
+	var symbol: Symbol?
 	var resolutionScope: Scope?
 }
 
@@ -23,7 +24,7 @@ abstract class Node : AstNode {
 	override var position: Position? = null
 	override var parent: AstNode? = null
 	override var children: List<AstNode> = emptyList()
-	override var typeReference: Type? = null
+	override var symbol: Symbol? = null
 	override var resolutionScope: Scope? = null
 }
 
