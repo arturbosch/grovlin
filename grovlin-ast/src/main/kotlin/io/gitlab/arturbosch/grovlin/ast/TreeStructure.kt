@@ -19,6 +19,7 @@ interface AstNode {
 	var symbol: Symbol?
 	var resolutionScope: Scope?
 	var evaluationType: Type?
+	var promotionType: Type?
 }
 
 abstract class Node : AstNode {
@@ -28,6 +29,7 @@ abstract class Node : AstNode {
 	override var symbol: Symbol? = null
 	override var resolutionScope: Scope? = null
 	override var evaluationType: Type? = null
+	override var promotionType: Type? = null
 }
 
 abstract class Expression : Node()

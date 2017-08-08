@@ -9,21 +9,21 @@ import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import io.gitlab.arturbosch.grovlin.ast.resolved
 import org.assertj.core.api.Assertions
 import org.junit.Test
-import kotlin.test.assertTrue
 
 /**
  * @author Artur Bosch
  */
 class VariableTypePromotionTest {
 
-
 	@Test
 	fun relationalOperationsResultInBoolType() {
 		val grovlinFile = "var b = 5 > 4\nvar b2 = 5.0 > 4".asGrovlinFile().resolved()
 
 		val vars = grovlinFile.collectByType<VarDeclaration>()
-		
-		vars.forEach { assertTrue(it.type is BoolType, "Should be BoolType but was ${it.type.javaClass}") }
+
+		Assertions.assertThat(vars).allMatch { it.type == BoolType }
+		Assertions.assertThat(vars).allMatch { it.evaluationType == BoolType }
+		Assertions.assertThat(vars).allMatch { it.evaluationType == BoolType }
 	}
 
 	@Test

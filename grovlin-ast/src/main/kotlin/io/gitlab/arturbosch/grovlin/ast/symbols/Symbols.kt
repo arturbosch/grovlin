@@ -16,13 +16,14 @@ abstract class Symbol {
 
 interface SymbolType {
 	val name: String
+	val typeIndex: Int
 }
 
 data class VariableSymbol(override val name: String,
 						  override var type: SymbolType? = null) : Symbol()
 
 data class BuiltinTypeSymbol(override val name: String,
-							 override var type: SymbolType?) : SymbolType, Symbol() {
+							 override var type: SymbolType?) : Symbol() {
 
 	override val isBuiltin: Boolean = true
 }
@@ -53,7 +54,7 @@ class MethodSymbol(override val name: String,
 
 class ClassSymbol(override val name: String,
 				  override var type: SymbolType?,
-				  override var enclosingScope: Scope) : SymbolType, ScopedSymbol() {
+				  override var enclosingScope: Scope) : ScopedSymbol() {
 
 	private val members: MutableMap<String, Symbol> = HashMap()
 	val parentScope: ClassSymbol? = null

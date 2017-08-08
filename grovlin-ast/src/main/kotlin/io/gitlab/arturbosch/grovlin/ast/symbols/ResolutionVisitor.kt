@@ -1,26 +1,34 @@
 package io.gitlab.arturbosch.grovlin.ast.symbols
 
+import io.gitlab.arturbosch.grovlin.ast.AndExpression
 import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.AstNode
 import io.gitlab.arturbosch.grovlin.ast.BinaryExpression
 import io.gitlab.arturbosch.grovlin.ast.BoolLit
+import io.gitlab.arturbosch.grovlin.ast.BoolType
 import io.gitlab.arturbosch.grovlin.ast.CallExpression
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.Declaration
+import io.gitlab.arturbosch.grovlin.ast.DivisionExpression
 import io.gitlab.arturbosch.grovlin.ast.GetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntRangeExpression
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
+import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
 import io.gitlab.arturbosch.grovlin.ast.ObjectCreation
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
+import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.Position
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
+import io.gitlab.arturbosch.grovlin.ast.RelationExpression
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.StringLit
+import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
+import io.gitlab.arturbosch.grovlin.ast.SumExpression
 import io.gitlab.arturbosch.grovlin.ast.ThisReference
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
@@ -29,6 +37,7 @@ import io.gitlab.arturbosch.grovlin.ast.UnaryExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
+import io.gitlab.arturbosch.grovlin.ast.XorExpression
 import io.gitlab.arturbosch.grovlin.ast.validation.SemanticError
 import io.gitlab.arturbosch.grovlin.ast.visitors.TreeBaseVisitor
 
@@ -42,7 +51,9 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile,
 
 	override fun visit(varDeclaration: VarDeclaration, data: Any) {
 		super.visit(varDeclaration, data)
-		val evaluationType = varDeclaration.value?.evaluationType
+		val exprPromotionType = varDeclaration.value?.promotionType
+		val exprEvaluationType = varDeclaration.value?.evaluationType
+		val evaluationType = exprPromotionType ?: exprEvaluationType
 		if (evaluationType != null) {
 			varDeclaration.type = evaluationType
 		} else {
@@ -192,7 +203,6 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile,
 			throw AssertionError("Scope of ${node.javaClass.simpleName} is not resolved!")
 
 	// Computing static expression types
-	// Literals have default builtin types
 
 	override fun visit(parenExpression: ParenExpression, data: Any) {
 		super.visit(parenExpression, data)
@@ -209,11 +219,6 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile,
 		objectCreation.evaluationType = objectCreation.type
 	}
 
-	override fun visit(binaryExpression: BinaryExpression, data: Any) {
-		super.visit(binaryExpression, data)
-		binaryExpression.evaluationType = binaryExpression.left.evaluationType
-	}
-
 	override fun visit(unaryExpression: UnaryExpression, data: Any) {
 		super.visit(unaryExpression, data)
 		unaryExpression.evaluationType = unaryExpression.value.evaluationType
@@ -223,6 +228,72 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile,
 		super.visit(intRangeExpression, data)
 		intRangeExpression.evaluationType = IntType
 	}
+
+	// Binary expressions need promotion through lookup tables
+
+	override fun visit(relationExpression: RelationExpression, data: Any) {
+		super.visit(relationExpression, data)
+		val resultType = promoteIfNecessary(relationExpression, RELATIONAL_PROMOTION_TABLE)
+		if (resultType == T_BOOL_INDEX) {
+			relationExpression.evaluationType = BoolType
+		}
+	}
+
+	private fun promoteIfNecessary(binExpr: BinaryExpression, promotionTable: Array<IntArray>): Int {
+		val resultType = getResultType(promotionTable, binExpr.left, binExpr.right)
+		if (resultType == T_VOID_INDEX) {
+			grovlinFile.addError(SemanticError("Incompatible types at ${binExpr.position}.",
+					binExpr.left.position?.start))
+		}
+		binExpr.evaluationType = binExpr.left.promotionType ?: binExpr.left.evaluationType
+		return resultType
+	}
+
+	override fun visit(sumExpression: SumExpression, data: Any) {
+		super.visit(sumExpression, data)
+		promoteIfNecessary(sumExpression, ARITHMETIC_PROMOTION_TABLE)
+	}
+
+	override fun visit(subtractionExpression: SubtractionExpression, data: Any) {
+		super.visit(subtractionExpression, data)
+		promoteIfNecessary(subtractionExpression, ARITHMETIC_PROMOTION_TABLE)
+	}
+
+	override fun visit(multiplicationExpression: MultiplicationExpression, data: Any) {
+		super.visit(multiplicationExpression, data)
+		promoteIfNecessary(multiplicationExpression, MUL_PROMOTION_TABLE)
+	}
+
+	override fun visit(divisionExpression: DivisionExpression, data: Any) {
+		super.visit(divisionExpression, data)
+		promoteIfNecessary(divisionExpression, DIVISION_PROMOTION_TABLE)
+	}
+
+	override fun visit(andExpression: AndExpression, data: Any) {
+		super.visit(andExpression, data)
+		val resultType = promoteIfNecessary(andExpression, BINARY_PROMOTION_TABLE)
+		if (resultType == T_BOOL_INDEX) {
+			andExpression.evaluationType = BoolType
+		}
+	}
+
+	override fun visit(orExpression: OrExpression, data: Any) {
+		super.visit(orExpression, data)
+		val resultType = promoteIfNecessary(orExpression, BINARY_PROMOTION_TABLE)
+		if (resultType == T_BOOL_INDEX) {
+			orExpression.evaluationType = BoolType
+		}
+	}
+
+	override fun visit(xorExpression: XorExpression, data: Any) {
+		super.visit(xorExpression, data)
+		val resultType = promoteIfNecessary(xorExpression, BINARY_PROMOTION_TABLE)
+		if (resultType == T_BOOL_INDEX) {
+			xorExpression.evaluationType = BoolType
+		}
+	}
+
+	// Literals
 
 	override fun visit(intLit: IntLit, data: Any) {
 		intLit.evaluationType = intLit.type

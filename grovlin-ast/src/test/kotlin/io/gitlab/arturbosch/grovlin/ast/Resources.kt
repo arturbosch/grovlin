@@ -11,4 +11,6 @@ fun parseFromTestResource(resourceName: String) = parseFromResource(resourceName
 
 fun String.asGrovlinFile() = parse().root.asGrovlinFile()
 
-fun GrovlinFile.resolved() = identify().resolve()
+fun GrovlinFile.resolved() = identify().resolve().apply {
+	errors.forEach { println(it) }
+}
