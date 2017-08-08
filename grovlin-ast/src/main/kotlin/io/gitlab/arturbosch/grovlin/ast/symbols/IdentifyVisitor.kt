@@ -76,7 +76,7 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor() {
 	}
 
 	override fun visit(objectDeclaration: ObjectDeclaration, data: Any) {
-		val classSymbol = ClassSymbol(objectDeclaration.name, objectDeclaration.type, currentScope)
+		val classSymbol = ClassSymbol(objectDeclaration.name, objectDeclaration.objectType, currentScope)
 		currentScope.define(classSymbol)
 		classSymbol.def = objectDeclaration
 		classSymbol.scope = currentScope
@@ -87,7 +87,7 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor() {
 	}
 
 	override fun visit(typeDeclaration: TypeDeclaration, data: Any) {
-		val classSymbol = ClassSymbol(typeDeclaration.name, typeDeclaration.type, currentScope)
+		val classSymbol = ClassSymbol(typeDeclaration.name, typeDeclaration.typeType, currentScope)
 		currentScope.define(classSymbol)
 		classSymbol.def = typeDeclaration
 		classSymbol.scope = currentScope
