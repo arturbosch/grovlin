@@ -9,7 +9,7 @@ import io.gitlab.arturbosch.grovlin.ast.symbols.SymbolType
 abstract class Type : Node(), NodeWithName, SymbolType {
 	companion object {
 		fun of(type: String) = when (type) {
-			"Bool" -> BoolType
+			"Bool", "Boolean" -> BoolType
 			"Int" -> IntType
 			"Decimal" -> DecimalType
 			"String" -> StringType

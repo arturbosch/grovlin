@@ -1,6 +1,11 @@
 package io.gitlab.arturbosch.grovlin.ast.symbols
 
+import io.gitlab.arturbosch.grovlin.ast.BoolType
+import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.Declaration
+import io.gitlab.arturbosch.grovlin.ast.IntType
+import io.gitlab.arturbosch.grovlin.ast.VoidType
+import io.gitlab.arturbosch.grovlin.ast.builtins.StringType
 import java.util.HashMap
 
 /**
@@ -11,6 +16,7 @@ abstract class Symbol {
 	open var type: SymbolType? = null
 	open var scope: Scope? = null
 	open var def: Declaration? = null
+	open val isBuiltin: Boolean = false
 }
 
 interface SymbolType {
@@ -20,7 +26,11 @@ interface SymbolType {
 data class VariableSymbol(override val name: String,
 						  override var type: SymbolType? = null) : Symbol()
 
-data class BuiltinTypeSymbol(override val name: String) : SymbolType, Symbol()
+data class BuiltinTypeSymbol(override val name: String,
+							 override var type: SymbolType?) : SymbolType, Symbol() {
+
+	override val isBuiltin: Boolean = true
+}
 
 abstract class ScopedSymbol : Symbol(), Scope
 
@@ -97,6 +107,15 @@ abstract class BaseScope : Scope {
 }
 
 class FileScope(fileName: String) : BaseScope() {
+
+	init {
+		define(BuiltinTypeSymbol(IntType.name, IntType))
+		define(BuiltinTypeSymbol(BoolType.name, BoolType))
+		define(BuiltinTypeSymbol(VoidType.name, VoidType))
+		define(BuiltinTypeSymbol(DecimalType.name, DecimalType))
+		define(BuiltinTypeSymbol(StringType.name, StringType))
+	}
+
 	override val name: String = "<file:$fileName>"
 }
 
