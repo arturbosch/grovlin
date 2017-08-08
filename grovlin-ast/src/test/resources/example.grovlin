@@ -4,7 +4,7 @@ type Example {
         print(age)
     }
 }
-program {
+def main(String args) {
     var a = 4
     print(a)
 }

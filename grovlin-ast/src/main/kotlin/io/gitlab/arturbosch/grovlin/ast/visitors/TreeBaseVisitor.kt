@@ -30,7 +30,6 @@ import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
-import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.RelationExpression
 import io.gitlab.arturbosch.grovlin.ast.ReturnStatement
@@ -58,10 +57,6 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 
 	override fun visit(file: GrovlinFile, data: Any) {
 		file.block?.let { visit(it, data) }
-	}
-
-	override fun visit(program: Program, data: Any) {
-		program.block?.let { visit(it, data) }
 	}
 
 	// Declarations
@@ -111,7 +106,6 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 	override fun visit(statement: Statement, data: Any) {
 		when (statement) {
 			is ExpressionStatement -> visit(statement, data)
-			is Program -> visit(statement, data)
 			is TypeDeclaration -> visit(statement, data)
 			is ObjectDeclaration -> visit(statement, data)
 			is MethodDeclaration -> visit(statement, data)

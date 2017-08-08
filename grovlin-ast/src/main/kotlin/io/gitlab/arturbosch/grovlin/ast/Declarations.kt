@@ -23,10 +23,10 @@ class ObjectDeclaration(val objectType: ObjectOrTypeType,
 	override var type: Type = objectType
 }
 
-class MethodDeclaration(override val name: String,
-						override val block: BlockStatement?,
-						override var type: Type = VoidType,
-						val parameters: MutableList<ParameterDeclaration> = mutableListOf())
+open class MethodDeclaration(override val name: String,
+							 override val block: BlockStatement?,
+							 override var type: Type = VoidType,
+							 val parameters: MutableList<ParameterDeclaration> = mutableListOf())
 	: MemberDeclaration(), NodeWithBlock, TopLevelDeclarable {
 
 	fun mustBeOverridden() = block == null

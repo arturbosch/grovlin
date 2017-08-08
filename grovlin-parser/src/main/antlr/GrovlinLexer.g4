@@ -14,7 +14,6 @@ OBJECT             : 'object';
 THIS               : 'this';
 AS                 : 'as';
 IS                 : 'is';
-PROGRAM            : 'program';
 EXTENDS            : 'extends';
 OVERRIDE           : 'override';
 RETURN             : 'return';

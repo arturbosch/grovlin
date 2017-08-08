@@ -69,7 +69,7 @@ class VariableIdentificationTest {
 		val grovlinFile = """
 			type Box { Int data def theData() { print(data) } }
 			object BoxImpl as Box { override Int data }
-			program { print(BoxImpl().data) }
+			def main(String args) { print(BoxImpl().data) }
 		""".asGrovlinFile().resolved()
 
 		val reference = grovlinFile.findVariableReferencesByName("data").first()

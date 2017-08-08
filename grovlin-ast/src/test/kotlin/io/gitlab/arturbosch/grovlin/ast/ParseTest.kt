@@ -1,8 +1,8 @@
 package io.gitlab.arturbosch.grovlin.ast
 
+import io.gitlab.arturbosch.grovlin.ast.builtins.MainDeclaration
+import org.assertj.core.api.Assertions
 import org.junit.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 /**
  * @author Artur Bosch
@@ -15,9 +15,8 @@ class ParseTest {
 
 		val block = file.block!!
 
-		assertEquals(block.statements.size, 2)
-		assertTrue(block.statements[0] is TypeDeclaration)
-		assertTrue(block.statements[1] is Program)
+		Assertions.assertThat(block.statements).hasSize(2)
+		Assertions.assertThat(block.statements[0]).isInstanceOf(TypeDeclaration::class.java)
+		Assertions.assertThat(block.statements[1]).isInstanceOf(MainDeclaration::class.java)
 	}
-
 }

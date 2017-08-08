@@ -15,7 +15,6 @@ statement
 | varDeclaration    #varDeclarationStatement
 | expressionStmt    #expressionStatement
 | assignment        #assignmentStatement
-| program           #programStatement
 | ifStmt            #ifStatement
 | forStmt           #forStatement
 | whileStmt         #whileStatement
@@ -89,10 +88,6 @@ parameter
 
 lambdaDeclaration
 : DEF ID ASSIGN LBRACE statements RBRACE
-;
-
-program
-: PROGRAM LBRACE statements RBRACE
 ;
 
 varDeclaration

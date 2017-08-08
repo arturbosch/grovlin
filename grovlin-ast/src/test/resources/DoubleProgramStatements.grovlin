@@ -1,8 +1,8 @@
-program {
+def main() {
     var x = 5
     var y = 4
     print(x + y)
 }
-program {
+def main() {
 
 }

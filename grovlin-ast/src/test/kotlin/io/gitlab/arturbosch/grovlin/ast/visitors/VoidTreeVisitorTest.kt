@@ -13,8 +13,8 @@ import org.junit.Test
  */
 class VoidTreeVisitorTest {
 
-	private val code =
-			"""program {
+	private val code = """
+			def main(String args) {
 				var x = 5
 				var y = 4
 				var z = 5 * 4

@@ -30,7 +30,6 @@ import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
-import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.RelationExpression
 import io.gitlab.arturbosch.grovlin.ast.ReturnStatement
@@ -57,7 +56,6 @@ import io.gitlab.arturbosch.grovlin.ast.XorExpression
 interface TreeVisitor<in P, out R> {
 
 	fun visit(file: GrovlinFile, data: P): R
-	fun visit(program: Program, data: P): R
 
 	// Declarations
 

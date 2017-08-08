@@ -5,7 +5,6 @@ import io.gitlab.arturbosch.grovlin.GrovlinParserBaseVisitor
 import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.AstNode
 import io.gitlab.arturbosch.grovlin.ast.BlockStatement
-import io.gitlab.arturbosch.grovlin.ast.DEFAULT_GROVLIN_FILE_NAME
 import io.gitlab.arturbosch.grovlin.ast.ElifStatement
 import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
 import io.gitlab.arturbosch.grovlin.ast.ForStatement
@@ -17,7 +16,6 @@ import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
 import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.Position
-import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ReturnStatement
 import io.gitlab.arturbosch.grovlin.ast.Statement
@@ -25,7 +23,10 @@ import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
+import io.gitlab.arturbosch.grovlin.ast.VoidType
 import io.gitlab.arturbosch.grovlin.ast.WhileStatement
+import io.gitlab.arturbosch.grovlin.ast.builtins.MAIN_METHOD_NAME
+import io.gitlab.arturbosch.grovlin.ast.builtins.MainDeclaration
 import io.gitlab.arturbosch.grovlin.ast.endPoint
 import io.gitlab.arturbosch.grovlin.ast.startPoint
 import io.gitlab.arturbosch.grovlin.ast.toPosition
@@ -73,7 +74,12 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 		}
 		val parameters = ctx.parameterList()?.parameter()?.mapTo(ArrayList()) { visitParameter(it) }
 				?: ArrayList<ParameterDeclaration>()
-		return MethodDeclaration(ctx.ID().text, block, returnType, parameters).apply {
+		val name = ctx.ID().text
+		val declaration = // isMainMethod
+				if (name == MAIN_METHOD_NAME && returnType == VoidType && parameters.size == 1)
+					MainDeclaration(block, returnType, parameters)
+				else MethodDeclaration(name, block, returnType, parameters)
+		return declaration.apply {
 			position = ctx.toPosition()
 			parameters.forEach { it.parent = this }
 			returnType.parent = this
@@ -199,18 +205,6 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 			children = listOf(varReference, expression)
 			varReference.parent = this
 			expression.parent = this
-		}
-	}
-
-	override fun visitProgram(ctx: GrovlinParser.ProgramContext): Statement {
-		val block = visitStatements(ctx.statements(), ctx.LBRACE(), ctx.RBRACE())
-		return Program(DEFAULT_GROVLIN_FILE_NAME, block).apply {
-			position = ctx.toPosition()
-			if (block != null) {
-				children = listOf(block)
-				block.parent = this
-			}
-
 		}
 	}
 
