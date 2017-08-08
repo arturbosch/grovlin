@@ -7,7 +7,9 @@ import java.nio.file.Path
  * @author Artur Bosch
  */
 
-data class RawParsingResult(val root: GrovlinParser.GrovlinFileContext?, val path: Path?, val errors: List<Error>) {
+data class RawParsingResult(val root: GrovlinParser.GrovlinFileContext?,
+							val path: Path?, val errors: List<Error>) {
+
 	fun isValid() = errors.isEmpty() && root != null
 }
 

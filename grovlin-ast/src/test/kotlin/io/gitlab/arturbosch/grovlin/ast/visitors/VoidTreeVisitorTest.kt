@@ -5,8 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasElement
 import com.natpryce.hamkrest.hasSize
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
-import io.gitlab.arturbosch.grovlin.ast.toAsT
-import io.gitlab.arturbosch.grovlin.parser.parse
+import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
 import org.junit.Test
 
 /**
@@ -23,7 +22,7 @@ class VoidTreeVisitorTest {
 			}
 			"""
 
-	private val file = code.parse().root!!.toAsT()
+	private val file = code.asGrovlinFile()
 
 	private val variableCollector = object : TreeBaseVisitor() {
 

@@ -9,11 +9,11 @@ import io.gitlab.arturbosch.grovlin.ast.visitors.antlr.AntlrStatementVisitor
 /**
  * @author Artur Bosch
  */
-fun GrovlinParser.GrovlinFileContext?.asGrovlinFile(): GrovlinFile {
+fun GrovlinParser.GrovlinFileContext?.asGrovlinFile(fileName: String? = null): GrovlinFile {
 	this ?: throw AssertionError("Grovlin file context must not be null!")
 	val visitor = AntlrStatementVisitor()
 	val block = visitor.visitStatements(this.statements(), start, stop)
-	val grovlinFile = GrovlinFile(DEFAULT_GROVLIN_FILE_NAME, block)
+	val grovlinFile = GrovlinFile(fileName ?: DEFAULT_GROVLIN_FILE_NAME, block)
 	grovlinFile.position = this.toPosition()
 	block?.let { grovlinFile.children = listOf(it) }
 	block?.parent = grovlinFile

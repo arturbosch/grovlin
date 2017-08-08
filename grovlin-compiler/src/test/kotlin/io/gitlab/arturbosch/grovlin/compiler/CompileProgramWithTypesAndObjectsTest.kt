@@ -5,9 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.present
 import io.gitlab.arturbosch.grovlin.ast.operations.asString
-import io.gitlab.arturbosch.grovlin.ast.toAsT
 import io.gitlab.arturbosch.grovlin.compiler.java.toJava
-import io.gitlab.arturbosch.grovlin.parser.parse
 import org.junit.Test
 
 /**
@@ -35,7 +33,7 @@ class CompileProgramWithTypesAndObjectsTest {
 			type Box { Int data }
 			object BoxImpl as Box { override Int data }
 			program { print(BoxImpl().data) }
-		""".parse().root!!.toAsT()
+		""".asGrovlinFile()
 		println(grovlinFile.asString())
 		val java = grovlinFile.toJava()
 		java.cus.forEach(::println)

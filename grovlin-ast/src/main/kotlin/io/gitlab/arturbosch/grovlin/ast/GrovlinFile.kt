@@ -1,11 +1,9 @@
 package io.gitlab.arturbosch.grovlin.ast
 
-import io.gitlab.arturbosch.grovlin.GrovlinParser
 import io.gitlab.arturbosch.grovlin.ast.symbols.FileScope
 import io.gitlab.arturbosch.grovlin.ast.symbols.IdentifyVisitor
 import io.gitlab.arturbosch.grovlin.ast.symbols.ResolutionVisitor
 import io.gitlab.arturbosch.grovlin.parser.Error
-import java.util.ArrayList
 
 /**
  * @author Artur Bosch
@@ -22,14 +20,6 @@ class GrovlinFile(override var name: String,
 }
 
 const val DEFAULT_GROVLIN_FILE_NAME = "Program"
-
-fun GrovlinParser.GrovlinFileContext.toAsT(fileName: String = DEFAULT_GROVLIN_FILE_NAME): GrovlinFile {
-	val statements = statements().statement().mapTo(ArrayList()) { it.toAst(fileName) }
-	val blockStatement = if (statements.isNotEmpty()) {
-		BlockStatement(statements).apply { position = toPosition() }
-	} else null
-	return GrovlinFile(fileName, blockStatement).apply { position = toPosition() }
-}
 
 fun GrovlinFile.identify(): GrovlinFile {
 	val visitor = IdentifyVisitor(this)
