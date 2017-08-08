@@ -22,7 +22,7 @@ class CompilerTest {
 		val file = parseFromTestResource("program.grovlin")
 		val cUnit = file.toJava().main
 		val clazz = cUnit.mainClass
-		assertThat(clazz.nameAsString, equalTo("ProgramGv"))
+		assertThat(clazz.nameAsString, equalTo("MainGv"))
 	}
 
 	@Test

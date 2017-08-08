@@ -1,4 +1,4 @@
-program {
+def main(String args) {
     var x = 5
     var y = 4
     y = 10

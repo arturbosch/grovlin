@@ -1,8 +1,8 @@
 package io.gitlab.arturbosch.grovlin.compiler.parser
 
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
-import io.gitlab.arturbosch.grovlin.ast.resolution.resolveTypes
-import io.gitlab.arturbosch.grovlin.ast.validation.validate
+import io.gitlab.arturbosch.grovlin.ast.identify
+import io.gitlab.arturbosch.grovlin.ast.resolve
 import io.gitlab.arturbosch.grovlin.ast.visitors.asGrovlinFile
 import io.gitlab.arturbosch.grovlin.parser.Error
 import io.gitlab.arturbosch.grovlin.parser.parse
@@ -26,9 +26,13 @@ object Parser {
 		} else {
 			null
 		}
-		val semanticErrors = grovlinFile?.validate() ?: emptyList()
-		val typeErrors = grovlinFile?.resolveTypes() ?: emptyList()
-		return ParsingResult(grovlinFile, path, syntaxErrors + semanticErrors + typeErrors)
+
+		if (syntaxErrors.isNotEmpty()) return ParsingResult(grovlinFile, path, syntaxErrors)
+
+		grovlinFile?.identify()?.resolve()
+
+		val semanticErrors = grovlinFile?.errors ?: mutableListOf()
+		return ParsingResult(grovlinFile, path, semanticErrors)
 	}
 
 }

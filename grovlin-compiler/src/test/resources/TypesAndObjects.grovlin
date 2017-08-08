@@ -27,7 +27,7 @@ object LeafImpl as Leaf {
     override Int data = 1
 }
 
-program {
+def main(String args) {
     var tree = BinaryTree()
     var leaf = LeafImpl()
     leaf.data = 5

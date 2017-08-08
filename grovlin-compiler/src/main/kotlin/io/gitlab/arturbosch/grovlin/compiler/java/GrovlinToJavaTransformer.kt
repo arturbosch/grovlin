@@ -61,9 +61,7 @@ import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
 import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
-import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
-import io.gitlab.arturbosch.grovlin.ast.Reference
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
@@ -76,8 +74,8 @@ import io.gitlab.arturbosch.grovlin.ast.TypeDeclaration
 import io.gitlab.arturbosch.grovlin.ast.UnequalExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
-import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
+import io.gitlab.arturbosch.grovlin.ast.builtins.MainDeclaration
 import io.gitlab.arturbosch.grovlin.ast.builtins.Print
 import io.gitlab.arturbosch.grovlin.ast.builtins.PrintLn
 import io.gitlab.arturbosch.grovlin.ast.builtins.ReadLine
@@ -97,10 +95,11 @@ fun GrovlinFile.toJava(): CPackage {
 
 	val unit = CompilationUnit()
 
-	val program = (block!!.statements.find { it is Program } ?: throw IllegalStateException("No program statement found!")) as Program
+	val program = (block!!.statements.find { it is MainDeclaration }
+			?: throw IllegalStateException("No program statement found!")) as MainDeclaration
 
 	val topLevelDeclarations = block!!.statements.filterIsInstance(TopLevelDeclarable::class.java)
-			.filterNot { it is Program }
+			.filterNot { it is MainDeclaration }
 			.filter { it.isTopLevelDeclaration() }
 			.map { it.toJava() }
 
@@ -128,7 +127,7 @@ private fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
-private fun Program.toJava(): ClassOrInterfaceDeclaration {
+private fun MainDeclaration.toJava(): ClassOrInterfaceDeclaration {
 	val clazzName = name[0].toUpperCase() + name.substring(1)
 	val statementsOfProgram = this@toJava.block?.statements
 	return ClassOrInterfaceDeclaration().apply {
@@ -218,9 +217,9 @@ private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when 
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
-private fun Reference<VariableDeclaration>.toJava(): JavaParserExpression = when (this.source) {
-	is PropertyDeclaration -> MethodCallExpr(null, name.toGetter())
-	is VarDeclaration -> NameExpr(name)
+private fun VarReference.toJava(): JavaParserExpression = when (this.symbol?.def) {
+	is PropertyDeclaration -> MethodCallExpr(null, varName.toGetter())
+	is VarDeclaration -> NameExpr(varName)
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
@@ -259,7 +258,7 @@ private fun Expression.toJava(): JavaParserExpression = when (this) {
 	is IntLit -> IntegerLiteralExpr(value)
 	is DecLit -> DoubleLiteralExpr(value)
 	is BoolLit -> BooleanLiteralExpr(value)
-	is VarReference -> reference.toJava()
+	is VarReference -> toJava()
 	is ThisReference -> ThisExpr()
 	is CallExpression -> MethodCallExpr().apply {
 		setName(this@toJava.name)

@@ -19,7 +19,7 @@ class GrovlinFile(override var name: String,
 	}
 }
 
-const val DEFAULT_GROVLIN_FILE_NAME = "Program"
+const val DEFAULT_GROVLIN_FILE_NAME = "MainGv"
 
 fun GrovlinFile.identify(): GrovlinFile {
 	val visitor = IdentifyVisitor(this)

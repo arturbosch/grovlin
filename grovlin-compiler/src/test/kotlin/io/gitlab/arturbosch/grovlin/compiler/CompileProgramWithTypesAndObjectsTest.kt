@@ -32,7 +32,7 @@ class CompileProgramWithTypesAndObjectsTest {
 		val grovlinFile = """
 			type Box { Int data }
 			object BoxImpl as Box { override Int data }
-			program { print(BoxImpl().data) }
+			def main(String args) { print(BoxImpl().data) }
 		""".asGrovlinFile()
 		println(grovlinFile.asString())
 		val java = grovlinFile.toJava()

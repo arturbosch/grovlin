@@ -1,4 +1,4 @@
-program {
+def main(String args) {
     val b = false || (true && true || (true ^ true))
     print(b)
     print(!b)

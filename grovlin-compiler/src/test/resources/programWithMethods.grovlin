@@ -2,7 +2,7 @@ def finished() {
     print(0)
 }
 
-program {
+def main(String args) {
     print(6)
     countdown()
     finished()

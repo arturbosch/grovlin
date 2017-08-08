@@ -1,3 +1,3 @@
-program {
+def main(String args) {
     if (5 != 4 && 4 == 4 && 5 > 4 && 4 < 5 && 4 <= 5 && 5 >= 4) { print(-1)}
 }
