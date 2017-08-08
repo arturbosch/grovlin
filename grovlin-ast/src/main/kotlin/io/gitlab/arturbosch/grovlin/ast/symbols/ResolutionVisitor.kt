@@ -57,8 +57,8 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile,
 		if (evaluationType != null) {
 			varDeclaration.type = evaluationType
 		} else {
-			grovlinFile.addError(SemanticError(
-					"Type of ${varDeclaration.name} could not be inferred!", varDeclaration.position?.start))
+			grovlinFile.addError(SemanticError("Type of '${varDeclaration.name}' could not be inferred!",
+					varDeclaration.position?.start))
 		}
 		varDeclaration.evaluationType = varDeclaration.type
 		resolveVariableSymbolType(varDeclaration)
@@ -118,21 +118,21 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile,
 		val referenceName = reference.varName
 		when {
 			definition == null -> grovlinFile.addError(SemanticError(
-					"Declaration for $referenceName not found.", referenceStart))
+					"Declaration for '$referenceName' not found.", referenceStart))
 
 			definition.position == null -> assertPositions(definition)
 
 			definition.position!!.contains(referencePositions) -> grovlinFile.addError(SemanticError(
-					"Reference is used within declaration of $referenceName!", referenceStart))
+					"Reference '$referenceName' is used within its own declaration.", referenceStart))
 
 			referenceStart.isBefore(definition.position!!.start) -> grovlinFile.addError(SemanticError(
-					"Reference $referenceName on $referenceStart is used before " +
-							"the declaration of $referenceName at ${definition.position!!.start}", referenceStart))
+					"Reference '$referenceName' on '$referenceStart' is used before " +
+							"the declaration of '$referenceName' at '${definition.position!!.start}'.", referenceStart))
 		}
 	}
 
 	private fun assertPositions(node: AstNode): Position {
-		throw AssertionError("No positions for ${node.javaClass.simpleName}!")
+		throw AssertionError("No positions for '${node.javaClass.simpleName}'.")
 	}
 
 	// Type, Object, Method resolution
@@ -200,7 +200,7 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile,
 	}
 
 	private fun assertScopeResolved(node: AstNode): Scope =
-			throw AssertionError("Scope of ${node.javaClass.simpleName} is not resolved!")
+			throw AssertionError("Scope of '${node.javaClass.simpleName}' is not resolved!")
 
 	// Computing static expression types
 
@@ -242,7 +242,8 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile,
 	private fun promoteIfNecessary(binExpr: BinaryExpression, promotionTable: Array<IntArray>): Int {
 		val resultType = getResultType(promotionTable, binExpr.left, binExpr.right)
 		if (resultType == T_VOID_INDEX) {
-			grovlinFile.addError(SemanticError("Incompatible types at ${binExpr.position}.",
+			grovlinFile.addError(SemanticError("Incompatible types " +
+					"'${binExpr.left.evaluationType}' and '${binExpr.right.evaluationType}' at ${binExpr.position}.",
 					binExpr.left.position?.start))
 		}
 		binExpr.evaluationType = binExpr.left.promotionType ?: binExpr.left.evaluationType

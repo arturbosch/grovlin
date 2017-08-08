@@ -1,10 +1,12 @@
 package io.gitlab.arturbosch.grovlin.ast.symbols
 
+import io.gitlab.arturbosch.grovlin.ast.BinaryExpression
 import io.gitlab.arturbosch.grovlin.ast.BoolType
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
+import io.gitlab.arturbosch.grovlin.ast.builtins.StringType
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import io.gitlab.arturbosch.grovlin.ast.resolved
 import org.assertj.core.api.Assertions
@@ -23,7 +25,24 @@ class VariableTypePromotionTest {
 
 		Assertions.assertThat(vars).allMatch { it.type == BoolType }
 		Assertions.assertThat(vars).allMatch { it.evaluationType == BoolType }
-		Assertions.assertThat(vars).allMatch { it.evaluationType == BoolType }
+	}
+
+	@Test
+	fun relationsOnStrings() {
+		val grovlinFile = """
+			var b = "Hello World" >= ""
+			var b2 = "Hello" == "World"
+			var b3 = "Stuff" != "Stuff"
+			var b4 = "Hello" < "World"
+		""".asGrovlinFile().resolved()
+
+		val varDecls = grovlinFile.collectByType<VarDeclaration>()
+
+		Assertions.assertThat(grovlinFile.errors).isEmpty()
+		Assertions.assertThat(varDecls).allMatch { it.type == BoolType }
+		Assertions.assertThat(varDecls).allMatch { it.type == BoolType }
+		Assertions.assertThat(varDecls).allMatch { (it.value as BinaryExpression).left.evaluationType == StringType }
+		Assertions.assertThat(varDecls).allMatch { (it.value as BinaryExpression).right.evaluationType == StringType }
 	}
 
 	@Test
@@ -42,5 +61,15 @@ class VariableTypePromotionTest {
 		Assertions.assertThat(vars[1].evaluationType).isEqualTo(DecimalType)
 		Assertions.assertThat(vars[2].type).isEqualTo(DecimalType)
 		Assertions.assertThat(vars[2].evaluationType).isEqualTo(DecimalType)
+	}
+
+	@Test
+	fun binaryOperationsOnlyForBooleans() {
+		Assertions.assertThat("var b = true && false".asGrovlinFile().resolved().errors).isEmpty()
+		Assertions.assertThat("var b = true || false".asGrovlinFile().resolved().errors).isEmpty()
+		Assertions.assertThat("var b = true ^ false".asGrovlinFile().resolved().errors).isEmpty()
+		Assertions.assertThat("var b = 1 && 2".asGrovlinFile().resolved().errors).hasSize(1)
+		Assertions.assertThat("var b = 1.0 || 2".asGrovlinFile().resolved().errors).hasSize(1)
+		Assertions.assertThat("var b = 1.0 ^ true".asGrovlinFile().resolved().errors).hasSize(1)
 	}
 }

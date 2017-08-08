@@ -1,5 +1,7 @@
 package io.gitlab.arturbosch.grovlin.ast
 
+import io.gitlab.arturbosch.grovlin.ast.builtins.StringType
+
 /**
  * @author Artur Bosch
  */
@@ -17,5 +19,5 @@ class DecLit(val value: String) : Expression(), NodeWithType {
 }
 
 class StringLit(val value: String) : Expression(), NodeWithType {
-	override var type: Type = ObjectOrTypeType("String")
+	override var type: Type = StringType
 }
