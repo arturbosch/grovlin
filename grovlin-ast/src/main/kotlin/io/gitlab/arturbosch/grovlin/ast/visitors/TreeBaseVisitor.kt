@@ -1,5 +1,6 @@
 package io.gitlab.arturbosch.grovlin.ast.visitors
 
+import io.gitlab.arturbosch.grovlin.ast.AndExpression
 import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.BinaryExpression
 import io.gitlab.arturbosch.grovlin.ast.BlockStatement
@@ -8,6 +9,7 @@ import io.gitlab.arturbosch.grovlin.ast.BoolType
 import io.gitlab.arturbosch.grovlin.ast.CallExpression
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.DecimalType
+import io.gitlab.arturbosch.grovlin.ast.DivisionExpression
 import io.gitlab.arturbosch.grovlin.ast.ElifStatement
 import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
@@ -20,18 +22,23 @@ import io.gitlab.arturbosch.grovlin.ast.IntRangeExpression
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.LambdaDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
+import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
 import io.gitlab.arturbosch.grovlin.ast.ObjectCreation
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
+import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.PrimitiveType
 import io.gitlab.arturbosch.grovlin.ast.Program
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
+import io.gitlab.arturbosch.grovlin.ast.RelationExpression
 import io.gitlab.arturbosch.grovlin.ast.ReturnStatement
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.StringLit
+import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
+import io.gitlab.arturbosch.grovlin.ast.SumExpression
 import io.gitlab.arturbosch.grovlin.ast.ThisReference
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
@@ -42,6 +49,7 @@ import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.VoidType
 import io.gitlab.arturbosch.grovlin.ast.WhileStatement
+import io.gitlab.arturbosch.grovlin.ast.XorExpression
 
 /**
  * @author Artur Bosch
@@ -218,8 +226,54 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 	}
 
 	override fun visit(binaryExpression: BinaryExpression, data: Any) {
+		when (binaryExpression) {
+			is RelationExpression -> visit(binaryExpression, data)
+			is SumExpression -> visit(binaryExpression, data)
+			is SubtractionExpression -> visit(binaryExpression, data)
+			is MultiplicationExpression -> visit(binaryExpression, data)
+			is DivisionExpression -> visit(binaryExpression, data)
+			is AndExpression -> visit(binaryExpression, data)
+			is OrExpression -> visit(binaryExpression, data)
+			is XorExpression -> visit(binaryExpression, data)
+		}
+	}
+
+	@Suppress("NOTHING_TO_INLINE")
+	private inline fun visitInternal(binaryExpression: BinaryExpression, data: Any) {
 		visit(binaryExpression.left, data)
 		visit(binaryExpression.right, data)
+	}
+
+	override fun visit(relationExpression: RelationExpression, data: Any) {
+		visitInternal(relationExpression, data)
+	}
+
+	override fun visit(sumExpression: SumExpression, data: Any) {
+		visitInternal(sumExpression, data)
+	}
+
+	override fun visit(subtractionExpression: SubtractionExpression, data: Any) {
+		visitInternal(subtractionExpression, data)
+	}
+
+	override fun visit(multiplicationExpression: MultiplicationExpression, data: Any) {
+		visitInternal(multiplicationExpression, data)
+	}
+
+	override fun visit(divisionExpression: DivisionExpression, data: Any) {
+		visitInternal(divisionExpression, data)
+	}
+
+	override fun visit(andExpression: AndExpression, data: Any) {
+		visitInternal(andExpression, data)
+	}
+
+	override fun visit(orExpression: OrExpression, data: Any) {
+		visitInternal(orExpression, data)
+	}
+
+	override fun visit(xorExpression: XorExpression, data: Any) {
+		visitInternal(xorExpression, data)
 	}
 
 	override fun visit(unaryExpression: UnaryExpression, data: Any) {
