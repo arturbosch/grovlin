@@ -4,6 +4,7 @@ import io.gitlab.arturbosch.grovlin.GrovlinParser
 import io.gitlab.arturbosch.grovlin.ast.symbols.FileScope
 import io.gitlab.arturbosch.grovlin.ast.symbols.IdentifyVisitor
 import io.gitlab.arturbosch.grovlin.ast.symbols.ResolutionVisitor
+import io.gitlab.arturbosch.grovlin.parser.Error
 import java.util.ArrayList
 
 /**
@@ -11,7 +12,14 @@ import java.util.ArrayList
  */
 class GrovlinFile(override var name: String,
 				  override var block: BlockStatement?)
-	: Node(), NodeWithBlock, NodeWithName
+	: Node(), NodeWithBlock, NodeWithName {
+
+	private val errors: MutableList<Error> = mutableListOf()
+
+	fun addError(error: Error) {
+		errors.add(error)
+	}
+}
 
 const val DEFAULT_GROVLIN_FILE_NAME = "Program"
 

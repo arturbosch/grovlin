@@ -59,7 +59,7 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 	// Declarations
 
 	override fun visit(typeDeclaration: TypeDeclaration, data: Any) {
-		visit(typeDeclaration.type, data)
+		visit(typeDeclaration.typeType, data)
 		for (extendedType in typeDeclaration.extendedTypes) {
 			visit(extendedType, data)
 		}
@@ -77,7 +77,7 @@ abstract class TreeBaseVisitor : TreeVisitor<Any, Unit> {
 	}
 
 	override fun visit(objectDeclaration: ObjectDeclaration, data: Any) {
-		visit(objectDeclaration.type, data)
+		visit(objectDeclaration.objectType, data)
 		objectDeclaration.extendedObject?.let { visit(it, data) }
 		for (extendedType in objectDeclaration.extendedTypes) {
 			visit(extendedType, data)

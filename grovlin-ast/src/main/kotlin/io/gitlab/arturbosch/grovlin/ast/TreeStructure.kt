@@ -31,7 +31,7 @@ abstract class Expression : Node()
 
 abstract class Statement : Node()
 
-interface Declaration : AstNode
+interface Declaration : AstNode, NodeWithType, NodeWithName
 
 interface TopLevelDeclarable {
 	fun isTopLevelDeclaration(): Boolean = true

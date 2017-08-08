@@ -21,6 +21,7 @@ fun AstNode.filteredMembers(): Sequence<KProperty1<AstNode, *>> {
 			.filterNot { it.name == "position" }
 			.filterNot { it.name == "parent" }
 			.filterNot { it.name == "children" }
+			.filterNot { it.name == "errors" }
 			.filterNot { it.name == "typeReference" }
 }
 
