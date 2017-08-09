@@ -4,3 +4,5 @@
 - No variables are used before their declaration
 - Method names conflicts & overloading
 - Re-declarations of variables/members
+- parameter types == argument types
+- no two main methods

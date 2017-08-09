@@ -5,4 +5,17 @@ def main(String args) {
             print(", ")
         }
     }
+
+    println()
+    println(loop(5))
+}
+
+def loop(Int n): String {
+    var current = n
+    while current > 0 {
+        print(".")
+        current = current - 1
+    }
+    println()
+    return "I 'have' finished!"
 }

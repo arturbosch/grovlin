@@ -28,6 +28,8 @@ import com.github.javaparser.ast.stmt.BlockStmt
 import com.github.javaparser.ast.stmt.ExpressionStmt
 import com.github.javaparser.ast.stmt.ForStmt
 import com.github.javaparser.ast.stmt.IfStmt
+import com.github.javaparser.ast.stmt.ReturnStmt
+import com.github.javaparser.ast.stmt.WhileStmt
 import com.github.javaparser.ast.type.ArrayType
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.type.PrimitiveType
@@ -63,8 +65,10 @@ import io.gitlab.arturbosch.grovlin.ast.ObjectCreation
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
 import io.gitlab.arturbosch.grovlin.ast.OrExpression
+import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
+import io.gitlab.arturbosch.grovlin.ast.ReturnStatement
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
 import io.gitlab.arturbosch.grovlin.ast.StringLit
@@ -84,6 +88,7 @@ import io.gitlab.arturbosch.grovlin.ast.builtins.MainDeclaration
 import io.gitlab.arturbosch.grovlin.ast.builtins.Print
 import io.gitlab.arturbosch.grovlin.ast.builtins.PrintLn
 import io.gitlab.arturbosch.grovlin.ast.builtins.ReadLine
+import io.gitlab.arturbosch.grovlin.ast.builtins.StringType
 import java.util.ArrayList
 import java.util.EnumSet
 import com.github.javaparser.ast.body.MethodDeclaration as JavaParserMethod
@@ -95,12 +100,7 @@ import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
  */
 
 fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
-	is MethodDeclaration -> {
-		val statements = block?.statements?.map { it.toJava() } ?: emptyList()
-		JavaParserMethod(EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), VoidType(), name).apply {
-			setBody(BlockStmt(NodeList.nodeList(statements)))
-		}
-	}
+	is MethodDeclaration -> toJava()
 	is TypeDeclaration -> transformToInterfaceDeclaration()
 	is ObjectDeclaration -> transformToClassDeclaration()
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
@@ -174,17 +174,36 @@ fun PropertyDeclaration.typePropertyToJava(members: MutableList<BodyDeclaration<
 			.setType(VoidType()))
 }
 
-fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*> = if (mustBeOverridden()) {
-	JavaParserMethod().setName(name)
-			.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
-			.setBody(null)
-			.setType(VoidType())
-} else {
-	JavaParserMethod().setName(name)
-			.setModifiers(EnumSet.of(Modifier.PUBLIC))
-			.setBody(block!!.toJava() as BlockStmt)
-			.setType(VoidType())
-			.setDefault(isType)
+fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*> {
+	val formalParameters = NodeList.nodeList(parameters.map { it.toJava() })
+	val returnType = evaluationType?.toJava() ?: VoidType()
+	val isStatic = isTopLevelDeclaration()
+	return if (mustBeOverridden()) {
+		val modifiers =
+				if (isStatic) EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC, Modifier.STATIC)
+				else EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC)
+		JavaParserMethod().setName(name)
+				.setModifiers(modifiers)
+				.setBody(null)
+				.setParameters(formalParameters)
+				.setType(returnType)
+	} else {
+		val modifiers =
+				if (isStatic) EnumSet.of(Modifier.PUBLIC, Modifier.STATIC)
+				else EnumSet.of(Modifier.PUBLIC)
+		JavaParserMethod().setName(name)
+				.setModifiers(modifiers)
+				.setBody(block!!.toJava() as BlockStmt)
+				.setType(returnType)
+				.setParameters(formalParameters)
+				.setDefault(isType)
+	}
+}
+
+fun ParameterDeclaration.toJava(): Parameter {
+	val realType = promotionType ?: evaluationType
+	val javaType = realType?.toJava() ?: VoidType()
+	return Parameter(javaType, name)
 }
 
 fun Statement.toJava(): JavaParserStatement = when (this) {
@@ -195,7 +214,14 @@ fun Statement.toJava(): JavaParserStatement = when (this) {
 	is BlockStatement -> BlockStmt(NodeList.nodeList(statements.map { it.toJava() }))
 	is ForStatement -> toJava()
 	is WhileStatement -> toJava()
+	is ReturnStatement -> ReturnStmt(expression.toJava())
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
+}
+
+fun WhileStatement.toJava(): WhileStmt {
+	val condition = condition.toJava()
+	val body = thenStatement.toJava()
+	return WhileStmt(condition, body)
 }
 
 fun ForStatement.toJava(): JavaParserStatement {
@@ -223,7 +249,9 @@ private fun ForStatement.forLoopFromIntRange(expr: IntRangeExpression): ForStmt 
 fun VarReference.toJava(): JavaParserExpression = when (this.symbol?.def) {
 	is PropertyDeclaration -> MethodCallExpr(null, varName.toGetter())
 	is VarDeclaration -> NameExpr(varName)
-	else -> throw UnsupportedOperationException(javaClass.canonicalName)
+	is ParameterDeclaration -> NameExpr(varName)
+	else -> throw UnsupportedOperationException("Could not resolve '$varName' at '$position'"
+			+ " because no definition found!")
 }
 
 private fun String.toGetter() = "get" + get(0).toUpperCase() + substring(1)
@@ -279,16 +307,29 @@ fun Expression.toJava(): JavaParserExpression = when (this) {
 
 fun CallExpression.toJava(): MethodCallExpr = when (this) {
 	is Print -> toJava()
-	is PrintLn -> MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
-			SimpleName("println"), NodeList.nodeList(arguments[0].toJava()))
+	is PrintLn -> toJava()
 	is ReadLine -> MethodCallExpr(
 			ObjectCreationExpr(null, JavaParser.parseClassOrInterfaceType("java.util.Scanner"),
 					NodeList.nodeList(FieldAccessExpr(NameExpr("System"), "in"))),
 			SimpleName("next"), NodeList.nodeList(arguments[0].toJava()))
-	else -> MethodCallExpr().apply {
-		setName(this@toJava.name)
-		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
-	}
+	else -> callToJava()
+}
+
+private fun CallExpression.callToJava(): MethodCallExpr {
+	val callName = this.name
+	val scopeExpr = scope?.toJava()
+	val arguments =
+			if (arguments.isEmpty()) NodeList()
+			else NodeList.nodeList(arguments.map { it.toJava() })
+	return MethodCallExpr(scopeExpr, callName, arguments)
+}
+
+private fun PrintLn.toJava(): MethodCallExpr {
+	val fieldAccess = FieldAccessExpr(NameExpr("System"), "out")
+	val arguments =
+			if (arguments.isEmpty()) NodeList()
+			else NodeList.nodeList(arguments[0].toJava())
+	return MethodCallExpr(fieldAccess, SimpleName("println"), arguments)
 }
 
 private fun Print.toJava(): MethodCallExpr {
@@ -301,6 +342,7 @@ fun Type.toJava(): com.github.javaparser.ast.type.Type = when (this) {
 	is IntType -> PrimitiveType.intType()
 	is DecimalType -> PrimitiveType.doubleType()
 	is BoolType -> PrimitiveType.booleanType()
-	is ObjectOrTypeType -> JavaParser.parseClassOrInterfaceType(name)
+	is io.gitlab.arturbosch.grovlin.ast.VoidType -> VoidType()
+	is ObjectOrTypeType, StringType -> JavaParser.parseClassOrInterfaceType(name)
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
