@@ -69,7 +69,7 @@ interface TreeVisitor<in P, out R> {
 
 	// Statements
 
-	fun visit(statement: Statement, data: Any): R
+	fun visit(statement: Statement, data: P): R
 	fun visit(expressionStatement: ExpressionStatement, data: P): R
 	fun visit(blockStatement: BlockStatement, data: P): R
 	fun visit(ifStatement: IfStatement, data: P): R
@@ -77,7 +77,7 @@ interface TreeVisitor<in P, out R> {
 	fun visit(forStatement: ForStatement, data: P): R
 	fun visit(whileStatement: WhileStatement, data: P): R
 	fun visit(assignment: Assignment, data: P): R
-	fun visit(returnStatement: ReturnStatement, data: Any): R
+	fun visit(returnStatement: ReturnStatement, data: P): R
 
 	// Expressions
 
@@ -111,16 +111,16 @@ interface TreeVisitor<in P, out R> {
 	fun visit(intLit: IntLit, data: P): R
 	fun visit(boolLit: BoolLit, data: P): R
 	fun visit(decLit: DecLit, data: P): R
-	fun visit(stringLit: StringLit, data: Any): R
+	fun visit(stringLit: StringLit, data: P): R
 
 	// Types
 
-	fun visit(type: Type, data: Any): R
+	fun visit(type: Type, data: P): R
 	fun visit(objectOrTypeType: ObjectOrTypeType, data: P): R
 	fun visit(primitiveType: PrimitiveType, data: P): R
 	fun visit(boolType: BoolType, data: P): R
 	fun visit(intType: IntType, data: P): R
 	fun visit(decType: DecimalType, data: P): R
 	fun visit(unknownType: UnknownType, data: P): R
-	fun visit(voidType: VoidType, data: Any)
+	fun visit(voidType: VoidType, data: P): R
 }

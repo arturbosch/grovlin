@@ -24,7 +24,7 @@ class VoidTreeVisitorTest {
 
 	private val file = code.asGrovlinFile()
 
-	private val variableCollector = object : TreeBaseVisitor() {
+	private val variableCollector = object : TreeBaseVisitor<Any>() {
 
 		val names = mutableListOf<String>()
 

@@ -17,7 +17,7 @@ import io.gitlab.arturbosch.grovlin.ast.visitors.TreeBaseVisitor
 /**
  * @author Artur Bosch
  */
-class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor() {
+class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	val fileScope = FileScope(grovlinFile.name)
 	var currentScope: Scope = fileScope

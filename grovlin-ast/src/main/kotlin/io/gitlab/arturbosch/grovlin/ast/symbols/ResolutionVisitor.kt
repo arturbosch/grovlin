@@ -44,7 +44,7 @@ import io.gitlab.arturbosch.grovlin.ast.visitors.TreeBaseVisitor
  * @author Artur Bosch
  */
 class ResolutionVisitor(val grovlinFile: GrovlinFile,
-						val fileScope: FileScope) : TreeBaseVisitor() {
+						val fileScope: FileScope) : TreeBaseVisitor<Any>() {
 
 	// Variable declarations resolution
 
