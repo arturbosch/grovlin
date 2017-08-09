@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.present
 import io.gitlab.arturbosch.grovlin.compiler.backend.asJavaFile
+import org.junit.Before
 import org.junit.Test
 import java.io.File
 
@@ -16,9 +17,13 @@ import java.io.File
  */
 class CompilerTest {
 
+	@Before
+	fun createOutDir() {
+		File("./out").mkdir()
+	}
+
 	@Test
 	fun parseProgram() {
-		File("./out").mkdir()
 		val file = parseFromTestResource("program.grovlin")
 		val cUnit = file.asJavaFile().main
 		val clazz = cUnit.mainClass
@@ -27,7 +32,6 @@ class CompilerTest {
 
 	@Test
 	fun parseProgramWithMethods() {
-		File("./out").mkdir()
 		val file = parseFromTestResource("programWithMethods.grovlin")
 		val cUnit = file.asJavaFile().main
 		val clazz = cUnit.mainClass
@@ -37,30 +41,27 @@ class CompilerTest {
 
 	@Test
 	fun parseProgramWithBooleans() {
-		File("./out").mkdir()
 		val file = parseFromTestResource("Booleans.grovlin")
 		val cUnit = file.asJavaFile().main
 		val clazz = cUnit.mainClass
-		assertThat(clazz.getNodesByType(VariableDeclarationExpr::class.java), hasSize(equalTo(1)))
+		assertThat(clazz.getChildNodesByType(VariableDeclarationExpr::class.java), hasSize(equalTo(1)))
 	}
 
 	@Test
 	fun parseProgramWithIfElifElse() {
-		File("./out").mkdir()
 		val file = parseFromTestResource("IfElifElse.grovlin")
 		val cUnit = file.asJavaFile().main
 		val clazz = cUnit.mainClass
-		val ifs = clazz.getNodesByType(IfStmt::class.java)
+		val ifs = clazz.getChildNodesByType(IfStmt::class.java)
 		assertThat(ifs, hasSize(equalTo(3)))
 	}
 
 	@Test
 	fun parseProgramWithRelationalOperators() {
-		File("./out").mkdir()
 		val file = parseFromTestResource("RelationalOperators.grovlin")
 		val cUnit = file.asJavaFile().main
 		val clazz = cUnit.mainClass
-		val expressions = clazz.getNodesByType(BinaryExpr::class.java)
+		val expressions = clazz.getChildNodesByType(BinaryExpr::class.java)
 		assertThat(expressions, hasSize(equalTo(11)))
 	}
 }

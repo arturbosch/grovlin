@@ -1,5 +1,6 @@
 package io.gitlab.arturbosch.grovlin.compiler.backend
 
+import com.github.javaparser.JavaParser
 import com.github.javaparser.ast.Modifier
 import com.github.javaparser.ast.NodeList
 import com.github.javaparser.ast.body.BodyDeclaration
@@ -112,7 +113,7 @@ fun MainDeclaration.toJava(): ClassOrInterfaceDeclaration {
 		setName(clazzName + "Gv") // #20
 		addModifier(Modifier.PUBLIC, Modifier.FINAL)
 		val main = addMethod("main", Modifier.PUBLIC, Modifier.STATIC)
-		main.addParameter(ArrayType(ClassOrInterfaceType("String")), "args")
+		main.addParameter(ArrayType(JavaParser.parseClassOrInterfaceType("String")), "args")
 		val statements = statementsOfProgram?.mapTo(NodeList<JavaParserStatement>()) { it.toJava() } ?: NodeList()
 		main.setBody(BlockStmt(statements))
 	}
@@ -120,7 +121,7 @@ fun MainDeclaration.toJava(): ClassOrInterfaceDeclaration {
 
 fun ObjectDeclaration.transformToClassDeclaration(): ClassOrInterfaceDeclaration {
 	val extends = extendedTypes.mapTo(ArrayList()) { it.toJava() as ClassOrInterfaceType }
-	val superclass = extendedObject?.let { ClassOrInterfaceType(extendedObject?.name) }
+	val superclass = extendedObject?.let { JavaParser.parseClassOrInterfaceType(extendedObject?.name) }
 	val members = memberDeclarationsToJava(block, false)
 	return ClassOrInterfaceDeclaration(EnumSet.of(Modifier.PUBLIC), false, name)
 			.setImplementedTypes(NodeList.nodeList(extends))
@@ -240,7 +241,7 @@ fun transformElifsToElseIfConstructs(elifs: MutableList<ElifStatement>, elseStat
 
 fun Expression.toJava(): JavaParserExpression = when (this) {
 	is ParenExpression -> EnclosedExpr(expression.toJava())
-	is ObjectCreation -> ObjectCreationExpr(null, ClassOrInterfaceType(type.name), NodeList())
+	is ObjectCreation -> ObjectCreationExpr(null, JavaParser.parseClassOrInterfaceType(type.name), NodeList())
 	is SumExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.PLUS)
 	is SubtractionExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.MINUS)
 	is MultiplicationExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.MULTIPLY)
@@ -281,7 +282,7 @@ fun CallExpression.toJava(): MethodCallExpr = when (this) {
 	is PrintLn -> MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
 			SimpleName("println"), NodeList.nodeList(arguments[0].toJava()))
 	is ReadLine -> MethodCallExpr(
-			ObjectCreationExpr(null, ClassOrInterfaceType("java.util.Scanner"),
+			ObjectCreationExpr(null, JavaParser.parseClassOrInterfaceType("java.util.Scanner"),
 					NodeList.nodeList(FieldAccessExpr(NameExpr("System"), "in"))),
 			SimpleName("next"), NodeList.nodeList(arguments[0].toJava()))
 	else -> MethodCallExpr().apply {
@@ -300,6 +301,6 @@ fun Type.toJava(): com.github.javaparser.ast.type.Type = when (this) {
 	is IntType -> PrimitiveType.intType()
 	is DecimalType -> PrimitiveType.doubleType()
 	is BoolType -> PrimitiveType.booleanType()
-	is ObjectOrTypeType -> ClassOrInterfaceType(name)
+	is ObjectOrTypeType -> JavaParser.parseClassOrInterfaceType(name)
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
