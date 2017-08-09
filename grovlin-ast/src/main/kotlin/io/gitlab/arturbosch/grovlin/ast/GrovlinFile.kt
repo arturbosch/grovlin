@@ -1,6 +1,5 @@
 package io.gitlab.arturbosch.grovlin.ast
 
-import io.gitlab.arturbosch.grovlin.ast.symbols.FileScope
 import io.gitlab.arturbosch.grovlin.ast.symbols.IdentifyVisitor
 import io.gitlab.arturbosch.grovlin.ast.symbols.ResolutionVisitor
 import io.gitlab.arturbosch.grovlin.parser.Error
@@ -29,7 +28,7 @@ fun GrovlinFile.identify(): GrovlinFile {
 }
 
 fun GrovlinFile.resolve(): GrovlinFile {
-	val visitor = ResolutionVisitor(this, this.resolutionScope as FileScope)
+	val visitor = ResolutionVisitor(this)
 	visitor.visit(this, Unit)
 	return this
 }

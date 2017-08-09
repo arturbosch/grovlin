@@ -1,6 +1,5 @@
-package io.gitlab.arturbosch.grovlin.compiler.java
+package io.gitlab.arturbosch.grovlin.compiler.frontend
 
-import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.Modifier
 import com.github.javaparser.ast.NodeList
 import com.github.javaparser.ast.body.BodyDeclaration
@@ -46,7 +45,6 @@ import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
 import io.gitlab.arturbosch.grovlin.ast.GetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.GreaterEqualExpression
 import io.gitlab.arturbosch.grovlin.ast.GreaterExpression
-import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.IfStatement
 import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntType
@@ -89,33 +87,7 @@ import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
  * @author Artur Bosch
  */
 
-fun GrovlinFile.toJava(): CPackage {
-	if (name.isNullOrBlank()) throw IllegalStateException("You cannot convert a grovlin file with no file name to java!")
-	if (block == null) throw IllegalStateException("Empty files are no valid grovlin files!")
-
-	val unit = CompilationUnit()
-
-	val program = (block!!.statements.find { it is MainDeclaration }
-			?: throw IllegalStateException("No program statement found!")) as MainDeclaration
-
-	val topLevelDeclarations = block!!.statements.filterIsInstance(TopLevelDeclarable::class.java)
-			.filterNot { it is MainDeclaration }
-			.filter { it.isTopLevelDeclaration() }
-			.map { it.toJava() }
-
-	val additionalUnits = topLevelDeclarations.filterIsInstance<ClassOrInterfaceDeclaration>()
-			.map { CUnit(it.nameAsString, it, CompilationUnit().apply { addType(it) }) }
-
-	val membersOfProgram = topLevelDeclarations.filterNot { it is ClassOrInterfaceDeclaration }
-
-	val clazz = program.toJava()
-	membersOfProgram.forEach { clazz.addMember(it) }
-	unit.addType(clazz)
-
-	return CPackage(CUnit(clazz.nameAsString, clazz, unit), additionalUnits)
-}
-
-private fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
+fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
 	is MethodDeclaration -> {
 		val statements = block?.statements?.map { it.toJava() } ?: emptyList()
 		JavaParserMethod(EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), VoidType(), name).apply {
@@ -127,7 +99,7 @@ private fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
-private fun MainDeclaration.toJava(): ClassOrInterfaceDeclaration {
+fun MainDeclaration.toJava(): ClassOrInterfaceDeclaration {
 	val clazzName = name[0].toUpperCase() + name.substring(1)
 	val statementsOfProgram = this@toJava.block?.statements
 	return ClassOrInterfaceDeclaration().apply {
@@ -140,7 +112,7 @@ private fun MainDeclaration.toJava(): ClassOrInterfaceDeclaration {
 	}
 }
 
-private fun ObjectDeclaration.transformToClassDeclaration(): ClassOrInterfaceDeclaration {
+fun ObjectDeclaration.transformToClassDeclaration(): ClassOrInterfaceDeclaration {
 	val extends = extendedTypes.mapTo(ArrayList()) { it.toJava() as ClassOrInterfaceType }
 	val superclass = extendedObject?.let { ClassOrInterfaceType(extendedObject?.name) }
 	val members = memberDeclarationsToJava(block, false)
@@ -156,7 +128,7 @@ private fun ObjectDeclaration.transformToClassDeclaration(): ClassOrInterfaceDec
 
 }
 
-private fun TypeDeclaration.transformToInterfaceDeclaration(): ClassOrInterfaceDeclaration {
+fun TypeDeclaration.transformToInterfaceDeclaration(): ClassOrInterfaceDeclaration {
 	val extends = extendedTypes.mapTo(ArrayList()) { it.toJava() as ClassOrInterfaceType }
 	val members = memberDeclarationsToJava(block, true)
 	return ClassOrInterfaceDeclaration(EnumSet.of(Modifier.PUBLIC), true, name)
@@ -164,7 +136,7 @@ private fun TypeDeclaration.transformToInterfaceDeclaration(): ClassOrInterfaceD
 			.setMembers(NodeList.nodeList(members))
 }
 
-private fun memberDeclarationsToJava(declarations: BlockStatement?, isType: Boolean = false): MutableList<BodyDeclaration<*>> {
+fun memberDeclarationsToJava(declarations: BlockStatement?, isType: Boolean = false): MutableList<BodyDeclaration<*>> {
 	val members = mutableListOf<BodyDeclaration<*>>()
 	declarations?.statements?.forEach {
 		when (it) {
@@ -179,10 +151,10 @@ private fun memberDeclarationsToJava(declarations: BlockStatement?, isType: Bool
 	return members
 }
 
-private fun PropertyDeclaration.toJava(): BodyDeclaration<*> = FieldDeclaration(EnumSet.of(Modifier.PRIVATE),
+fun PropertyDeclaration.toJava(): BodyDeclaration<*> = FieldDeclaration(EnumSet.of(Modifier.PRIVATE),
 		VariableDeclarator(type.toJava(), name).setInitializer(value?.toJava()))
 
-private fun PropertyDeclaration.typePropertyToJava(members: MutableList<BodyDeclaration<*>>) {
+fun PropertyDeclaration.typePropertyToJava(members: MutableList<BodyDeclaration<*>>) {
 	val fieldType = type.toJava()
 	members.add(JavaParserMethod().setName("get" + name[0].toUpperCase() + name.substring(1))
 			.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
@@ -195,7 +167,7 @@ private fun PropertyDeclaration.typePropertyToJava(members: MutableList<BodyDecl
 			.setType(VoidType()))
 }
 
-private fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*> = if (mustBeOverridden()) {
+fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*> = if (mustBeOverridden()) {
 	JavaParserMethod().setName(name)
 			.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
 			.setBody(null)
@@ -208,7 +180,7 @@ private fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*
 			.setDefault(isType)
 }
 
-private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {
+fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {
 	is VarDeclaration -> ExpressionStmt(VariableDeclarationExpr(VariableDeclarator(type.toJava(), name, value?.toJava())))
 	is Assignment -> ExpressionStmt(AssignExpr(varReference.toJava(), value.toJava(), AssignExpr.Operator.ASSIGN))
 	is ExpressionStatement -> ExpressionStmt(expression.toJava())
@@ -217,7 +189,7 @@ private fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when 
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
-private fun VarReference.toJava(): JavaParserExpression = when (this.symbol?.def) {
+fun VarReference.toJava(): JavaParserExpression = when (this.symbol?.def) {
 	is PropertyDeclaration -> MethodCallExpr(null, varName.toGetter())
 	is VarDeclaration -> NameExpr(varName)
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
@@ -236,7 +208,7 @@ fun transformElifsToElseIfConstructs(elifs: MutableList<ElifStatement>, elseStat
 	}
 }
 
-private fun Expression.toJava(): JavaParserExpression = when (this) {
+fun Expression.toJava(): JavaParserExpression = when (this) {
 	is ParenExpression -> EnclosedExpr(expression.toJava())
 	is ObjectCreation -> ObjectCreationExpr(null, ClassOrInterfaceType(type.name), NodeList())
 	is SumExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.PLUS)
@@ -284,7 +256,7 @@ private fun Expression.toJava(): JavaParserExpression = when (this) {
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
 }
 
-private fun Type.toJava(): com.github.javaparser.ast.type.Type = when (this) {
+fun Type.toJava(): com.github.javaparser.ast.type.Type = when (this) {
 	is IntType -> PrimitiveType.intType()
 	is DecimalType -> PrimitiveType.doubleType()
 	is BoolType -> PrimitiveType.booleanType()
