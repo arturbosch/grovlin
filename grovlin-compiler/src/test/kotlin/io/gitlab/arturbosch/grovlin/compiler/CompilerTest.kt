@@ -7,7 +7,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.present
-import io.gitlab.arturbosch.grovlin.compiler.java.toJava
+import io.gitlab.arturbosch.grovlin.compiler.backend.asJavaFile
 import org.junit.Test
 import java.io.File
 
@@ -20,7 +20,7 @@ class CompilerTest {
 	fun parseProgram() {
 		File("./out").mkdir()
 		val file = parseFromTestResource("program.grovlin")
-		val cUnit = file.toJava().main
+		val cUnit = file.asJavaFile().main
 		val clazz = cUnit.mainClass
 		assertThat(clazz.nameAsString, equalTo("MainGv"))
 	}
@@ -29,7 +29,7 @@ class CompilerTest {
 	fun parseProgramWithMethods() {
 		File("./out").mkdir()
 		val file = parseFromTestResource("programWithMethods.grovlin")
-		val cUnit = file.toJava().main
+		val cUnit = file.asJavaFile().main
 		val clazz = cUnit.mainClass
 		assertThat(clazz, present())
 		assertThat(clazz.methods, hasSize(equalTo(3))) // 2 defs + main
@@ -39,7 +39,7 @@ class CompilerTest {
 	fun parseProgramWithBooleans() {
 		File("./out").mkdir()
 		val file = parseFromTestResource("Booleans.grovlin")
-		val cUnit = file.toJava().main
+		val cUnit = file.asJavaFile().main
 		val clazz = cUnit.mainClass
 		assertThat(clazz.getNodesByType(VariableDeclarationExpr::class.java), hasSize(equalTo(1)))
 	}
@@ -48,7 +48,7 @@ class CompilerTest {
 	fun parseProgramWithIfElifElse() {
 		File("./out").mkdir()
 		val file = parseFromTestResource("IfElifElse.grovlin")
-		val cUnit = file.toJava().main
+		val cUnit = file.asJavaFile().main
 		val clazz = cUnit.mainClass
 		val ifs = clazz.getNodesByType(IfStmt::class.java)
 		assertThat(ifs, hasSize(equalTo(3)))
@@ -58,7 +58,7 @@ class CompilerTest {
 	fun parseProgramWithRelationalOperators() {
 		File("./out").mkdir()
 		val file = parseFromTestResource("RelationalOperators.grovlin")
-		val cUnit = file.toJava().main
+		val cUnit = file.asJavaFile().main
 		val clazz = cUnit.mainClass
 		val expressions = clazz.getNodesByType(BinaryExpr::class.java)
 		assertThat(expressions, hasSize(equalTo(11)))

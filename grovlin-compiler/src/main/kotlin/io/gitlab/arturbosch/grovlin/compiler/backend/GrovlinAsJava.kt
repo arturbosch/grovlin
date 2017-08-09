@@ -1,12 +1,10 @@
-package io.gitlab.arturbosch.grovlin.compiler.frontend
+package io.gitlab.arturbosch.grovlin.compiler.backend
 
 import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.TopLevelDeclarable
 import io.gitlab.arturbosch.grovlin.ast.builtins.MainDeclaration
-import io.gitlab.arturbosch.grovlin.compiler.java.CPackage
-import io.gitlab.arturbosch.grovlin.compiler.java.CUnit
 
 /**
  * @author Artur Bosch

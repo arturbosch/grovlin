@@ -6,10 +6,10 @@ import io.gitlab.arturbosch.grovlin.compiler.args.Args
 import io.gitlab.arturbosch.grovlin.compiler.args.failWithErrorMessage
 import io.gitlab.arturbosch.grovlin.compiler.args.jCommander
 import io.gitlab.arturbosch.grovlin.compiler.args.parseArguments
-import io.gitlab.arturbosch.grovlin.compiler.java.run
-import io.gitlab.arturbosch.grovlin.compiler.java.toFile
-import io.gitlab.arturbosch.grovlin.compiler.java.toJava
-import io.gitlab.arturbosch.grovlin.compiler.parser.Parser
+import io.gitlab.arturbosch.grovlin.compiler.backend.asJavaFile
+import io.gitlab.arturbosch.grovlin.compiler.frontend.Parser
+import io.gitlab.arturbosch.grovlin.compiler.java.interpret
+import io.gitlab.arturbosch.grovlin.compiler.java.writeToDisk
 import java.io.File
 import java.util.concurrent.CompletableFuture
 
@@ -42,16 +42,17 @@ fun main(args: Array<String>) {
 }
 
 private fun runJvm(grovlinFile: GrovlinFile) {
-	val java = grovlinFile.toJava()
+	val java = grovlinFile.asJavaFile()
 	if (Args.showTree) {
 		CompletableFuture.runAsync { java.all().forEach { println(it.unit) } }
 	}
-	java.run()
+	java.interpret()
 }
 
 private fun runCompiler(grovlinFile: GrovlinFile) {
 	if (Args.output == null) jCommander.failWithErrorMessage("For compilation specify an output path!")
-	val output: File = Args.output!!.toFile()
-	if (!output.exists()) output.mkdir()
-	grovlinFile.toJava().toFile(output)
+	val outputFile: File = Args.output!!.toFile()
+	if (!outputFile.exists()) outputFile.mkdir()
+	val javaFile = grovlinFile.asJavaFile()
+	writeToDisk(outputFile, javaFile)
 }

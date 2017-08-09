@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.present
 import io.gitlab.arturbosch.grovlin.ast.operations.asString
-import io.gitlab.arturbosch.grovlin.compiler.java.toJava
+import io.gitlab.arturbosch.grovlin.compiler.backend.asJavaFile
 import org.junit.Test
 
 /**
@@ -17,7 +17,7 @@ class CompileProgramWithTypesAndObjectsTest {
 	fun threeTypesOneObject() {
 		val grovlinFile = parseFromTestResource("TypesAndObjects.grovlin")
 		println(grovlinFile.asString())
-		val cPackage = grovlinFile.toJava()
+		val cPackage = grovlinFile.asJavaFile()
 		val cUnit = cPackage.main
 		val clazz = cUnit.mainClass
 		println(clazz)
@@ -35,7 +35,7 @@ class CompileProgramWithTypesAndObjectsTest {
 			def main(String args) { print(BoxImpl().data) }
 		""".asGrovlinFile()
 		println(grovlinFile.asString())
-		val java = grovlinFile.toJava()
+		val java = grovlinFile.asJavaFile()
 		java.cus.forEach(::println)
 		println(java.main)
 	}

@@ -1,4 +1,4 @@
-package io.gitlab.arturbosch.grovlin.compiler.parser
+package io.gitlab.arturbosch.grovlin.compiler.frontend
 
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.identify
@@ -22,7 +22,7 @@ object Parser {
 		val root = parsingResult.root
 		val syntaxErrors = parsingResult.errors
 		val grovlinFile = if (parsingResult.isValid()) {
-			root!!.asGrovlinFile(fileName.substring(0, fileName.lastIndexOf(".")))
+			root!!.asGrovlinFile(fileName.substring(0, fileName.lastIndexOf("")))
 		} else {
 			null
 		}

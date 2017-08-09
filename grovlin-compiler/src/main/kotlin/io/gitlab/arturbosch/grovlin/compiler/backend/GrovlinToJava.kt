@@ -1,4 +1,4 @@
-package io.gitlab.arturbosch.grovlin.compiler.frontend
+package io.gitlab.arturbosch.grovlin.compiler.backend
 
 import com.github.javaparser.ast.Modifier
 import com.github.javaparser.ast.NodeList
