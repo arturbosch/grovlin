@@ -63,5 +63,4 @@ class CompilerTest {
 		val expressions = clazz.getNodesByType(BinaryExpr::class.java)
 		assertThat(expressions, hasSize(equalTo(11)))
 	}
-
 }

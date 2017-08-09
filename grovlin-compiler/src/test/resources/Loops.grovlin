@@ -1,0 +1,8 @@
+def main(String args) {
+    for i : 0..10 {
+        print(i)
+        if i != 9 {
+            print(", ")
+        }
+    }
+}

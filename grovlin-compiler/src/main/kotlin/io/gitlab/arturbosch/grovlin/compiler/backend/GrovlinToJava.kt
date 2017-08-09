@@ -19,11 +19,14 @@ import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.expr.NameExpr
 import com.github.javaparser.ast.expr.ObjectCreationExpr
 import com.github.javaparser.ast.expr.SimpleName
+import com.github.javaparser.ast.expr.StringLiteralExpr
 import com.github.javaparser.ast.expr.ThisExpr
 import com.github.javaparser.ast.expr.UnaryExpr
 import com.github.javaparser.ast.expr.VariableDeclarationExpr
 import com.github.javaparser.ast.stmt.BlockStmt
 import com.github.javaparser.ast.stmt.ExpressionStmt
+import com.github.javaparser.ast.stmt.ForStmt
+import com.github.javaparser.ast.stmt.ForeachStmt
 import com.github.javaparser.ast.stmt.IfStmt
 import com.github.javaparser.ast.type.ArrayType
 import com.github.javaparser.ast.type.ClassOrInterfaceType
@@ -42,11 +45,13 @@ import io.gitlab.arturbosch.grovlin.ast.ElifStatement
 import io.gitlab.arturbosch.grovlin.ast.EqualExpression
 import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.ExpressionStatement
+import io.gitlab.arturbosch.grovlin.ast.ForStatement
 import io.gitlab.arturbosch.grovlin.ast.GetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.GreaterEqualExpression
 import io.gitlab.arturbosch.grovlin.ast.GreaterExpression
 import io.gitlab.arturbosch.grovlin.ast.IfStatement
 import io.gitlab.arturbosch.grovlin.ast.IntLit
+import io.gitlab.arturbosch.grovlin.ast.IntRangeExpression
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.LessEqualExpression
 import io.gitlab.arturbosch.grovlin.ast.LessExpression
@@ -62,6 +67,7 @@ import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.Statement
+import io.gitlab.arturbosch.grovlin.ast.StringLit
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
 import io.gitlab.arturbosch.grovlin.ast.SumExpression
 import io.gitlab.arturbosch.grovlin.ast.ThisReference
@@ -72,6 +78,7 @@ import io.gitlab.arturbosch.grovlin.ast.TypeDeclaration
 import io.gitlab.arturbosch.grovlin.ast.UnequalExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
+import io.gitlab.arturbosch.grovlin.ast.WhileStatement
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
 import io.gitlab.arturbosch.grovlin.ast.builtins.MainDeclaration
 import io.gitlab.arturbosch.grovlin.ast.builtins.Print
@@ -180,13 +187,35 @@ fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*> = if (
 			.setDefault(isType)
 }
 
-fun Statement.toJava(): com.github.javaparser.ast.stmt.Statement = when (this) {
+fun Statement.toJava(): JavaParserStatement = when (this) {
 	is VarDeclaration -> ExpressionStmt(VariableDeclarationExpr(VariableDeclarator(type.toJava(), name, value?.toJava())))
 	is Assignment -> ExpressionStmt(AssignExpr(varReference.toJava(), value.toJava(), AssignExpr.Operator.ASSIGN))
 	is ExpressionStatement -> ExpressionStmt(expression.toJava())
 	is IfStatement -> IfStmt(condition.toJava(), thenStatement.toJava(), transformElifsToElseIfConstructs(elifs, elseStatement))
 	is BlockStatement -> BlockStmt(NodeList.nodeList(statements.map { it.toJava() }))
+	is ForStatement -> toJava()
+	is WhileStatement -> toJava()
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
+}
+
+fun ForStatement.toJava(): JavaParserStatement {
+	val expr = expression
+	if (expr is IntRangeExpression) {
+		val forStmt = ForStmt()
+		val start = expr.start.toJava()
+		val endExclusive = expr.endExclusive.toJava()
+		forStmt.initialization = NodeList.nodeList(VariableDeclarationExpr(
+				VariableDeclarator(varDeclaration.type.toJava(), varDeclaration.name, start)))
+		forStmt.setCompare(BinaryExpr(start, endExclusive, BinaryExpr.Operator.LESS))
+		forStmt.update = NodeList.nodeList(UnaryExpr(
+				NameExpr(varDeclaration.name), UnaryExpr.Operator.POSTFIX_INCREMENT))
+		forStmt.body = block.toJava()
+		return forStmt
+	} else {
+		val foreachStmt = ForeachStmt()
+
+		return foreachStmt
+	}
 }
 
 fun VarReference.toJava(): JavaParserExpression = when (this.symbol?.def) {
@@ -230,6 +259,7 @@ fun Expression.toJava(): JavaParserExpression = when (this) {
 	is IntLit -> IntegerLiteralExpr(value)
 	is DecLit -> DoubleLiteralExpr(value)
 	is BoolLit -> BooleanLiteralExpr(value)
+	is StringLit -> StringLiteralExpr(value)
 	is VarReference -> toJava()
 	is ThisReference -> ThisExpr()
 	is CallExpression -> toJava()
