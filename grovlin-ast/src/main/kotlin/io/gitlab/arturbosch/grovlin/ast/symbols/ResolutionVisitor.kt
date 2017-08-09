@@ -10,6 +10,7 @@ import io.gitlab.arturbosch.grovlin.ast.CallExpression
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.Declaration
 import io.gitlab.arturbosch.grovlin.ast.DivisionExpression
+import io.gitlab.arturbosch.grovlin.ast.ForStatement
 import io.gitlab.arturbosch.grovlin.ast.GetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.IntLit
@@ -225,6 +226,11 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 	override fun visit(intRangeExpression: IntRangeExpression, data: Any) {
 		super.visit(intRangeExpression, data)
 		intRangeExpression.evaluationType = IntType
+		val forStatement = intRangeExpression.parent as ForStatement
+		val varDeclaration = forStatement.varDeclaration
+		varDeclaration.type = IntType
+		varDeclaration.evaluationType = IntType
+		varDeclaration.value = intRangeExpression.start
 	}
 
 	// Binary expressions need promotion through lookup tables

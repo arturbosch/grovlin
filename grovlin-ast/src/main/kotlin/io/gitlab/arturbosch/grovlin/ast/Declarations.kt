@@ -45,7 +45,7 @@ class PropertyDeclaration(override var type: Type,
 	: MemberDeclaration(), VariableDeclaration
 
 class VarDeclaration(override val name: String,
-					 val value: Expression?,
+					 var value: Expression?,
 					 val isVal: Boolean = false)
 	: MemberDeclaration(), VariableDeclaration {
 

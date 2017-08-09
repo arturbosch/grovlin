@@ -179,6 +179,7 @@ abstract class TreeBaseVisitor<in P> : TreeVisitor<P, Unit> {
 			is TypeConversion -> visit(expression, data)
 			is VarReference -> visit(expression, data)
 			is ObjectCreation -> visit(expression, data)
+			is IntRangeExpression -> visit(expression, data)
 			is BinaryExpression -> visit(expression, data)
 			is UnaryExpression -> visit(expression, data)
 			is StringLit -> visit(expression, data)
