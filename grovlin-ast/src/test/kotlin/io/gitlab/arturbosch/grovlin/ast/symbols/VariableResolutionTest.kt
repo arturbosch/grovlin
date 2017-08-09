@@ -2,6 +2,7 @@ package io.gitlab.arturbosch.grovlin.ast.symbols
 
 import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.IntType
+import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
@@ -83,5 +84,26 @@ class VariableResolutionTest {
 		val assignment = grovlinFile.findByType<Assignment>()
 
 		Assertions.assertThat(assignment?.evaluationType).isEqualTo(IntType)
+	}
+
+	@Test
+	fun varReferenceInAssignmentInferredFromVarDeclOutsideOfWhileLoop() {
+		val grovlinFile = """
+			def loop(Int n): String {
+				var current = n
+				while current > 0 {
+					print(".")
+					current = current - 1
+				}
+				println()
+				return "I 'have' finished!"
+			}
+		""".asGrovlinFile().resolved()
+
+		val assignment = grovlinFile.findByType<Assignment>()
+		val currentDecl = grovlinFile.findByType<VarDeclaration>()
+
+		Assertions.assertThat(assignment?.evaluationType).isEqualTo(IntType)
+		Assertions.assertThat(assignment?.varReference?.symbol?.def).isEqualTo(currentDecl)
 	}
 }

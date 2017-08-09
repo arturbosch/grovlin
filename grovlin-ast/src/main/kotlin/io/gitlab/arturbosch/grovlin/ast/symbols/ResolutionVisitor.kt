@@ -102,7 +102,7 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		super.visit(assignment, data)
 		val scope = assignment.resolutionScope ?: assertScopeResolved(assignment)
 		val symbol = scope.resolve(assignment.varName)
-		assignment.symbol = symbol
+		assignment.varReference.symbol = symbol
 		val definition = symbol?.def
 		symbol?.type = definition?.type
 		assignment.evaluationType = definition?.type
