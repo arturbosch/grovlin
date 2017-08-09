@@ -9,7 +9,7 @@ object Args {
 
 	@Parameter(
 			names = arrayOf("--mode", "-m"),
-			description = "Specifies if the compiler should only 'compile' and also 'run' the file. Default is 'run'.")
+			description = "Specifies if the compiler should only 'compile' or also 'run' the file.")
 	var mode: String = "run"
 	@Parameter(
 			required = true,
@@ -19,7 +19,7 @@ object Args {
 	var input: Path? = null
 	@Parameter(
 			names = arrayOf("--output", "-o"),
-			description = "The input grovlin file.",
+			description = "The output directory for the java classes.",
 			converter = ExistingPathConverter::class)
 	var output: Path? = null
 	@Parameter(
