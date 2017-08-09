@@ -232,10 +232,7 @@ fun Expression.toJava(): JavaParserExpression = when (this) {
 	is BoolLit -> BooleanLiteralExpr(value)
 	is VarReference -> toJava()
 	is ThisReference -> ThisExpr()
-	is CallExpression -> MethodCallExpr().apply {
-		setName(this@toJava.name)
-		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
-	}
+	is CallExpression -> toJava()
 	is SetterAccessExpression -> MethodCallExpr().apply {
 		setName(this@toJava.name.toSetter())
 		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
@@ -245,6 +242,10 @@ fun Expression.toJava(): JavaParserExpression = when (this) {
 		setName(this@toJava.name.toGetter())
 		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
 	}
+	else -> throw UnsupportedOperationException(javaClass.canonicalName)
+}
+
+fun CallExpression.toJava(): MethodCallExpr = when (this) {
 	is Print -> MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
 			SimpleName("print"), NodeList.nodeList(arguments[0].toJava()))
 	is PrintLn -> MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
@@ -253,7 +254,10 @@ fun Expression.toJava(): JavaParserExpression = when (this) {
 			ObjectCreationExpr(null, ClassOrInterfaceType("java.util.Scanner"),
 					NodeList.nodeList(FieldAccessExpr(NameExpr("System"), "in"))),
 			SimpleName("next"), NodeList.nodeList(arguments[0].toJava()))
-	else -> throw UnsupportedOperationException(javaClass.canonicalName)
+	else -> MethodCallExpr().apply {
+		setName(this@toJava.name)
+		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
+	}
 }
 
 fun Type.toJava(): com.github.javaparser.ast.type.Type = when (this) {
