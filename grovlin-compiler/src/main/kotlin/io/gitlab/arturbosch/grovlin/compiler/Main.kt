@@ -43,7 +43,7 @@ fun main(args: Array<String>) {
 
 private fun runJvm(grovlinFile: GrovlinFile) {
 	val java = grovlinFile.asJavaFile()
-	if (Args.showTree) {
+	if (Args.showJava) {
 		CompletableFuture.runAsync { java.all().forEach { println(it.unit) } }
 	}
 	java.interpret()

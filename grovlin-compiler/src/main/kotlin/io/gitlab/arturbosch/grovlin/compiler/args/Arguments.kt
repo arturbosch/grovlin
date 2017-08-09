@@ -27,6 +27,10 @@ object Args {
 			description = "Prints the grovlin file tree.")
 	var showTree = false
 	@Parameter(
+			names = arrayOf("--show-java", "-sj"),
+			description = "Prints the generated java code.")
+	var showJava = false
+	@Parameter(
 			names = arrayOf("--help", "-h"),
 			help = true,
 			description = "Prints the help message.")
