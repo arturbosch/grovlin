@@ -2,6 +2,7 @@ package io.gitlab.arturbosch.grovlin.ast
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import io.gitlab.arturbosch.grovlin.ast.builtins.Print
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
 import io.gitlab.arturbosch.grovlin.ast.operations.findByType
 import org.assertj.core.api.Assertions
@@ -34,5 +35,14 @@ class MethodsAndCallsTest {
 
 		Assertions.assertThat(parameters).hasSize(2)
 		Assertions.assertThat(arguments).hasSize(2)
+	}
+
+	@Test
+	fun parsePrintAsMethodCall() {
+		val grovlinFile = """print(", ")""".asGrovlinFile()
+
+		val printCall = grovlinFile.findByType<Print>()
+
+		Assertions.assertThat(printCall).isNotNull()
 	}
 }

@@ -210,7 +210,10 @@ class AntlrExpressionVisitor : GrovlinParserBaseVisitor<Expression>() {
 	}
 
 	override fun visitStringLiteral(ctx: GrovlinParser.StringLiteralContext): Expression {
-		return StringLit(ctx.text).apply {
+		var value = ctx.STRINGLIT().text
+		assert(value.isNotEmpty()) { "String literal must start and end with quotation marks!" }
+		value = value.substring(1, value.lastIndex)
+		return StringLit(value).apply {
 			position = ctx.toPosition()
 		}
 	}

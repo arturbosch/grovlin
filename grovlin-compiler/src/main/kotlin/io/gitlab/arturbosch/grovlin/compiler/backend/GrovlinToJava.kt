@@ -26,7 +26,6 @@ import com.github.javaparser.ast.expr.VariableDeclarationExpr
 import com.github.javaparser.ast.stmt.BlockStmt
 import com.github.javaparser.ast.stmt.ExpressionStmt
 import com.github.javaparser.ast.stmt.ForStmt
-import com.github.javaparser.ast.stmt.ForeachStmt
 import com.github.javaparser.ast.stmt.IfStmt
 import com.github.javaparser.ast.type.ArrayType
 import com.github.javaparser.ast.type.ClassOrInterfaceType
@@ -201,21 +200,23 @@ fun Statement.toJava(): JavaParserStatement = when (this) {
 fun ForStatement.toJava(): JavaParserStatement {
 	val expr = expression
 	if (expr is IntRangeExpression) {
-		val forStmt = ForStmt()
-		val start = expr.start.toJava()
-		val endExclusive = expr.endExclusive.toJava()
-		forStmt.initialization = NodeList.nodeList(VariableDeclarationExpr(
-				VariableDeclarator(varDeclaration.type.toJava(), varDeclaration.name, start)))
-		forStmt.setCompare(BinaryExpr(start, endExclusive, BinaryExpr.Operator.LESS))
-		forStmt.update = NodeList.nodeList(UnaryExpr(
-				NameExpr(varDeclaration.name), UnaryExpr.Operator.POSTFIX_INCREMENT))
-		forStmt.body = block.toJava()
-		return forStmt
+		return forLoopFromIntRange(expr)
 	} else {
-		val foreachStmt = ForeachStmt()
-
-		return foreachStmt
+		throw UnsupportedOperationException("No foreach for now!")
 	}
+}
+
+private fun ForStatement.forLoopFromIntRange(expr: IntRangeExpression): ForStmt {
+	val forStmt = ForStmt()
+	val start = expr.start.toJava()
+	val endExclusive = expr.endExclusive.toJava()
+	val varReference = NameExpr(varDeclaration.name)
+	forStmt.initialization = NodeList.nodeList(VariableDeclarationExpr(
+			VariableDeclarator(varDeclaration.type.toJava(), varDeclaration.name, start)))
+	forStmt.setCompare(BinaryExpr(varReference, endExclusive, BinaryExpr.Operator.LESS))
+	forStmt.update = NodeList.nodeList(UnaryExpr(varReference, UnaryExpr.Operator.POSTFIX_INCREMENT))
+	forStmt.body = block.toJava()
+	return forStmt
 }
 
 fun VarReference.toJava(): JavaParserExpression = when (this.symbol?.def) {
@@ -276,8 +277,7 @@ fun Expression.toJava(): JavaParserExpression = when (this) {
 }
 
 fun CallExpression.toJava(): MethodCallExpr = when (this) {
-	is Print -> MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
-			SimpleName("print"), NodeList.nodeList(arguments[0].toJava()))
+	is Print -> toJava()
 	is PrintLn -> MethodCallExpr(FieldAccessExpr(NameExpr("System"), "out"),
 			SimpleName("println"), NodeList.nodeList(arguments[0].toJava()))
 	is ReadLine -> MethodCallExpr(
@@ -288,6 +288,12 @@ fun CallExpression.toJava(): MethodCallExpr = when (this) {
 		setName(this@toJava.name)
 		if (this@toJava.scope != null) setScope(this@toJava.scope!!.toJava())
 	}
+}
+
+private fun Print.toJava(): MethodCallExpr {
+	val fieldAccess = FieldAccessExpr(NameExpr("System"), "out")
+	val arguments = NodeList.nodeList(arguments[0].toJava())
+	return MethodCallExpr(fieldAccess, SimpleName("print"), arguments)
 }
 
 fun Type.toJava(): com.github.javaparser.ast.type.Type = when (this) {

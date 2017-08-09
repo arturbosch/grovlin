@@ -1,5 +1,6 @@
 package io.gitlab.arturbosch.grovlin.parser
 
+import io.gitlab.arturbosch.grovlin.GrovlinParser
 import org.assertj.core.api.Assertions
 import org.junit.Test
 
@@ -56,5 +57,14 @@ class MethodTest {
 		Assertions.assertThat(zeroArgs.argumentList()).isNull()
 		Assertions.assertThat(oneArgs.argumentList().argument()).hasSize(1)
 		Assertions.assertThat(twoArgs.argumentList().argument()).hasSize(2)
+	}
+
+	@Test
+	fun argumentWithString() {
+		val call = """print(", ")""".parseMethodCall()
+
+		Assertions.assertThat(call.argumentList().argument()).hasSize(1)
+		Assertions.assertThat(call.argumentList().argument()[0].expression())
+				.isInstanceOf(GrovlinParser.StringLiteralContext::class.java)
 	}
 }
