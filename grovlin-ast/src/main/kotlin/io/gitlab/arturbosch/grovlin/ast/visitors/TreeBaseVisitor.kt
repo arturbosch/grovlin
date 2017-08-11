@@ -160,6 +160,7 @@ abstract class TreeBaseVisitor<in P> : TreeVisitor<P, Unit> {
 	}
 
 	override fun visit(assignment: Assignment, data: P) {
+		visit(assignment.varReference, data)
 		visit(assignment.value, data)
 	}
 

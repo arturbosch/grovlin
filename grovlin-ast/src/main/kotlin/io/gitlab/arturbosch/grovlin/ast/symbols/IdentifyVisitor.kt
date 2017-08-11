@@ -1,6 +1,5 @@
 package io.gitlab.arturbosch.grovlin.ast.symbols
 
-import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.BlockStatement
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
@@ -28,11 +27,6 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	override fun visit(thisReference: ThisReference, data: Any) {
 		thisReference.resolutionScope = currentScope
-	}
-
-	override fun visit(assignment: Assignment, data: Any) {
-		assignment.resolutionScope = currentScope
-		super.visit(assignment, data)
 	}
 
 	override fun visit(varDeclaration: VarDeclaration, data: Any) {

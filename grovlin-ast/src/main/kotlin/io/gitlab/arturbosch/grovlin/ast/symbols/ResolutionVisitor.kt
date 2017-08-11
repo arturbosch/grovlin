@@ -112,13 +112,10 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	override fun visit(assignment: Assignment, data: Any) {
 		super.visit(assignment, data)
-		val scope = assignment.resolutionScope ?: assertScopeResolved(assignment)
-		val symbol = scope.resolve(assignment.varName)
-		assignment.varReference.symbol = symbol
-		val definition = symbol?.def
-		symbol?.type = definition?.type
-		assignment.evaluationType = definition?.type
-		checkSemanticVarReferenceCases(definition, assignment.varReference)
+		assignment.resolutionScope = assignment.varReference.resolutionScope
+		assignment.symbol = assignment.varReference.symbol
+		assignment.evaluationType = assignment.varReference.evaluationType
+		assignment.promotionType = assignment.varReference.promotionType
 	}
 
 	private fun checkSemanticVarReferenceCases(definition: Declaration?,
