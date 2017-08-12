@@ -14,11 +14,11 @@ class MethodDeclarationTest {
 		val main = MethodDeclaration("main", null, parameters = mutableListOf(
 				ParameterDeclaration("args", StringType)))
 
-		Assertions.assertThat(main.methodParameterSignature).isEqualTo("main(String args)")
-		Assertions.assertThat(main.methodSignature).isEqualTo("main(String args)")
+		Assertions.assertThat(main.parameterSignature).isEqualTo("main(String args)")
+		Assertions.assertThat(main.signature).isEqualTo("main(String args)")
 
 		main.parameters.add(ParameterDeclaration("oh", IntType))
-		Assertions.assertThat(main.methodParameterSignature).isEqualTo("main(String args, Int oh)")
+		Assertions.assertThat(main.parameterSignature).isEqualTo("main(String args, Int oh)")
 	}
 
 	@Test
@@ -26,8 +26,8 @@ class MethodDeclarationTest {
 		val method = MethodDeclaration("hello", null, ObjectOrTypeType("MyType"), mutableListOf(
 				ParameterDeclaration("i", IntType), ParameterDeclaration("d", DecimalType)))
 
-		val methodSignature = method.methodSignature
-		val methodParameterSignature = method.methodParameterSignature
+		val methodSignature = method.signature
+		val methodParameterSignature = method.parameterSignature
 		Assertions.assertThat(methodSignature).isEqualTo("hello(Int i, Decimal d): MyType")
 		Assertions.assertThat(methodParameterSignature).isEqualTo("hello(Int i, Decimal d)")
 	}
