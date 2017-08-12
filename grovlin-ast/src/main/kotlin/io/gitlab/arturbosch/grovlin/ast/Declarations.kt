@@ -30,6 +30,9 @@ open class MethodDeclaration(override val name: String,
 	: MemberDeclaration(), NodeWithBlock, TopLevelDeclarable {
 
 	fun mustBeOverridden() = block == null
+	val methodParameterSignature get() = "$name(${parameters.joinToString(", ") { it.parameterSignature }})"
+	val methodSignature get() = "$name(${parameters.joinToString(", ") { it.parameterSignature }})" +
+			if (type != VoidType) ": $type" else ""
 }
 
 class LambdaDeclaration(override val name: String,
@@ -54,4 +57,7 @@ class VarDeclaration(override val name: String,
 
 class ParameterDeclaration(override val name: String,
 						   override var type: Type)
-	: Statement(), VariableDeclaration
+	: Statement(), VariableDeclaration {
+
+	val parameterSignature get() = "$type $name"
+}
