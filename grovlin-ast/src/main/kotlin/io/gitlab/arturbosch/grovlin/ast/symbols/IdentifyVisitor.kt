@@ -47,7 +47,7 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	private fun createRedeclarationError(signature: String, sameDecls: List<MethodDeclaration>): SemanticError {
 		return SemanticError("Method redeclaration with signature '$signature' on " +
-				sameDecls.joinToString(", ") { it.position.toString() }, sameDecls[0].position?.start)
+				sameDecls.joinToString(", ") { it.position.toString() }, sameDecls[0].position)
 	}
 
 	// Identify

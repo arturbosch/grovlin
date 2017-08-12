@@ -54,7 +54,7 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		if (cacheForMains.size > 1) {
 			grovlinFile.addError(SemanticError("More than one 'main' declaration found. Positions: " +
 					cacheForMains.joinToString(", ") { it.position.toString() },
-					cacheForMains[0].position?.start))
+					cacheForMains[0].position))
 		}
 	}
 
@@ -69,7 +69,7 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 			varDeclaration.type = evaluationType
 		} else {
 			grovlinFile.addError(SemanticError("Type of '${varDeclaration.name}' could not be inferred!",
-					varDeclaration.position?.start))
+					varDeclaration.position))
 		}
 		varDeclaration.evaluationType = varDeclaration.type
 		resolveVariableSymbolType(varDeclaration)
@@ -126,16 +126,17 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		val referenceName = reference.varName
 		when {
 			definition == null -> grovlinFile.addError(SemanticError(
-					"Declaration for '$referenceName' not found.", referenceStart))
+					"Declaration for '$referenceName' not found.", referencePositions))
 
 			definition.position == null -> assertPositions(definition)
 
 			definition.position!!.contains(referencePositions) -> grovlinFile.addError(SemanticError(
-					"Reference '$referenceName' is used within its own declaration.", referenceStart))
+					"Reference '$referenceName' is used within its own declaration.", referencePositions))
 
 			referenceStart.isBefore(definition.position!!.start) -> grovlinFile.addError(SemanticError(
 					"Reference '$referenceName' on '$referenceStart' is used before " +
-							"the declaration of '$referenceName' at '${definition.position!!.start}'.", referenceStart))
+							"the declaration of '$referenceName' at '${definition.position!!.start}'.",
+					referencePositions))
 		}
 	}
 
@@ -262,7 +263,7 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		if (resultType == T_VOID_INDEX) {
 			grovlinFile.addError(SemanticError("Incompatible types " +
 					"'${binExpr.left.evaluationType}' and '${binExpr.right.evaluationType}' at ${binExpr.position}.",
-					binExpr.left.position?.start))
+					binExpr.left.position))
 		}
 		binExpr.evaluationType = binExpr.left.promotionType ?: binExpr.left.evaluationType
 		return resultType
