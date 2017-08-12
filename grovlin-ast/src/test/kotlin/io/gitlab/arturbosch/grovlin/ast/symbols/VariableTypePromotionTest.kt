@@ -38,7 +38,6 @@ class VariableTypePromotionTest {
 
 		val varDecls = grovlinFile.collectByType<VarDeclaration>()
 
-		Assertions.assertThat(grovlinFile.errors).isEmpty()
 		Assertions.assertThat(varDecls).allMatch { it.type == BoolType }
 		Assertions.assertThat(varDecls).allMatch { it.type == BoolType }
 		Assertions.assertThat(varDecls).allMatch { (it.value as BinaryExpression).left.evaluationType == StringType }

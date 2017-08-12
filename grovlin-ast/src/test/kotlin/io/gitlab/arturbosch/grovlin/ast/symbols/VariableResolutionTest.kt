@@ -59,16 +59,15 @@ class VariableResolutionTest {
 
 		val errors = grovlinFile.errors
 
-		Assertions.assertThat(errors).hasSize(2)
-		Assertions.assertThat(errors).anySatisfy { "a" in it.message }
-		Assertions.assertThat(errors).anySatisfy { "b" in it.message }
+		Assertions.assertThat(errors).anySatisfy { "'a'" in it.message }
+		Assertions.assertThat(errors).anySatisfy { "'b'" in it.message }
 	}
 
 	@Test
 	fun varDeclsTypeInferredFromIntRange() {
 		val grovlinFile = "for i : 1..10 {}".asGrovlinFile().resolved()
 
-		Assertions.assertThat(grovlinFile.errors).isEmpty()
+		Assertions.assertThat(grovlinFile.findByType<VarDeclaration>()?.evaluationType).isEqualTo(IntType)
 	}
 
 	@Test

@@ -75,7 +75,7 @@ import io.gitlab.arturbosch.grovlin.ast.StringLit
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
 import io.gitlab.arturbosch.grovlin.ast.SumExpression
 import io.gitlab.arturbosch.grovlin.ast.ThisReference
-import io.gitlab.arturbosch.grovlin.ast.TopLevelDeclarable
+import io.gitlab.arturbosch.grovlin.ast.TopLevelDeclarableNode
 import io.gitlab.arturbosch.grovlin.ast.Type
 import io.gitlab.arturbosch.grovlin.ast.TypeConversion
 import io.gitlab.arturbosch.grovlin.ast.TypeDeclaration
@@ -99,7 +99,7 @@ import com.github.javaparser.ast.stmt.Statement as JavaParserStatement
  * @author Artur Bosch
  */
 
-fun TopLevelDeclarable.toJava(): BodyDeclaration<*> = when (this) {
+fun TopLevelDeclarableNode.toJava(): BodyDeclaration<*> = when (this) {
 	is MethodDeclaration -> toJava()
 	is TypeDeclaration -> transformToInterfaceDeclaration()
 	is ObjectDeclaration -> transformToClassDeclaration()

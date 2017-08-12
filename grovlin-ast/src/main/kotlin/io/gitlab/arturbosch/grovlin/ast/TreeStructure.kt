@@ -38,8 +38,8 @@ abstract class Statement : Node()
 
 interface Declaration : AstNode, NodeWithType, NodeWithName
 
-interface TopLevelDeclarable {
-	fun isTopLevelDeclaration(): Boolean = true
+interface TopLevelDeclarableNode : AstNode {
+	val isTopLevelDeclaration get(): Boolean = parent?.parent is GrovlinFile // GrovlinFile>Block>This
 }
 
 abstract class MemberDeclaration : Statement(), Declaration
@@ -86,11 +86,7 @@ interface NodeWithBlock : AstNode {
 			?.filter { it.reference == name } ?: emptyList()
 
 	fun topLevelStatements(): List<Statement> = block?.statements
-			?.filter { it is TopLevelDeclarable && it.isTopLevelDeclaration() } ?: emptyList()
+			?.filter { it is TopLevelDeclarableNode && it.isTopLevelDeclaration } ?: emptyList()
 
 	fun statements(): List<Statement> = block?.statements ?: emptyList()
-}
-
-interface NodeWithReference<N : Named> : AstNode {
-	val reference: Reference<N>
 }

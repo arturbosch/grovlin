@@ -11,34 +11,23 @@ import org.junit.Test
 class ContextAnalysisEdgeCasesTest {
 
 	@Test
-	fun singleMainAllowed() {
-		val grovlinFile = """
-			def main(String args) {}
-			def main(String args) {}
-		""".asGrovlinFile().resolved()
-
-		Assertions.assertThat(grovlinFile.errors).hasSize(2) // redecl, 2xmain
-		Assertions.assertThat(grovlinFile.errors[0].message).contains("main")
-	}
-
-	@Test
 	fun methodRedeclaration() {
 		val grovlinFile = """
-			def method(String s, Int i) {}
-			def method(String s, Int i) {}
+			def main(String args) {}
+			def main(String args) {}
 		""".asGrovlinFile().resolved()
 
 		Assertions.assertThat(grovlinFile.errors).hasSize(1)
-		Assertions.assertThat(grovlinFile.errors[0].message).contains("method(String s, Int i)")
+		Assertions.assertThat(grovlinFile.errors[0].message).contains("main(String args)")
 	}
 
 	@Test
 	fun sameMethodSignatureAllowedInDifferentScopes() {
 		val grovlinFile = """
 			object O {
-				def method(String s, Int i) {}
+				def main(String args) {}
 			}
-			def method(String s, Int i) {}
+			def main(String args) {}
 		""".asGrovlinFile().resolved()
 
 		Assertions.assertThat(grovlinFile.errors).hasSize(0)

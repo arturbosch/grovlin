@@ -2,6 +2,7 @@ package io.gitlab.arturbosch.grovlin.ast.symbols
 
 import io.gitlab.arturbosch.grovlin.ast.Declaration
 import java.util.HashMap
+import java.util.HashSet
 
 /**
  * @author Artur Bosch
@@ -30,7 +31,8 @@ data class BuiltinTypeSymbol(override val name: String,
 
 abstract class ScopedSymbol : Symbol(), Scope {
 
-	override fun getParentScope(): Scope? = enclosingScope
+	override val declarations: MutableSet<String> = HashSet()
+	override val declarationsMap: MutableMap<String, Declaration> = HashMap()
 }
 
 class MethodSymbol(override val name: String,

@@ -12,8 +12,6 @@ import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
 import io.gitlab.arturbosch.grovlin.ast.visitors.TreeBaseVisitor
-import org.antlr.v4.misc.MutableInt
-import java.util.HashMap
 
 /**
  * @author Artur Bosch
@@ -22,35 +20,6 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	val fileScope = FileScope(grovlinFile.name)
 	private var currentScope: Scope = fileScope
-
-	private val methodSignatureCache: MutableMap<Scope, MutableMap<String, MutableInt>> = HashMap()
-	private val methodCache: MutableList<MethodDeclaration> = mutableListOf()
-
-	override fun visit(file: GrovlinFile, data: Any) {
-		super.visit(file, data)
-		// context results
-		methodRedeclarationCheck()
-	}
-
-	private fun methodRedeclarationCheck() {
-		for (scopeToMethods in methodSignatureCache.values) {
-			for ((signature, value) in scopeToMethods) {
-				if (value.v > 1) {
-					val sameName = methodCache.filter { it.parameterSignature == signature }
-					if (sameName.size > 1) {
-						grovlinFile.addError(createRedeclarationError(signature, sameName))
-					}
-				}
-			}
-		}
-	}
-
-	private fun createRedeclarationError(signature: String, sameDecls: List<MethodDeclaration>): SemanticError {
-		return SemanticError("Method redeclaration with signature '$signature' on " +
-				sameDecls.joinToString(", ") { it.position.toString() }, sameDecls[0].position)
-	}
-
-	// Identify
 
 	override fun visit(varReference: VarReference, data: Any) {
 		varReference.resolutionScope = currentScope
@@ -61,16 +30,19 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 	}
 
 	override fun visit(varDeclaration: VarDeclaration, data: Any) {
+		currentScope.declare(varDeclaration, grovlinFile)
 		identifyVariable(varDeclaration)
 		super.visit(varDeclaration, data)
 	}
 
 	override fun visit(propertyDeclaration: PropertyDeclaration, data: Any) {
+		currentScope.declare(propertyDeclaration, grovlinFile)
 		identifyVariable(propertyDeclaration)
 		super.visit(propertyDeclaration, data)
 	}
 
 	override fun visit(parameterDeclaration: ParameterDeclaration, data: Any) {
+		currentScope.declare(parameterDeclaration, grovlinFile)
 		identifyVariable(parameterDeclaration)
 		super.visit(parameterDeclaration, data)
 	}
@@ -85,12 +57,7 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 	}
 
 	override fun visit(methodDeclaration: MethodDeclaration, data: Any) {
-		// cache method parameter signature for redeclaration check
-		val currentCache = methodSignatureCache.getOrPut(currentScope) { HashMap() }
-		currentCache.compute(methodDeclaration.parameterSignature,
-				{ _, value -> value?.apply { v += 1 } ?: MutableInt(1) })
-		methodCache.add(methodDeclaration)
-		// method symbol identify
+		currentScope.declare(methodDeclaration, grovlinFile)
 		val methodSymbol = MethodSymbol(methodDeclaration.name, methodDeclaration.type, currentScope)
 		currentScope.define(methodSymbol)
 		methodSymbol.def = methodDeclaration
@@ -103,6 +70,7 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 	}
 
 	override fun visit(objectDeclaration: ObjectDeclaration, data: Any) {
+		currentScope.declare(objectDeclaration, grovlinFile)
 		val classSymbol = ClassSymbol(objectDeclaration.name, objectDeclaration.objectType, currentScope)
 		currentScope.define(classSymbol)
 		classSymbol.def = objectDeclaration
@@ -115,6 +83,7 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 	}
 
 	override fun visit(typeDeclaration: TypeDeclaration, data: Any) {
+		currentScope.declare(typeDeclaration, grovlinFile)
 		val classSymbol = ClassSymbol(typeDeclaration.name, typeDeclaration.typeType, currentScope)
 		currentScope.define(classSymbol)
 		classSymbol.def = typeDeclaration

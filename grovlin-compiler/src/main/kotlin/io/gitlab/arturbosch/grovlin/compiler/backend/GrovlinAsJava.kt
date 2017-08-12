@@ -3,7 +3,7 @@ package io.gitlab.arturbosch.grovlin.compiler.backend
 import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
-import io.gitlab.arturbosch.grovlin.ast.TopLevelDeclarable
+import io.gitlab.arturbosch.grovlin.ast.TopLevelDeclarableNode
 import io.gitlab.arturbosch.grovlin.ast.builtins.MainDeclaration
 
 /**
@@ -18,7 +18,7 @@ fun GrovlinFile.asJavaFile(): CPackage {
 	main ?: throw MainMethodNotFound(name)
 
 	val topLevelDeclarations = fileBody.statements.asSequence()
-			.filterIsInstance(TopLevelDeclarable::class.java)
+			.filterIsInstance(TopLevelDeclarableNode::class.java)
 			.filterNot { it is MainDeclaration }
 			.filter { it.isTopLevelDeclaration() }
 			.map { it.toJava() }

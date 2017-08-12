@@ -39,24 +39,12 @@ import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
-import io.gitlab.arturbosch.grovlin.ast.builtins.MainDeclaration
 import io.gitlab.arturbosch.grovlin.ast.visitors.TreeBaseVisitor
 
 /**
  * @author Artur Bosch
  */
 class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
-
-	private val cacheForMains = mutableListOf<MainDeclaration>()
-
-	override fun visit(file: GrovlinFile, data: Any) {
-		super.visit(file, data)
-		if (cacheForMains.size > 1) {
-			grovlinFile.addError(SemanticError("More than one 'main' declaration found. Positions: " +
-					cacheForMains.joinToString(", ") { it.position.toString() },
-					cacheForMains[0].position))
-		}
-	}
 
 	// Variable declarations resolution
 
@@ -110,14 +98,6 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		checkSemanticVarReferenceCases(definition, varReference)
 	}
 
-	override fun visit(assignment: Assignment, data: Any) {
-		super.visit(assignment, data)
-		assignment.resolutionScope = assignment.varReference.resolutionScope
-		assignment.symbol = assignment.varReference.symbol
-		assignment.evaluationType = assignment.varReference.evaluationType
-		assignment.promotionType = assignment.varReference.promotionType
-	}
-
 	private fun checkSemanticVarReferenceCases(definition: Declaration?,
 											   reference: VarReference) {
 
@@ -144,20 +124,23 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		throw AssertionError("No positions for '${node.javaClass.simpleName}'.")
 	}
 
+	override fun visit(assignment: Assignment, data: Any) {
+		super.visit(assignment, data)
+		assignment.resolutionScope = assignment.varReference.resolutionScope
+		assignment.symbol = assignment.varReference.symbol
+		assignment.evaluationType = assignment.varReference.evaluationType
+		assignment.promotionType = assignment.varReference.promotionType
+	}
+
 	// Type, Object, Method resolution
 
 	override fun visit(methodDeclaration: MethodDeclaration, data: Any) {
-		checkMainMethod(methodDeclaration)
 		super.visit(methodDeclaration, data)
 		val scope = methodDeclaration.resolutionScope ?: assertScopeResolved(methodDeclaration)
 		val returnType = methodDeclaration.type
 		val symbol = scope.resolve(returnType.name)
 		returnType.symbol = symbol
 		methodDeclaration.evaluationType = methodDeclaration.type
-	}
-
-	private fun checkMainMethod(method: MethodDeclaration) {
-		if (method is MainDeclaration) cacheForMains.add(method)
 	}
 
 	override fun visit(typeDeclaration: TypeDeclaration, data: Any) {

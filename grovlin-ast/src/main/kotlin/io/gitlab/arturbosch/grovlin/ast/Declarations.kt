@@ -7,7 +7,7 @@ package io.gitlab.arturbosch.grovlin.ast
 class TypeDeclaration(val typeType: ObjectOrTypeType,
 					  val extendedTypes: MutableList<ObjectOrTypeType>,
 					  override val block: BlockStatement?)
-	: MemberDeclaration(), NodeWithBlock, TopLevelDeclarable {
+	: MemberDeclaration(), NodeWithBlock, TopLevelDeclarableNode {
 
 	override val name: String = typeType.name
 	override var type: Type = typeType
@@ -17,7 +17,7 @@ class ObjectDeclaration(val objectType: ObjectOrTypeType,
 						val extendedObject: ObjectOrTypeType?,
 						val extendedTypes: MutableList<ObjectOrTypeType>,
 						override val block: BlockStatement?)
-	: MemberDeclaration(), NodeWithBlock, TopLevelDeclarable {
+	: MemberDeclaration(), NodeWithBlock, TopLevelDeclarableNode {
 
 	override val name: String = objectType.name
 	override var type: Type = objectType
@@ -27,7 +27,7 @@ open class MethodDeclaration(override val name: String,
 							 override val block: BlockStatement?,
 							 override var type: Type = VoidType,
 							 val parameters: MutableList<ParameterDeclaration> = mutableListOf())
-	: MemberDeclaration(), NodeWithBlock, TopLevelDeclarable {
+	: MemberDeclaration(), NodeWithBlock, TopLevelDeclarableNode {
 
 	fun mustBeOverridden() = block == null
 	val parameterSignature get() = "$name(${parameters.joinToString(", ") { it.parameterSignature }})"
@@ -37,7 +37,7 @@ open class MethodDeclaration(override val name: String,
 
 class LambdaDeclaration(override val name: String,
 						override val block: BlockStatement)
-	: MemberDeclaration(), NodeWithBlock, TopLevelDeclarable {
+	: MemberDeclaration(), NodeWithBlock, TopLevelDeclarableNode {
 
 	override var type: Type = UnknownType
 }
