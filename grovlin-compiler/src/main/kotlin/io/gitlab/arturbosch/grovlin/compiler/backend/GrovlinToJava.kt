@@ -177,7 +177,7 @@ fun PropertyDeclaration.typePropertyToJava(members: MutableList<BodyDeclaration<
 fun MethodDeclaration.toJava(isType: Boolean = false): BodyDeclaration<*> {
 	val formalParameters = NodeList.nodeList(parameters.map { it.toJava() })
 	val returnType = evaluationType?.toJava() ?: VoidType()
-	val isStatic = isTopLevelDeclaration()
+	val isStatic = isTopLevelDeclaration
 	return if (mustBeOverridden()) {
 		val modifiers =
 				if (isStatic) EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC, Modifier.STATIC)
