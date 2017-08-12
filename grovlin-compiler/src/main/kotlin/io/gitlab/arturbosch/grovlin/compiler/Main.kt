@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
 	val parsingResult = Parser.parse(arguments.input!!)
 
 	if (!parsingResult.isValid()) {
-		parsingResult.errors.forEach { println(" * L${it.position?.line}: ${it.message}") }
+		parsingResult.errors.forEach { println(it.formattedMessage()) }
 		return
 	}
 

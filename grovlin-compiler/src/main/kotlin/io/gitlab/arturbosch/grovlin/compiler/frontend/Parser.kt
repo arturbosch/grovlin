@@ -4,7 +4,7 @@ import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.identify
 import io.gitlab.arturbosch.grovlin.ast.resolve
 import io.gitlab.arturbosch.grovlin.ast.visitors.asGrovlinFile
-import io.gitlab.arturbosch.grovlin.parser.Error
+import io.gitlab.arturbosch.grovlin.parser.FrontendError
 import io.gitlab.arturbosch.grovlin.parser.parse
 import java.nio.file.Path
 
@@ -37,6 +37,6 @@ object Parser {
 
 }
 
-data class ParsingResult(val root: GrovlinFile?, val path: Path, val errors: List<Error>) {
+data class ParsingResult(val root: GrovlinFile?, val path: Path, val errors: List<FrontendError>) {
 	fun isValid() = root != null && errors.isEmpty()
 }

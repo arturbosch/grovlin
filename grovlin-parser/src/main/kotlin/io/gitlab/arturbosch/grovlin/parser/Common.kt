@@ -8,17 +8,19 @@ import java.nio.file.Path
  */
 
 data class RawParsingResult(val root: GrovlinParser.GrovlinFileContext?,
-							val path: Path?, val errors: List<Error>) {
+							val path: Path?, val errors: List<SyntaxError>) {
 
 	fun isValid() = errors.isEmpty() && root != null
 }
 
-interface Error {
-	val message: String
-	val position: CodePoint?
+interface FrontendError {
+	fun formattedMessage(): String
 }
 
-data class SyntaxError(override val message: String, override val position: CodePoint) : Error
+data class SyntaxError(val message: String, val position: CodePoint) : FrontendError {
+
+	override fun formattedMessage(): String = "$message:$position"
+}
 
 open class CodePoint(val line: Int, val column: Int) {
 

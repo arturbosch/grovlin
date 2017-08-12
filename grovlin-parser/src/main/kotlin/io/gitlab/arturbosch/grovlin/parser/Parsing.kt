@@ -7,8 +7,10 @@ import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
+import java.io.Reader
 import java.io.StringReader
-import java.nio.file.Files
+import java.nio.channels.Channels
+import java.nio.channels.FileChannel
 import java.nio.file.Path
 
 /**
@@ -16,34 +18,37 @@ import java.nio.file.Path
  */
 object Parsing
 
-fun lexer(code: String): GrovlinLexer = GrovlinLexer(ANTLRInputStream(StringReader(code)))
+private fun lexer(code: String): GrovlinLexer = GrovlinLexer(ANTLRInputStream(StringReader(code)))
+
+private fun lexer(reader: Reader): GrovlinLexer = GrovlinLexer(ANTLRInputStream(reader))
 
 fun String.parse(): RawParsingResult {
 
-	val errors = mutableListOf<Error>()
 	val grovlinParser = GrovlinParser(CommonTokenStream(lexer(this)))
-	grovlinParser.addErrorListener(SyntaxErrorListener(errors))
+	val syntaxErrorListener = SyntaxErrorListener()
+	grovlinParser.addErrorListener(syntaxErrorListener)
 	val grovlinFile = grovlinParser.grovlinFile()
 
-	return RawParsingResult(grovlinFile, null, errors)
+	return RawParsingResult(grovlinFile, null, syntaxErrorListener.errors)
 }
 
 fun Path.parse(): RawParsingResult {
-	val code = String(Files.readAllBytes(this))
-	val errors = mutableListOf<Error>()
+	val byteChannel = FileChannel.open(this)
+	val reader = Channels.newReader(byteChannel, Charsets.UTF_8.displayName())
 
-	val grovlinParser = GrovlinParser(CommonTokenStream(lexer(code)))
-	grovlinParser.addErrorListener(SyntaxErrorListener(errors))
+	val grovlinParser = GrovlinParser(CommonTokenStream(lexer(reader)))
+	val syntaxErrorListener = SyntaxErrorListener()
+	grovlinParser.addErrorListener(SyntaxErrorListener())
 	val grovlinFile = grovlinParser.grovlinFile()
 
-	return RawParsingResult(grovlinFile, this, errors)
+	return RawParsingResult(grovlinFile, this, syntaxErrorListener.errors)
 }
 
 fun parseFromResource(resourceName: String): GrovlinParser.GrovlinFileContext {
-	val errors = mutableListOf<Error>()
+	val errors = mutableListOf<SyntaxError>()
 
 	val grovlinParser = GrovlinParser(CommonTokenStream(lexerFromResource(resourceName)))
-	grovlinParser.addErrorListener(SyntaxErrorListener(errors))
+	grovlinParser.addErrorListener(SyntaxErrorListener())
 	val grovlinFile = grovlinParser.grovlinFile()
 
 	errors.forEach(::println)
@@ -62,7 +67,10 @@ fun tokens(code: String): List<String> {
 			.map { vocabulary.getSymbolicName(it.type) }
 }
 
-class SyntaxErrorListener(val errors: MutableList<Error>) : BaseErrorListener() {
+class SyntaxErrorListener : BaseErrorListener() {
+
+	val errors: MutableList<SyntaxError> = mutableListOf()
+
 	override fun syntaxError(recognizer: Recognizer<*, *>, offendingSymbol: Any,
 							 line: Int, charPositionInLine: Int, msg: String, e: RecognitionException) {
 		errors.add(SyntaxError(msg, CodePoint(line, charPositionInLine)))

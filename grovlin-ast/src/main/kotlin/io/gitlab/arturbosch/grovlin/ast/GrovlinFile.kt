@@ -2,7 +2,7 @@ package io.gitlab.arturbosch.grovlin.ast
 
 import io.gitlab.arturbosch.grovlin.ast.symbols.IdentifyVisitor
 import io.gitlab.arturbosch.grovlin.ast.symbols.ResolutionVisitor
-import io.gitlab.arturbosch.grovlin.parser.Error
+import io.gitlab.arturbosch.grovlin.ast.symbols.SemanticError
 
 /**
  * @author Artur Bosch
@@ -11,9 +11,9 @@ class GrovlinFile(override var name: String,
 				  override var block: BlockStatement?)
 	: Node(), NodeWithBlock, NodeWithName {
 
-	val errors: MutableList<Error> = mutableListOf()
+	val errors: MutableList<SemanticError> = mutableListOf()
 
-	fun addError(error: Error) {
+	fun addError(error: SemanticError) {
 		errors.add(error)
 	}
 }
