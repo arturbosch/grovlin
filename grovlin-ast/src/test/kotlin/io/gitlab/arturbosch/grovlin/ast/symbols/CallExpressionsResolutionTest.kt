@@ -99,4 +99,19 @@ class CallExpressionsResolutionTest {
 		Assertions.assertThat(grovlinFile.errors).isEmpty()
 		Assertions.assertThat(variable?.value?.symbol?.def).isEqualTo(helloMethod)
 	}
+
+	@Test
+	fun incompatibleParameters() {
+		val grovlinFile = """
+			def hello(String s, Int i): String {
+				return "Hello World!" + i + s
+			}
+			def main(String args) {
+				val result = hello(5, "x")
+				println(result)
+			}
+		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors[0]).isInstanceOf(IncompatibleArgumentTypes::class.java)
+	}
 }

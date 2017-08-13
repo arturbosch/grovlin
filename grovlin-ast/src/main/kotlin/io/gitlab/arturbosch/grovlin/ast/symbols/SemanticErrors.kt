@@ -22,8 +22,10 @@ class IncompatibleArgumentTypes(fileName: String, methodCall: String,
 								paramTypes: String, argumentTypes: String,
 								positions: Position?)
 	: SemanticError("$fileName:$positions: " +
-		"Call to '$methodCall' with incompatible types '$argumentTypes', expected '$paramTypes'.",
-		positions)
+		"Call to '$methodCall' with incompatible types '$argumentTypes', expected '$paramTypes'.", positions) {
+
+	override fun formattedMessage() = message
+}
 
 class RedeclarationError(val id: String, vararg val positions: Position?) : SemanticError(id, positions[0]) {
 
