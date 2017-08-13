@@ -133,6 +133,11 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		assignment.symbol = varReference.symbol
 		assignment.evaluationType = varReference.evaluationType
 		assignment.promotionType = varReference.promotionType
+
+		val varDef = assignment.symbol?.def as? VarDeclaration
+		if (varDef?.isVal ?: false) {
+			grovlinFile.addError(MutationOfFinalVariable(varReference.varName, varReference.position))
+		}
 	}
 
 	// Type, Object, Method resolution

@@ -6,5 +6,5 @@
 - [X] Re-declarations of variables/members
 - [X] parameter types == argument types
 - [X] no two main methods
-- [ ] val/var checks
+- [X] val/var checks
 - [X] this only allowed inside type/object

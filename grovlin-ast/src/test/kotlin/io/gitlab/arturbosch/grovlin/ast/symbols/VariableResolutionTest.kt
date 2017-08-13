@@ -105,4 +105,17 @@ class VariableResolutionTest {
 		Assertions.assertThat(assignment?.evaluationType).isEqualTo(IntType)
 		Assertions.assertThat(assignment?.varReference?.symbol?.def).isEqualTo(currentDecl)
 	}
+
+	@Test
+	fun reassignmentForValIsProhibited() {
+		val grovlinFile = """
+			val i = 5
+			while i > 0 {
+				println(i)
+				i = i - 1
+			}
+		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors[0]).isInstanceOf(MutationOfFinalVariable::class.java)
+	}
 }
