@@ -174,7 +174,9 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 	fun visitStatements(ctx: GrovlinParser.StatementsContext?,
 						lbrace: Token?,
 						rbrace: Token?): BlockStatement? {
-		val statements = ctx?.statement()?.mapTo(ArrayList()) { visit(it) }
+		val statements = ctx?.statement()
+				?.map { visit(it) }
+				?.filterNotNullTo(ArrayList())
 		return statements?.let {
 			BlockStatement(it).apply {
 				position = Position(

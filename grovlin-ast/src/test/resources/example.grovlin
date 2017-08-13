@@ -1,4 +1,4 @@
-type Example {
+trait Example {
     Int age = 5
     def speak() {
         print(age)

@@ -72,7 +72,7 @@ class SyntaxErrorListener : BaseErrorListener() {
 	val errors: MutableList<SyntaxError> = mutableListOf()
 
 	override fun syntaxError(recognizer: Recognizer<*, *>, offendingSymbol: Any,
-							 line: Int, charPositionInLine: Int, msg: String, e: RecognitionException) {
+							 line: Int, charPositionInLine: Int, msg: String, e: RecognitionException?) {
 		errors.add(SyntaxError(msg, CodePoint(line, charPositionInLine)))
 	}
 }

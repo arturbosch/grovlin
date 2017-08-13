@@ -50,7 +50,7 @@ returnStmt
 ;
 
 typeDeclaration
-: TYPE typeName=TYPEID (EXTENDS extendTypes+=TYPEID (COMMA extendTypes+=TYPEID)*)? (LBRACE memberDeclaration* RBRACE)?
+: TRAIT typeName=TYPEID (EXTENDS extendTypes+=TYPEID (COMMA extendTypes+=TYPEID)*)? (LBRACE memberDeclaration* RBRACE)?
 ;
 
 objectDeclaration

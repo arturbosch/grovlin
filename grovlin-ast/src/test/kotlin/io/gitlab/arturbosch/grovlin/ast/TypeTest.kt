@@ -15,7 +15,7 @@ class TypeTest {
 
 	@Test
 	fun parseTypeDeclaration() {
-		val grovlinFile = "type Node {}".asGrovlinFile()
+		val grovlinFile = "trait Node {}".asGrovlinFile()
 
 		assertThat(grovlinFile.findTypeByName("Node"), present())
 	}

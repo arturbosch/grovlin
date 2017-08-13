@@ -107,7 +107,7 @@ class SymbolIdentificationTest {
 	@Test
 	fun resolveParametersInMethodsInTypesAndObjects() {
 		val grovlinFile = """
-			type A { def say() { println(5) } }
+			trait A { def say() { println(5) } }
 			object O as A {
 				Int x = -1
 				def number(Int z): Int {

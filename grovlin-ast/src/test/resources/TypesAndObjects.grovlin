@@ -1,8 +1,8 @@
-type Node
-type Leaf extends Node {
+trait Node
+trait Leaf extends Node {
     Node data
 }
-type Tree extends Node {
+trait Tree extends Node {
     Node left
     Node right
     Node parent

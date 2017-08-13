@@ -118,4 +118,18 @@ class VariableResolutionTest {
 
 		Assertions.assertThat(grovlinFile.errors[0]).isInstanceOf(MutationOfFinalVariable::class.java)
 	}
+
+	@Test
+	fun reassignmentOfForLoopVarDeclIsProhibited() {
+		val grovlinFile = """
+			var i = 5
+			for i : 0..10 {
+				println(i)
+				i = i - 1
+			}
+		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors).anySatisfy { it is MutationOfFinalVariable }
+		Assertions.assertThat(grovlinFile.errors).anySatisfy { it is RedeclarationError }
+	}
 }

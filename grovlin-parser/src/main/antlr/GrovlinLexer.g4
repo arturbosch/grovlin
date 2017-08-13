@@ -5,11 +5,11 @@ fragment NL        : '\r\n' | '\r' | '\n' ;
 WS                 : ( ' ' | '\t' | NL) -> skip;
 
 // Keywords
-TYPE               : 'type';
 DEF                : 'def';
 VAR                : 'var';
 VAL                : 'val';
 HAS                : 'has';
+TRAIT              : 'trait';
 OBJECT             : 'object';
 THIS               : 'this';
 AS                 : 'as';

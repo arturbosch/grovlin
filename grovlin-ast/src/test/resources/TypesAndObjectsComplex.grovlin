@@ -1,13 +1,13 @@
-type Node {
+trait Node {
     def traverse()
 }
-type Leaf extends Node {
+trait Leaf extends Node {
     Int data
     def traverse() {
         print(data)
     }
 }
-type Tree extends Node {
+trait Tree extends Node {
     Node left
     Node right
     Node parent
