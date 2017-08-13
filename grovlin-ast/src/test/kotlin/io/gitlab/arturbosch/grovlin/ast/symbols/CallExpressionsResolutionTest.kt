@@ -77,4 +77,26 @@ class CallExpressionsResolutionTest {
 		Assertions.assertThat(helloCall?.arguments?.joinToString(",") { it.evaluationType.toString() })
 				.isEqualTo(helloMethod?.parameters?.joinToString(",") { it.type.toString() })
 	}
+
+	@Test
+	fun thisReferenceScopeWithParameters() {
+		val grovlinFile = """
+			object O {
+				def hello(): String {
+					return "Hello World!"
+				}
+				def main(String args) {
+					val result = this.hello()
+					println(result)
+				}
+			}
+		""".asGrovlinFile().resolved()
+
+		val objectDecl = grovlinFile.findObjectByName("O")
+		val helloMethod = objectDecl?.findMethodByName("hello")
+		val variable = objectDecl?.findMethodByName("main")?.findVariableByName("result")
+
+		Assertions.assertThat(grovlinFile.errors).isEmpty()
+		Assertions.assertThat(variable?.value?.symbol?.def).isEqualTo(helloMethod)
+	}
 }

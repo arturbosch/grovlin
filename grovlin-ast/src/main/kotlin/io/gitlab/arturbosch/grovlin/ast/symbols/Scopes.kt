@@ -50,7 +50,7 @@ interface Scope {
 		var current: Scope? = this
 		while (current != null) {
 			if (current is ClassSymbol) return current
-			current = getParentScope()
+			current = current.getParentScope()
 		}
 		return null
 	}
