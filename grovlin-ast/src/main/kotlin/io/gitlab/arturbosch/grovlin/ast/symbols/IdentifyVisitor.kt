@@ -1,9 +1,11 @@
 package io.gitlab.arturbosch.grovlin.ast.symbols
 
 import io.gitlab.arturbosch.grovlin.ast.BlockStatement
+import io.gitlab.arturbosch.grovlin.ast.CallExpression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
+import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
 import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ThisReference
@@ -27,6 +29,15 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	override fun visit(thisReference: ThisReference, data: Any) {
 		thisReference.resolutionScope = currentScope
+	}
+
+	override fun visit(objectOrTypeType: ObjectOrTypeType, data: Any) {
+		objectOrTypeType.resolutionScope = currentScope
+	}
+
+	override fun visit(callExpression: CallExpression, data: Any) {
+		super.visit(callExpression, data)
+		callExpression.resolutionScope = currentScope
 	}
 
 	override fun visit(varDeclaration: VarDeclaration, data: Any) {

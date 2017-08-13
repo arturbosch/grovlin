@@ -18,8 +18,15 @@ class MainMethodMissing(fileName: String) : SemanticError("Main method declarati
 	override fun formattedMessage() = message
 }
 
+class IncompatibleArgumentTypes(fileName: String, methodCall: String,
+								paramTypes: String, argumentTypes: String,
+								positions: Position?)
+	: SemanticError("$fileName:$positions: " +
+		"Call to '$methodCall' with incompatible types '$argumentTypes', expected '$paramTypes'.",
+		positions)
+
 class RedeclarationError(val id: String, vararg val positions: Position?) : SemanticError(id, positions[0]) {
 
-	override fun formattedMessage() = "Redeclaration of '$id':${positions
+	override fun formattedMessage() = "Redeclaration of '$id': ${positions
 			.joinToString(", ") { it.toString() }}"
 }

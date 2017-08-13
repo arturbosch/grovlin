@@ -79,7 +79,9 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		val scope = variableDeclaration.resolutionScope ?: assertScopeResolved(variableDeclaration)
 		val varType = variableDeclaration.type
 		val symbol = scope.resolve(varType.name)
-		symbol?.type = varType
+		if (symbol != null && !symbol.isBuiltin) {
+			symbol.type = varType
+		}
 		variableDeclaration.symbol?.type = symbol?.type
 		varType.symbol = symbol
 	}
@@ -178,8 +180,30 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 	override fun visit(callExpression: CallExpression, data: Any) {
 		super.visit(callExpression, data)
 		val scopeSym = callExpression.scope?.symbol
-		val memberSym = (scopeSym?.scope as? ClassSymbol)?.resolveMember(callExpression.name)
-		callExpression.symbol = memberSym
+		if (callExpression.scope != null) {
+			val memberSym = (scopeSym as? ClassSymbol)?.resolveMember(callExpression.name)
+			callExpression.symbol = memberSym
+			callExpression.evaluationType = callExpression.scope.evaluationType
+			callExpression.promotionType = callExpression.scope.promotionType
+			checkArgumentTypesEqualsParameterTypes(memberSym, callExpression)
+		} else { // same scope
+			val methodSym = callExpression.resolutionScope?.resolve(callExpression.name)
+			if (methodSym is MethodSymbol) {
+				callExpression.symbol = methodSym
+				callExpression.evaluationType = methodSym.def?.type
+				checkArgumentTypesEqualsParameterTypes(methodSym, callExpression)
+			}
+		}
+	}
+
+	private fun checkArgumentTypesEqualsParameterTypes(scopeSym: Symbol?, callExpression: CallExpression) {
+		val definition = scopeSym?.def as? MethodDeclaration
+		val argumentTypes = callExpression.arguments.joinToString(", ") { it.evaluationType.toString() }
+		val parameterTypes = definition?.parameters?.joinToString(", ") { it.evaluationType.toString() }
+		if (parameterTypes == null || argumentTypes != parameterTypes) {
+			grovlinFile.addError(IncompatibleArgumentTypes(grovlinFile.name, callExpression.name,
+					parameterTypes ?: "No Params", argumentTypes, callExpression.position))
+		}
 	}
 
 	override fun visit(getterAccessExpression: GetterAccessExpression, data: Any) {
@@ -213,7 +237,10 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	override fun visit(objectCreation: ObjectCreation, data: Any) {
 		super.visit(objectCreation, data)
-		objectCreation.evaluationType = objectCreation.type
+		val objectOrTypeType = objectCreation.type
+		val symbol = objectOrTypeType.resolutionScope?.resolve(objectOrTypeType.name)
+		objectCreation.evaluationType = objectOrTypeType
+		objectCreation.symbol = symbol
 	}
 
 	override fun visit(unaryExpression: UnaryExpression, data: Any) {

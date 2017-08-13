@@ -8,7 +8,7 @@ import org.junit.Test
 /**
  * @author Artur Bosch
  */
-class ContextAnalysisEdgeCasesTest {
+class RedeclarationTest {
 
 	@Test
 	fun methodRedeclaration() {
@@ -30,6 +30,6 @@ class ContextAnalysisEdgeCasesTest {
 			def main(String args) {}
 		""".asGrovlinFile().resolved()
 
-		Assertions.assertThat(grovlinFile.errors).hasSize(0)
+		Assertions.assertThat(grovlinFile.errors).isEmpty()
 	}
 }
