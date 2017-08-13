@@ -128,10 +128,11 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	override fun visit(assignment: Assignment, data: Any) {
 		super.visit(assignment, data)
-		assignment.resolutionScope = assignment.varReference.resolutionScope
-		assignment.symbol = assignment.varReference.symbol
-		assignment.evaluationType = assignment.varReference.evaluationType
-		assignment.promotionType = assignment.varReference.promotionType
+		val varReference = assignment.varReference
+		assignment.resolutionScope = varReference.resolutionScope
+		assignment.symbol = varReference.symbol
+		assignment.evaluationType = varReference.evaluationType
+		assignment.promotionType = varReference.promotionType
 	}
 
 	// Type, Object, Method resolution
@@ -173,8 +174,13 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 	// Member reference resolution
 
 	override fun visit(thisReference: ThisReference, data: Any) {
-		thisReference.symbol = thisReference.resolutionScope?.getEnclosingClass()
-		thisReference.evaluationType = thisReference.symbol?.type as? Type
+		val enclosingClass = thisReference.resolutionScope?.getEnclosingClass()
+		if (enclosingClass != null) {
+			thisReference.symbol = enclosingClass
+			thisReference.evaluationType = enclosingClass.type as? Type
+		} else {
+			grovlinFile.addError(ThisReferenceOutsideOfObjectScope(thisReference.position))
+		}
 	}
 
 	override fun visit(callExpression: CallExpression, data: Any) {
@@ -198,11 +204,13 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	private fun checkArgumentTypesEqualsParameterTypes(scopeSym: Symbol?, callExpression: CallExpression) {
 		val definition = scopeSym?.def as? MethodDeclaration
-		val argumentTypes = callExpression.arguments.joinToString(", ") { it.evaluationType.toString() }
-		val parameterTypes = definition?.parameters?.joinToString(", ") { it.evaluationType.toString() }
-		if (parameterTypes == null || argumentTypes != parameterTypes) {
-			grovlinFile.addError(IncompatibleArgumentTypes(grovlinFile.name, callExpression.name,
-					parameterTypes ?: "No Params", argumentTypes, callExpression.position))
+		if (definition != null) {
+			val argumentTypes = callExpression.arguments.joinToString(", ") { it.evaluationType.toString() }
+			val parameterTypes = definition.parameters.joinToString(", ") { it.evaluationType.toString() }
+			if (argumentTypes != parameterTypes) {
+				grovlinFile.addError(IncompatibleArgumentTypes(grovlinFile.name, callExpression.name,
+						parameterTypes, argumentTypes, callExpression.position))
+			}
 		}
 	}
 

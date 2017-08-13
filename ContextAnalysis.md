@@ -7,4 +7,4 @@
 - [X] parameter types == argument types
 - [X] no two main methods
 - [ ] val/var checks
-- [ ] this only allowed inside type/object
+- [X] this only allowed inside type/object

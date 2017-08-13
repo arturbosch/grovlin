@@ -101,6 +101,21 @@ class CallExpressionsResolutionTest {
 	}
 
 	@Test
+	fun unresolvedThisReferenceOutsideObjectOrType() {
+		val grovlinFile = """
+			def hello(): String {
+				return "Hello World!"
+			}
+			def main(String args) {
+				val result = this.hello()
+				println(result)
+			}
+		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors).anySatisfy { it is ThisReferenceOutsideOfObjectScope }
+	}
+
+	@Test
 	fun incompatibleParameters() {
 		val grovlinFile = """
 			def hello(String s, Int i): String {

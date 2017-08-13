@@ -32,3 +32,9 @@ class RedeclarationError(val id: String, vararg val positions: Position?) : Sema
 	override fun formattedMessage() = "Redeclaration of '$id': ${positions
 			.joinToString(", ") { it.toString() }}"
 }
+
+class ThisReferenceOutsideOfObjectScope(positions: Position?) : SemanticError(
+		"This reference is used outside of object or type scope.", positions)
+
+class MutationOfFinalVariable(varName: String, positions: Position?) : SemanticError(
+		"Variable '$varName' is declared final and cannot be mutated.", positions)

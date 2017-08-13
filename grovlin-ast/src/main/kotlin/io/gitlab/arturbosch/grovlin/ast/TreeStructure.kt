@@ -54,7 +54,7 @@ interface NodeWithStatements : AstNode {
 
 interface NodeWithType : AstNode {
 	var type: Type
-	fun isUnsolved() = type is UnknownType
+	fun isUnsolved(): Boolean = type == UnknownType
 }
 
 interface NodeWithBlock : AstNode {
