@@ -23,6 +23,9 @@ interface SymbolType {
 data class VariableSymbol(override val name: String,
 						  override var type: SymbolType? = null) : Symbol()
 
+data class PropertySymbol(override val name: String,
+						  override var type: SymbolType? = null) : Symbol()
+
 data class BuiltinTypeSymbol(override val name: String,
 							 override var type: SymbolType?) : Symbol() {
 
@@ -59,7 +62,8 @@ class ClassSymbol(override val name: String,
 				  override var enclosingScope: Scope) : ScopedSymbol() {
 
 	private val members: MutableMap<String, Symbol> = HashMap()
-	val parentScope: ClassSymbol? = null
+	var parentScope: ClassSymbol? = null
+	val traitScopes: MutableList<ClassSymbol> = mutableListOf()
 	override var scope: Scope? = LocalScope("<$name:body", enclosingScope)
 
 	override fun define(symbol: Symbol) {
@@ -67,10 +71,19 @@ class ClassSymbol(override val name: String,
 	}
 
 	override fun resolve(name: String): Symbol? = members[name]
-			?: parentScope?.resolve(name)
-			?: enclosingScope.resolve(name)
+			?: getParentScope()?.resolve(name)
 
-	fun resolveMember(name: String): Symbol? = members[name] ?: parentScope?.resolveMember(name)
+	fun resolveMember(name: String): Symbol? = members[name]
+			?: parentScope?.resolveMember(name)
+			?: traitScopes.find { it.resolveMember(name) != null }?.resolveMember(name)
+
+	fun addTraitScope(trait: ClassSymbol?) {
+		if (trait != null) {
+			traitScopes.add(trait)
+		}
+	}
+
+	fun getMemberSymbols() = members.values.toList()
 
 	override fun getParentScope(): Scope? = parentScope ?: enclosingScope
 

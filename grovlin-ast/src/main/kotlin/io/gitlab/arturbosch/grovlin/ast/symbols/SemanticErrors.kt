@@ -38,3 +38,6 @@ class ThisReferenceOutsideOfObjectScope(positions: Position?) : SemanticError(
 
 class MutationOfFinalVariable(varName: String, positions: Position?) : SemanticError(
 		"Variable '$varName' is declared final and cannot be mutated.", positions)
+
+class MissingOverride(varName: String, positions: Position?) : SemanticError(
+		"Inherited member '$varName' is not declared as 'override'.", positions)

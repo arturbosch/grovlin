@@ -21,7 +21,7 @@ class MainRedeclarationTest {
 			object O {
 				def main(String args) {}
 			}
-			type T {
+			trait T {
 				def main(String args) {}
 			}
 		""".asGrovlinFile()

@@ -11,8 +11,8 @@ class LexerTest {
 
 	@Test
 	fun parseTypeDeclarations() {
-		val actual = tokens("type Node {}")
-		val expected = listOf("TYPE", "TYPEID", "LBRACE", "RBRACE")
+		val actual = tokens("trait Node {}")
+		val expected = listOf("TRAIT", "TYPEID", "LBRACE", "RBRACE")
 
 		assertEquals(actual, expected)
 	}
