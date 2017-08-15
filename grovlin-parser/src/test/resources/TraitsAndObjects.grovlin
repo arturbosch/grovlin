@@ -1,15 +1,3 @@
-def main(String args) {
-    var x = 25
-
-    if (x > 4 && 4 == 4) {
-        println(true)
-        x = x + 1
-    }
-
-    val p = Person("Artur", x)
-    sayMyName.invoke(p)
-}
-
 trait HasData {
     String data
 }
@@ -44,6 +32,6 @@ object Tree as Node, HasData {
     }
 }
 
-def sayMyName: (Person) -> Void { person ->
-    println(person.data)
+def main(String args) {
+    val p = Person("Artur", 26)
 }

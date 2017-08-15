@@ -8,3 +8,4 @@
 - [X] no two main methods
 - [X] val/var checks
 - [X] this only allowed inside type/object
+- [ ] has return on each branch
