@@ -9,6 +9,10 @@ buildscript {
 	}
 }
 
+plugins {
+	id 'org.sonarqube' version '2.5'
+}
+
 allprojects {
 	group 'io.gitlab.arturbosch'
 	version '0.1.0'
