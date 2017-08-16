@@ -27,6 +27,7 @@ import io.gitlab.arturbosch.grovlin.ast.ParenExpression
 import io.gitlab.arturbosch.grovlin.ast.Position
 import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.RelationExpression
+import io.gitlab.arturbosch.grovlin.ast.ReturnStatement
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.StringLit
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
@@ -146,7 +147,7 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		}
 	}
 
-	// Type, Object, Method resolution
+	// Method resolution
 
 	override fun visit(methodDeclaration: MethodDeclaration, data: Any) {
 		super.visit(methodDeclaration, data)
@@ -155,7 +156,16 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		val symbol = scope.resolve(returnType.name)
 		returnType.symbol = symbol
 		methodDeclaration.evaluationType = methodDeclaration.type
+		val returnErrors = ReturnEvaluationVisitor(methodDeclaration).errors
+		grovlinFile.errors.addAll(returnErrors)
 	}
+
+	override fun visit(returnStatement: ReturnStatement, data: Any) {
+		super.visit(returnStatement, data)
+		returnStatement.evaluationType = returnStatement.expression.evaluationType
+	}
+
+	// Type, Object resolution
 
 	override fun visit(typeDeclaration: TypeDeclaration, data: Any) {
 		super.visit(typeDeclaration, data)
