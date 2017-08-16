@@ -1,0 +1,11 @@
+def main(String args) {
+    println("Guess my number (0-9)!")
+    var number = rand(10).toString()
+    var input = readline()
+
+    if input == number {
+        println("You guessed my number!")
+    } else {
+        println("My number was " + number + " and your number is " + input)
+    }
+}

@@ -10,6 +10,7 @@ import io.gitlab.arturbosch.grovlin.ast.CallExpression
 import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.Declaration
 import io.gitlab.arturbosch.grovlin.ast.DivisionExpression
+import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.ForStatement
 import io.gitlab.arturbosch.grovlin.ast.GetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
@@ -38,6 +39,7 @@ import io.gitlab.arturbosch.grovlin.ast.UnaryExpression
 import io.gitlab.arturbosch.grovlin.ast.VarDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.VariableDeclaration
+import io.gitlab.arturbosch.grovlin.ast.VoidType
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
 import io.gitlab.arturbosch.grovlin.ast.visitors.TreeBaseVisitor
 
@@ -54,6 +56,10 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		val exprEvaluationType = varDeclaration.value?.evaluationType
 		val evaluationType = exprPromotionType ?: exprEvaluationType
 		if (evaluationType != null) {
+			if (evaluationType == VoidType) {
+				grovlinFile.addError(SemanticError("Expressions evaluated to void cannot be assigned to variables",
+						varDeclaration.position))
+			}
 			varDeclaration.type = evaluationType
 		} else {
 			grovlinFile.addError(SemanticError("Type of '${varDeclaration.name}' could not be inferred!",
@@ -197,20 +203,52 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	override fun visit(callExpression: CallExpression, data: Any) {
 		super.visit(callExpression, data)
-		val scopeSym = callExpression.scope?.symbol
 		if (callExpression.scope != null) {
-			val memberSym = (scopeSym as? ClassSymbol)?.resolveMember(callExpression.name)
-			callExpression.symbol = memberSym
-			callExpression.evaluationType = callExpression.scope.evaluationType
-			callExpression.promotionType = callExpression.scope.promotionType
-			checkArgumentTypesEqualsParameterTypes(memberSym, callExpression)
+			resolveCallWithScope(callExpression.scope, callExpression)
 		} else { // same scope
-			val methodSym = callExpression.resolutionScope?.resolve(callExpression.name)
-			if (methodSym is MethodSymbol) {
-				callExpression.symbol = methodSym
-				callExpression.evaluationType = methodSym.def?.type
-				checkArgumentTypesEqualsParameterTypes(methodSym, callExpression)
+			resolveCallWithoutScope(callExpression)
+		}
+	}
+
+	private fun resolveCallWithScope(scope: Expression, callExpression: CallExpression) {
+		val evaluationType = scope.evaluationType
+		if (evaluationType == null) {
+			grovlinFile.addError(SemanticError("Scope of call expression '${callExpression.name}' is not " +
+					"resolved!", scope.position))
+		} else {
+			val resolutionScope = callExpression.resolutionScope
+			val scopeSymbol = resolutionScope?.resolve(evaluationType.name)
+			if (scopeSymbol is ClassSymbol) {
+				resolveMemberCall(scopeSymbol, callExpression)
+			} else if (scopeSymbol is BuiltinTypeSymbol) {
+				resolveBuiltinCalls(resolutionScope, callExpression)
 			}
+		}
+	}
+
+	private fun resolveBuiltinCalls(resolutionScope: Scope, callExpression: CallExpression) {
+		val symbol = resolutionScope.resolve(callExpression.name)
+		callExpression.symbol = symbol
+		callExpression.evaluationType = symbol?.type as? Type
+		checkArgumentTypesEqualsParameterTypes(symbol, callExpression)
+	}
+
+	private fun resolveMemberCall(scopeSymbol: Symbol?, callExpression: CallExpression) {
+		val memberSym = (scopeSymbol as? ClassSymbol)?.resolveMember(callExpression.name)
+		callExpression.symbol = memberSym
+		callExpression.evaluationType = memberSym?.type as? Type
+		checkArgumentTypesEqualsParameterTypes(memberSym, callExpression)
+	}
+
+	private fun resolveCallWithoutScope(callExpression: CallExpression) {
+		val methodSym = callExpression.resolutionScope?.resolve(callExpression.name)
+		if (methodSym is MethodSymbol) {
+			callExpression.symbol = methodSym
+			callExpression.evaluationType = methodSym.def?.type
+			checkArgumentTypesEqualsParameterTypes(methodSym, callExpression)
+		} else if (methodSym is BuiltinTypeSymbol) {
+			callExpression.symbol = methodSym
+			callExpression.evaluationType = methodSym.type as? Type
 		}
 	}
 

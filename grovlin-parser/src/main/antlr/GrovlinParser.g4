@@ -135,4 +135,5 @@ type
 | DECIMAL # decimal
 | BOOL    # bool
 | STRING  # string
+| TYPEID  # userType
 ;

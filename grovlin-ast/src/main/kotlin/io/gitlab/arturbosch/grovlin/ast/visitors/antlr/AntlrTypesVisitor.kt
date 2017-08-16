@@ -14,6 +14,12 @@ import io.gitlab.arturbosch.grovlin.ast.toPosition
  */
 class AntlrTypesVisitor : GrovlinParserBaseVisitor<Type>() {
 
+	override fun visitUserType(ctx: GrovlinParser.UserTypeContext): Type {
+		return Type.of(ctx.text).apply {
+			position = ctx.toPosition()
+		}
+	}
+
 	override fun visitInteger(ctx: GrovlinParser.IntegerContext): Type {
 		return IntType.apply {
 			position = ctx.toPosition()

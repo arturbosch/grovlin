@@ -14,12 +14,10 @@ import com.github.javaparser.ast.expr.BooleanLiteralExpr
 import com.github.javaparser.ast.expr.CastExpr
 import com.github.javaparser.ast.expr.DoubleLiteralExpr
 import com.github.javaparser.ast.expr.EnclosedExpr
-import com.github.javaparser.ast.expr.FieldAccessExpr
 import com.github.javaparser.ast.expr.IntegerLiteralExpr
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.expr.NameExpr
 import com.github.javaparser.ast.expr.ObjectCreationExpr
-import com.github.javaparser.ast.expr.SimpleName
 import com.github.javaparser.ast.expr.StringLiteralExpr
 import com.github.javaparser.ast.expr.ThisExpr
 import com.github.javaparser.ast.expr.UnaryExpr
@@ -87,8 +85,12 @@ import io.gitlab.arturbosch.grovlin.ast.XorExpression
 import io.gitlab.arturbosch.grovlin.ast.builtins.MainDeclaration
 import io.gitlab.arturbosch.grovlin.ast.builtins.Print
 import io.gitlab.arturbosch.grovlin.ast.builtins.PrintLn
+import io.gitlab.arturbosch.grovlin.ast.builtins.RandomNumber
 import io.gitlab.arturbosch.grovlin.ast.builtins.ReadLine
 import io.gitlab.arturbosch.grovlin.ast.builtins.StringType
+import io.gitlab.arturbosch.grovlin.ast.builtins.ToString
+import io.gitlab.arturbosch.grovlin.compiler.backend.builtins.builtinToJava
+import io.gitlab.arturbosch.grovlin.compiler.backend.builtins.readlineToJava
 import java.util.ArrayList
 import java.util.EnumSet
 import com.github.javaparser.ast.body.MethodDeclaration as JavaParserMethod
@@ -278,7 +280,7 @@ fun Expression.toJava(): JavaParserExpression = when (this) {
 	is AndExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.AND)
 	is OrExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.OR)
 	is XorExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.XOR)
-	is EqualExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.EQUALS)
+	is EqualExpression -> builtinToJava()
 	is UnequalExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.NOT_EQUALS)
 	is LessEqualExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.LESS_EQUALS)
 	is GreaterEqualExpression -> BinaryExpr(left.toJava(), right.toJava(), BinaryExpr.Operator.GREATER_EQUALS)
@@ -306,12 +308,11 @@ fun Expression.toJava(): JavaParserExpression = when (this) {
 }
 
 fun CallExpression.toJava(): MethodCallExpr = when (this) {
-	is Print -> toJava()
-	is PrintLn -> toJava()
-	is ReadLine -> MethodCallExpr(
-			ObjectCreationExpr(null, JavaParser.parseClassOrInterfaceType("java.util.Scanner"),
-					NodeList.nodeList(FieldAccessExpr(NameExpr("System"), "in"))),
-			SimpleName("next"), NodeList.nodeList(arguments[0].toJava()))
+	is Print -> builtinToJava()
+	is PrintLn -> builtinToJava()
+	is ReadLine -> readlineToJava()
+	is RandomNumber -> builtinToJava()
+	is ToString -> builtinToJava()
 	else -> callToJava()
 }
 
@@ -322,20 +323,6 @@ private fun CallExpression.callToJava(): MethodCallExpr {
 			if (arguments.isEmpty()) NodeList()
 			else NodeList.nodeList(arguments.map { it.toJava() })
 	return MethodCallExpr(scopeExpr, callName, arguments)
-}
-
-private fun PrintLn.toJava(): MethodCallExpr {
-	val fieldAccess = FieldAccessExpr(NameExpr("System"), "out")
-	val arguments =
-			if (arguments.isEmpty()) NodeList()
-			else NodeList.nodeList(arguments[0].toJava())
-	return MethodCallExpr(fieldAccess, SimpleName("println"), arguments)
-}
-
-private fun Print.toJava(): MethodCallExpr {
-	val fieldAccess = FieldAccessExpr(NameExpr("System"), "out")
-	val arguments = NodeList.nodeList(arguments[0].toJava())
-	return MethodCallExpr(fieldAccess, SimpleName("print"), arguments)
 }
 
 fun Type.toJava(): com.github.javaparser.ast.type.Type = when (this) {

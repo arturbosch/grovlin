@@ -71,4 +71,22 @@ class VariableTypePromotionTest {
 		Assertions.assertThat("var b = 1.0 || 2".asGrovlinFile().resolved().errors).hasSize(1)
 		Assertions.assertThat("var b = 1.0 ^ true".asGrovlinFile().resolved().errors).hasSize(1)
 	}
+
+	@Test
+	fun stringPlusOtherTypesIsString() {
+		val grovlinFile = """ var promotedString = "" + 5 """.asGrovlinFile().resolved()
+
+		val variable = grovlinFile.findVariableByName("promotedString")
+
+		Assertions.assertThat(variable?.evaluationType).isEqualTo(StringType)
+	}
+
+	@Test
+	fun builtinToStringPromotesToString() {
+		val grovlinFile = "var x = 5.toString()".asGrovlinFile().resolved()
+
+		val variable = grovlinFile.findVariableByName("x")
+
+		Assertions.assertThat(variable?.evaluationType).isEqualTo(StringType)
+	}
 }

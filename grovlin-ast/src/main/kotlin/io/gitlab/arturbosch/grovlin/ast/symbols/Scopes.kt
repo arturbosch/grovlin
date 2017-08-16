@@ -7,6 +7,11 @@ import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.VoidType
+import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_PRINTLN_NAME
+import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_PRINT_NAME
+import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_RAND_NAME
+import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_READLINE_NAME
+import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_TO_STRING_NAME
 import io.gitlab.arturbosch.grovlin.ast.builtins.StringType
 import java.util.HashMap
 import java.util.HashSet
@@ -86,6 +91,11 @@ class FileScope(fileName: String) : BaseScope() {
 		define(BuiltinTypeSymbol(VoidType.name, VoidType))
 		define(BuiltinTypeSymbol(DecimalType.name, DecimalType))
 		define(BuiltinTypeSymbol(StringType.name, StringType))
+		define(BuiltinTypeSymbol(BUILTIN_RAND_NAME, IntType))
+		define(BuiltinTypeSymbol(BUILTIN_PRINTLN_NAME, VoidType))
+		define(BuiltinTypeSymbol(BUILTIN_PRINT_NAME, VoidType))
+		define(BuiltinTypeSymbol(BUILTIN_READLINE_NAME, StringType))
+		define(BuiltinTypeSymbol(BUILTIN_TO_STRING_NAME, StringType))
 	}
 
 	override val name: String = "<file:$fileName>"

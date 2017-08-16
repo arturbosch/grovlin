@@ -34,10 +34,14 @@ import io.gitlab.arturbosch.grovlin.ast.VarReference
 import io.gitlab.arturbosch.grovlin.ast.XorExpression
 import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_PRINTLN_NAME
 import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_PRINT_NAME
+import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_RAND_NAME
 import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_READLINE_NAME
+import io.gitlab.arturbosch.grovlin.ast.builtins.BUILTIN_TO_STRING_NAME
 import io.gitlab.arturbosch.grovlin.ast.builtins.Print
 import io.gitlab.arturbosch.grovlin.ast.builtins.PrintLn
+import io.gitlab.arturbosch.grovlin.ast.builtins.RandomNumber
 import io.gitlab.arturbosch.grovlin.ast.builtins.ReadLine
+import io.gitlab.arturbosch.grovlin.ast.builtins.ToString
 import io.gitlab.arturbosch.grovlin.ast.toPosition
 
 /**
@@ -184,17 +188,35 @@ class AntlrExpressionVisitor : GrovlinParserBaseVisitor<Expression>() {
 
 	private fun convertToCallConsiderBuiltins(scope: Expression?,
 											  methodName: String,
-											  arguments: List<Expression>): Expression =
-			if (scope == null) {
-				when (methodName) {
-					BUILTIN_PRINTLN_NAME -> PrintLn(arguments)
-					BUILTIN_PRINT_NAME -> Print(arguments)
-					BUILTIN_READLINE_NAME -> ReadLine(arguments)
-					else -> CallExpression(scope, methodName, arguments)
-				}
-			} else {
-				CallExpression(scope, methodName, arguments)
+											  arguments: List<Expression>): Expression {
+
+		fun normalCall() = CallExpression(scope, methodName, arguments)
+
+		fun singleArgumentCall() = when (methodName) {
+			BUILTIN_PRINTLN_NAME -> PrintLn(arguments[0])
+			BUILTIN_PRINT_NAME -> Print(arguments[0])
+			BUILTIN_RAND_NAME -> RandomNumber(arguments[0])
+			else -> normalCall()
+		}
+
+		fun zeroArgumentCall() = when (methodName) {
+			BUILTIN_PRINTLN_NAME -> PrintLn(StringLit(""))
+			BUILTIN_PRINT_NAME -> Print(StringLit(""))
+			BUILTIN_READLINE_NAME -> ReadLine()
+			else -> normalCall()
+		}
+
+		return if (scope == null) {
+			when {
+				arguments.isEmpty() -> zeroArgumentCall()
+				arguments.size == 1 -> singleArgumentCall()
+				else -> normalCall()
 			}
+		} else when (methodName) {
+			BUILTIN_TO_STRING_NAME -> ToString(scope)
+			else -> normalCall()
+		}
+	}
 
 	override fun visitArgument(ctx: GrovlinParser.ArgumentContext): Expression {
 		return visit(ctx.expression())
