@@ -48,3 +48,6 @@ class SingleReturnAllowed(methodDeclaration: MethodDeclaration) : SemanticError(
 
 class ReturnMustBeLast(methodDeclaration: MethodDeclaration, positions: Position?) : SemanticError(
 		"Return statement must be the last statement in '${methodDeclaration.name}'.", positions)
+
+class IncompatibleTypes(left: Type?, right: Type?, positions: Position?) : SemanticError(
+		"Incompatible types '$left' and '$right'.", positions)

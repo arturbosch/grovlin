@@ -4,17 +4,14 @@ import io.gitlab.arturbosch.grovlin.ast.AndExpression
 import io.gitlab.arturbosch.grovlin.ast.Assignment
 import io.gitlab.arturbosch.grovlin.ast.AstNode
 import io.gitlab.arturbosch.grovlin.ast.BinaryExpression
-import io.gitlab.arturbosch.grovlin.ast.BoolLit
 import io.gitlab.arturbosch.grovlin.ast.BoolType
 import io.gitlab.arturbosch.grovlin.ast.CallExpression
-import io.gitlab.arturbosch.grovlin.ast.DecLit
 import io.gitlab.arturbosch.grovlin.ast.Declaration
 import io.gitlab.arturbosch.grovlin.ast.DivisionExpression
 import io.gitlab.arturbosch.grovlin.ast.Expression
 import io.gitlab.arturbosch.grovlin.ast.ForStatement
 import io.gitlab.arturbosch.grovlin.ast.GetterAccessExpression
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
-import io.gitlab.arturbosch.grovlin.ast.IntLit
 import io.gitlab.arturbosch.grovlin.ast.IntRangeExpression
 import io.gitlab.arturbosch.grovlin.ast.IntType
 import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
@@ -29,7 +26,6 @@ import io.gitlab.arturbosch.grovlin.ast.PropertyDeclaration
 import io.gitlab.arturbosch.grovlin.ast.RelationExpression
 import io.gitlab.arturbosch.grovlin.ast.ReturnStatement
 import io.gitlab.arturbosch.grovlin.ast.SetterAccessExpression
-import io.gitlab.arturbosch.grovlin.ast.StringLit
 import io.gitlab.arturbosch.grovlin.ast.SubtractionExpression
 import io.gitlab.arturbosch.grovlin.ast.SumExpression
 import io.gitlab.arturbosch.grovlin.ast.ThisReference
@@ -339,9 +335,8 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 	private fun promoteIfNecessary(binExpr: BinaryExpression, promotionTable: Array<IntArray>): Int {
 		val resultType = getResultType(promotionTable, binExpr.left, binExpr.right)
 		if (resultType == T_VOID_INDEX) {
-			grovlinFile.addError(SemanticError("Incompatible types " +
-					"'${binExpr.left.evaluationType}' and '${binExpr.right.evaluationType}' at ${binExpr.position}.",
-					binExpr.left.position))
+			grovlinFile.addError(IncompatibleTypes(binExpr.left.evaluationType,
+					binExpr.right.evaluationType, binExpr.position))
 		}
 		binExpr.evaluationType = binExpr.left.promotionType ?: binExpr.left.evaluationType
 		return resultType
@@ -389,23 +384,5 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		if (resultType == T_BOOL_INDEX) {
 			xorExpression.evaluationType = BoolType
 		}
-	}
-
-	// Literals
-
-	override fun visit(intLit: IntLit, data: Any) {
-		intLit.evaluationType = intLit.type
-	}
-
-	override fun visit(boolLit: BoolLit, data: Any) {
-		boolLit.evaluationType = boolLit.type
-	}
-
-	override fun visit(decLit: DecLit, data: Any) {
-		decLit.evaluationType = decLit.type
-	}
-
-	override fun visit(stringLit: StringLit, data: Any) {
-		stringLit.evaluationType = stringLit.type
 	}
 }
