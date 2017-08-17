@@ -51,3 +51,6 @@ class ReturnMustBeLast(methodDeclaration: MethodDeclaration, positions: Position
 
 class IncompatibleTypes(left: Type?, right: Type?, positions: Position?) : SemanticError(
 		"Incompatible types '$left' and '$right'.", positions)
+
+class IllegalPropertyInitialization(positions: Position?) : SemanticError(
+		"Properties cannot be initialized in traits.", positions)

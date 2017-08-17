@@ -70,6 +70,15 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		super.visit(propertyDeclaration, data)
 		propertyDeclaration.evaluationType = propertyDeclaration.type
 		resolveVariableSymbolType(propertyDeclaration)
+		initializedWithinTraitCheck(propertyDeclaration)
+	}
+
+	private fun initializedWithinTraitCheck(propertyDeclaration: PropertyDeclaration) {
+		val isDeclaredInTrait = propertyDeclaration.parent?.parent is TypeDeclaration
+		val isInitialized = propertyDeclaration.value != null
+		if (isDeclaredInTrait && isInitialized) {
+			grovlinFile.addError(IllegalPropertyInitialization(propertyDeclaration.position))
+		}
 	}
 
 	override fun visit(parameterDeclaration: ParameterDeclaration, data: Any) {

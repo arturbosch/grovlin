@@ -11,6 +11,17 @@ import org.junit.Test
 class TypeObjectResolutionTest {
 
 	@Test
+	fun illegalPropertyInitializationInTrait() {
+		val grovlinFile = """
+			trait Named {
+				String name = "NAME"
+			}
+		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors).anySatisfy { it is IllegalPropertyInitialization }
+	}
+
+	@Test
 	fun mustOverrideProperty() {
 		val grovlinFile = """
 			trait Named {

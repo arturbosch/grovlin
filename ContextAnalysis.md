@@ -1,11 +1,20 @@
 ## Context Analysis Checks
 
-- [ ] Type properties and methods are overridden and initialized
 - [X] No variables are used before their declaration
-- [X] Method names conflicts & overloading
 - [X] Re-declarations of variables/members
-- [X] parameter types == argument types
 - [X] no two main methods
 - [X] val/var checks
 - [X] this only allowed inside type/object
-- [ ] has return on each branch
+
+### Methods
+
+- [X] single return allowed
+- [X] returned expression type == method type
+- [X] parameter types == argument types
+- [X] Method names conflicts & overloading
+
+### Traits and Objects
+
+- [ ] No property initializations allowed in traits
+- [ ] methods with empty block of traits need to be overridden
+- [ ] properties are overridden
