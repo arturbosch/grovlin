@@ -11,6 +11,7 @@ import io.gitlab.arturbosch.grovlin.compiler.frontend.Parser
 import io.gitlab.arturbosch.grovlin.compiler.java.interpret
 import io.gitlab.arturbosch.grovlin.compiler.java.writeToDisk
 import java.io.File
+import java.lang.reflect.InvocationTargetException
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -46,7 +47,12 @@ private fun runJvm(grovlinFile: GrovlinFile) {
 	if (Args.showJava) {
 		CompletableFuture.runAsync { java.all().forEach { println(it.unit) } }
 	}
-	java.interpret()
+	try {
+		java.interpret()
+	} catch (ex: InvocationTargetException) {
+		println("Program finished exceptionally.\n")
+		ex.targetException.printStackTrace()
+	}
 }
 
 private fun runCompiler(grovlinFile: GrovlinFile) {

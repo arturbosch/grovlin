@@ -15,9 +15,11 @@ import com.github.javaparser.ast.expr.CastExpr
 import com.github.javaparser.ast.expr.DoubleLiteralExpr
 import com.github.javaparser.ast.expr.EnclosedExpr
 import com.github.javaparser.ast.expr.IntegerLiteralExpr
+import com.github.javaparser.ast.expr.LambdaExpr
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.expr.NameExpr
 import com.github.javaparser.ast.expr.ObjectCreationExpr
+import com.github.javaparser.ast.expr.SimpleName
 import com.github.javaparser.ast.expr.StringLiteralExpr
 import com.github.javaparser.ast.expr.ThisExpr
 import com.github.javaparser.ast.expr.UnaryExpr
@@ -129,12 +131,28 @@ fun ObjectDeclaration.transformToClassDeclaration(): ClassOrInterfaceDeclaration
 			.setImplementedTypes(NodeList.nodeList(extends))
 			.setMembers(NodeList.nodeList(members)).apply {
 		superclass?.let { addExtendedType(superclass) }
-		fields.forEach {
-			it.createGetter()
-			it.createSetter()
+		fields.forEach { field ->
+			val fieldName = field.variables[0].nameAsString
+			field.createGetter().body.ifPresent {
+				createNullCheck(fieldName, it, "Accessing uninitialized property!")
+			}
+			field.createSetter().body.ifPresent {
+				createNullCheck(fieldName, it, "Property cannot be null!")
+			}
 		}
 	}
 
+}
+
+private fun createNullCheck(variable: String, it: BlockStmt, errorMessage: String) {
+	it.addStatement(0,
+			ExpressionStmt(MethodCallExpr(
+					NameExpr("java.util.Objects"),
+					SimpleName("requireNonNull"),
+					NodeList.nodeList(NameExpr(variable), LambdaExpr(NodeList<Parameter>(),
+							ExpressionStmt(StringLiteralExpr(errorMessage)), true))
+			))
+	)
 }
 
 fun TypeDeclaration.transformToInterfaceDeclaration(): ClassOrInterfaceDeclaration {
@@ -151,7 +169,7 @@ fun memberDeclarationsToJava(declarations: BlockStatement?, isType: Boolean = fa
 		when (it) {
 			is MethodDeclaration -> members.add(it.toJava(isType))
 			is PropertyDeclaration -> if (isType) {
-				it.typePropertyToJava(members)
+				it.generateGetterAndSetterForTraitProperty(members)
 			} else {
 				members.add(it.toJava())
 			}
@@ -163,7 +181,7 @@ fun memberDeclarationsToJava(declarations: BlockStatement?, isType: Boolean = fa
 fun PropertyDeclaration.toJava(): BodyDeclaration<*> = FieldDeclaration(EnumSet.of(Modifier.PRIVATE),
 		VariableDeclarator(type.toJava(), name).setInitializer(value?.toJava()))
 
-fun PropertyDeclaration.typePropertyToJava(members: MutableList<BodyDeclaration<*>>) {
+fun PropertyDeclaration.generateGetterAndSetterForTraitProperty(members: MutableList<BodyDeclaration<*>>) {
 	val fieldType = type.toJava()
 	members.add(JavaParserMethod().setName("get" + name[0].toUpperCase() + name.substring(1))
 			.setModifiers(EnumSet.of(Modifier.ABSTRACT, Modifier.PUBLIC))
