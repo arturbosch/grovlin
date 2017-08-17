@@ -1,6 +1,7 @@
 package io.gitlab.arturbosch.grovlin.ast.symbols
 
 import io.gitlab.arturbosch.grovlin.ast.asGrovlinFile
+import io.gitlab.arturbosch.grovlin.ast.parseFromTestResource
 import io.gitlab.arturbosch.grovlin.ast.resolved
 import org.assertj.core.api.Assertions
 import org.junit.Test
@@ -209,6 +210,13 @@ class TypeObjectResolutionTest {
 				}
 			}
 		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors).isEmpty()
+	}
+
+	@Test
+	fun multiLevelInheritanceTreeNeedOverride() {
+		val grovlinFile = parseFromTestResource("TypesAndObjectsComplex.grovlin").resolved()
 
 		Assertions.assertThat(grovlinFile.errors).isEmpty()
 	}

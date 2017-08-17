@@ -16,5 +16,5 @@
 ### Traits and Objects
 
 - [X] No property initializations allowed in traits
-- [ ] methods with empty block of traits need to be overridden
+- [X] methods with empty block of traits need to be overridden
 - [X] properties are overridden

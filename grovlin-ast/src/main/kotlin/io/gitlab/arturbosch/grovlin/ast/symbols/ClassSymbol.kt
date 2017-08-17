@@ -34,13 +34,20 @@ class ClassSymbol(override val name: String,
 	}
 
 	private fun getMemberSymbols() = members.values
-	private fun getMemberSymbolsNeedingOverride() = members.values.filter { it.needOverride }
 	private fun getInheritedMemberSymbolsNeedingOverride(): MutableMap<String, Symbol> {
 		val symbols = HashMap<String, Symbol>()
 		for (traitScope in traitScopes) {
-			symbols.putAll(traitScope.getInheritedMemberSymbolsNeedingOverride())
-			for (symbol in traitScope.getMemberSymbolsNeedingOverride()) {
-				symbols.put(symbol.name, symbol)
+			val inheritedNeedingOverride = traitScope.getInheritedMemberSymbolsNeedingOverride()
+			for ((name, symbol) in inheritedNeedingOverride) {
+				symbols.put(name, symbol)
+			}
+			for (symbol in traitScope.getMemberSymbols()) {
+				if (!symbol.needOverride && symbol.name in symbols) {
+					symbols.remove(symbol.name)
+				}
+				if (symbol.needOverride) {
+					symbols.put(symbol.name, symbol)
+				}
 			}
 		}
 		return symbols
