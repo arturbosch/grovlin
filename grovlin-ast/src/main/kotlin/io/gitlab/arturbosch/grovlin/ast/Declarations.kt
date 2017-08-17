@@ -45,7 +45,10 @@ class LambdaDeclaration(override val name: String,
 class PropertyDeclaration(override var type: Type,
 						  override val name: String,
 						  val value: Expression?)
-	: MemberDeclaration(), VariableDeclaration
+	: MemberDeclaration(), VariableDeclaration {
+
+	override var evaluationType: Type? = type
+}
 
 class VarDeclaration(override val name: String,
 					 var value: Expression?,
@@ -60,4 +63,5 @@ class ParameterDeclaration(override val name: String,
 	: Statement(), VariableDeclaration {
 
 	val parameterSignature get() = "$type $name"
+	override var evaluationType: Type? = type
 }

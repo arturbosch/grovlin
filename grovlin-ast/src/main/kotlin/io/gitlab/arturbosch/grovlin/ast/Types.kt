@@ -13,6 +13,7 @@ import io.gitlab.arturbosch.grovlin.ast.symbols.T_VOID_INDEX
  * @author Artur Bosch
  */
 abstract class Type : Node(), NodeWithName, SymbolType {
+
 	companion object {
 		fun of(type: String) = when (type) {
 			"Bool", "Boolean" -> BoolType
