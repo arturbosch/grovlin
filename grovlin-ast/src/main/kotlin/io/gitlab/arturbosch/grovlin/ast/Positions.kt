@@ -63,7 +63,7 @@ fun Node.isAfter(other: Node): Boolean = position != null && other.position != n
 
 fun Token.startPoint() = Point(line, charPositionInLine + 1)
 
-fun Token.endPoint() = Point(line, charPositionInLine + 1 + text.length)
+fun Token.endPoint() = Point(line, charPositionInLine + 1)
 
 fun Token.toPosition() = Position(startPoint(), endPoint())
 
