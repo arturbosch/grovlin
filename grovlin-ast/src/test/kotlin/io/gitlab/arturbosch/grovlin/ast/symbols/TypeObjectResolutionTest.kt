@@ -145,15 +145,71 @@ class TypeObjectResolutionTest {
 		""".asGrovlinFile().resolved()
 
 		Assertions.assertThat(grovlinFile.errors).anySatisfy { it is MissingOverrideKeyword }
-		Assertions.assertThat(grovlinFile.errors).anySatisfy { it is PropertyNotOverridden }
+		Assertions.assertThat(grovlinFile.errors).anySatisfy { it is MemberNotOverridden }
 		Assertions.assertThat(grovlinFile.errors).anySatisfy { it is OverridesNothing }
 	}
-}
 
-interface A {
-	val name: String
-}
+	@Test
+	fun traitMethodsWithoutBlockNeedOverride() {
+		val grovlinFile = """
+			trait A {
+				def sayHello(): String
+			}
+			object O as A
+		""".asGrovlinFile().resolved()
 
-interface B : A {
-	override val name: String
+		Assertions.assertThat(grovlinFile.errors).anySatisfy { it is MemberNotOverridden }
+	}
+
+	@Test
+	fun traitMethodsWithBlockDoNotNeedOverride() {
+		val grovlinFile = """
+			trait A {
+				def sayHello(): String {
+					return "Hello World!"
+				}
+			}
+			object O as A
+		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors).isEmpty()
+	}
+
+	@Test
+	fun inheritedMethodsFromInheritanceTreeNeedOverride() {
+		val grovlinFile = """
+			trait A {
+				def sayHello(): String
+			}
+			trait B extends A {
+				def bla(): Bool
+			}
+			object O as B
+		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors).hasSize(2)
+		Assertions.assertThat(grovlinFile.errors).allSatisfy { it is MemberNotOverridden }
+	}
+
+	@Test
+	fun methodsOverriddenFromTraits() {
+		val grovlinFile = """
+			trait A {
+				def sayHello(): String
+			}
+			trait B extends A {
+				def bla(): Bool
+			}
+			object O as B {
+				override def sayHello(): String {
+					return "Hello"
+				}
+				override def bla(): Bool {
+					return true
+				}
+			}
+		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors).isEmpty()
+	}
 }

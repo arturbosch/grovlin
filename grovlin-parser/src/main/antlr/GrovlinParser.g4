@@ -75,7 +75,7 @@ defDeclaration
 ;
 
 methodDeclaration
-: DEF ID LPAREN parameterList? RPAREN (SEMICOLON TYPEID)? (LBRACE statements RBRACE)?
+: (OVERRIDE)? DEF ID LPAREN parameterList? RPAREN (SEMICOLON TYPEID)? (LBRACE statements RBRACE)?
 ;
 
 parameterList

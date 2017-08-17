@@ -37,12 +37,12 @@ class MutationOfFinalVariable(varName: String, positions: Position?) : SemanticE
 		"Variable '$varName' is declared final and cannot be mutated.", positions)
 
 class MissingOverrideKeyword(varName: String, positions: Position?) : SemanticError(
-		"Inherited member '$varName' is not declared as 'override'.", positions)
+		"Inherited member '$varName' is missing override keyword.", positions)
 
 class OverridesNothing(varName: String, positions: Position?) : SemanticError(
 		"Member '$varName' is declared as 'override' but overrides nothing.", positions)
 
-class PropertyNotOverridden(varName: String, objectName: String, positions: Position?) : SemanticError(
+class MemberNotOverridden(varName: String, objectName: String, positions: Position?) : SemanticError(
 		"Property '$varName' is not overridden in object '$objectName'.", positions)
 
 class IncompatibleReturnType(evaluationType: Type?, returnType: Type, positions: Position?) : SemanticError(

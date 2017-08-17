@@ -3,7 +3,7 @@ trait Node {
 }
 trait Leaf extends Node {
     Int data
-    override def traverse() {
+    def traverse() {
         print(data)
     }
 }
@@ -11,7 +11,7 @@ trait Tree extends Node {
     Node left
     Node right
     Node parent
-    override def traverse() {
+    def traverse() {
         left.traverse()
         right.traverse()
     }

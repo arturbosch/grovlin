@@ -88,7 +88,7 @@ class ClassSymbol(override val name: String,
 			}
 		}
 		symbolsNeedingOverride.values.forEach {
-			grovlinFile.addError(PropertyNotOverridden(it.name, name, def?.position))
+			grovlinFile.addError(MemberNotOverridden(it.name, name, def?.position))
 		}
 	}
 
