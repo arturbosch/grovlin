@@ -51,6 +51,20 @@ class TypeObjectResolutionTest {
 	}
 
 	@Test
+	fun overriddenTraitPropertyMustHaveSameEvaluationType() {
+		val grovlinFile = """
+			trait Named {
+				String name
+			}
+			trait SuperNamed extends Named {
+				override Int name
+			}
+		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors).anySatisfy { it is IncompatibleOverrideType }
+	}
+
+	@Test
 	fun mustOverrideProperty() {
 		val grovlinFile = """
 			trait Named {
@@ -160,6 +174,24 @@ class TypeObjectResolutionTest {
 		""".asGrovlinFile().resolved()
 
 		Assertions.assertThat(grovlinFile.errors).anySatisfy { it is MemberNotOverridden }
+	}
+
+	@Test
+	fun overriddenMemberMustHaveSameEvaluationType() {
+		val grovlinFile = """
+			trait A {
+				String name
+				def sayHello(): String
+			}
+			object O as A {
+				override Int name = 4
+				override def sayHello(): Int {
+					return 5
+				}
+			}
+		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors).allSatisfy { it is IncompatibleOverrideType }
 	}
 
 	@Test

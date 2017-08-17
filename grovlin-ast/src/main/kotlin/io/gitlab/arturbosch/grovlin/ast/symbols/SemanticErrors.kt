@@ -58,5 +58,8 @@ class ReturnMustBeLast(methodDeclaration: MethodDeclaration, positions: Position
 class IncompatibleTypes(left: Type?, right: Type?, positions: Position?) : SemanticError(
 		"Incompatible types '$left' and '$right'.", positions)
 
+class IncompatibleOverrideType(actual: SymbolType?, expected: SymbolType?, positions: Position?) : SemanticError(
+		"Incompatible override type of '${actual?.name}' must be '${expected?.name}'.", positions)
+
 class IllegalPropertyInitialization(positions: Position?) : SemanticError(
 		"Properties cannot be initialized in traits.", positions)

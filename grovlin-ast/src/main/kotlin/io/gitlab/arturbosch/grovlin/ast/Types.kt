@@ -8,11 +8,20 @@ import io.gitlab.arturbosch.grovlin.ast.symbols.T_INT_INDEX
 import io.gitlab.arturbosch.grovlin.ast.symbols.T_UNKNOWN_INDEX
 import io.gitlab.arturbosch.grovlin.ast.symbols.T_USER_INDEX
 import io.gitlab.arturbosch.grovlin.ast.symbols.T_VOID_INDEX
+import java.util.Objects
 
 /**
  * @author Artur Bosch
  */
 abstract class Type : Node(), NodeWithName, SymbolType {
+
+	override fun equals(other: Any?): Boolean {
+		return this === other || other is Type && (name == other.name && typeIndex == other.typeIndex)
+	}
+
+	override fun hashCode(): Int {
+		return Objects.hash(name, typeIndex)
+	}
 
 	companion object {
 		fun of(type: String) = when (type) {

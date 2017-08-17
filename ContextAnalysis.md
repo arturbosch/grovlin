@@ -18,3 +18,4 @@
 - [X] No property initializations allowed in traits
 - [X] methods with empty block of traits need to be overridden
 - [X] properties are overridden
+- [X] overridden members have same types

@@ -62,7 +62,11 @@ class ClassSymbol(override val name: String,
 			val nodeWithOverride = declaration is NodeWithOverride
 			val hasOverride = (declaration as? NodeWithOverride)?.hasOverride
 			if (symbolName in symbolsNeedingOverride) {
-				symbolsNeedingOverride.remove(symbolName)
+				val inheritedSymbol = symbolsNeedingOverride.remove(symbolName)
+				if (nodeWithOverride && symbol.type != inheritedSymbol?.type) {
+					grovlinFile.addError(IncompatibleOverrideType(
+							symbol.type, inheritedSymbol?.type, symbol.def?.position))
+				}
 				if (nodeWithOverride && hasOverride == false) {
 					grovlinFile.addError(MissingOverrideKeyword(symbolName, symbol.def?.position))
 				}
@@ -84,7 +88,11 @@ class ClassSymbol(override val name: String,
 			val nodeWithOverride = declaration is NodeWithOverride
 			val hasOverride = (declaration as? NodeWithOverride)?.hasOverride
 			if (symbolName in symbolsNeedingOverride) {
-				symbolsNeedingOverride.remove(symbolName)
+				val inheritedSymbol = symbolsNeedingOverride.remove(symbolName)
+				if (nodeWithOverride && symbol.type != inheritedSymbol?.type) {
+					grovlinFile.addError(IncompatibleOverrideType(
+							symbol.type, inheritedSymbol?.type, symbol.def?.position))
+				}
 				if (nodeWithOverride && hasOverride == false) {
 					grovlinFile.addError(MissingOverrideKeyword(symbolName, symbol.def?.position))
 				}
