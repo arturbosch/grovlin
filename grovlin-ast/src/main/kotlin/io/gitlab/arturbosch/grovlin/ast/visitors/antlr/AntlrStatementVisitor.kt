@@ -64,6 +64,7 @@ class AntlrStatementVisitor : GrovlinParserBaseVisitor<Statement>() {
 			} else {
 				children = listOf(type)
 			}
+			hasOverride = ctx.OVERRIDE() != null
 		}
 	}
 

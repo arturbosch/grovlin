@@ -48,6 +48,10 @@ interface VariableDeclaration : Declaration, NodeWithType, Named
 
 interface NodeWithName : AstNode, Named
 
+interface NodeWithOverride : AstNode {
+	var hasOverride: Boolean
+}
+
 interface NodeWithStatements : AstNode {
 	val statements: MutableList<Statement>
 }

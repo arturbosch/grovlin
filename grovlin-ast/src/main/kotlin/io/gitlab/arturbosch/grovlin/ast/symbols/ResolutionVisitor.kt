@@ -182,6 +182,7 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 			typeSymbol?.addTraitScope(symbol)
 		}
 		typeDeclaration.evaluationType = typeDeclaration.typeType
+		typeSymbol?.checkOverridingTraitMembers(grovlinFile)
 	}
 
 	override fun visit(objectDeclaration: ObjectDeclaration, data: Any) {
@@ -193,15 +194,14 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 			val symbol = scope.resolve(extendedObject.name) as? ClassSymbol
 			extendedObject.symbol = symbol
 			typeSymbol?.parentScope = symbol
-			val memberNames = symbol?.getMemberSymbols()?.map { it.name }
 		}
 		for (extendedType in objectDeclaration.extendedTypes) {
-			val symbol = scope.resolve(extendedType.name)as? ClassSymbol
+			val symbol = scope.resolve(extendedType.name) as? ClassSymbol
 			extendedType.symbol = symbol
 			typeSymbol?.addTraitScope(symbol)
 		}
 		objectDeclaration.evaluationType = objectDeclaration.objectType
-		// check inherited members are overridden
+		typeSymbol?.checkOverridingObjectMembers(grovlinFile)
 	}
 
 	// Member reference resolution

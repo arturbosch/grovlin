@@ -27,9 +27,10 @@ open class MethodDeclaration(override val name: String,
 							 override val block: BlockStatement?,
 							 override var type: Type = VoidType,
 							 val parameters: MutableList<ParameterDeclaration> = mutableListOf())
-	: MemberDeclaration(), NodeWithBlock, TopLevelDeclarableNode {
+	: MemberDeclaration(), NodeWithBlock, NodeWithOverride, TopLevelDeclarableNode {
 
 	fun mustBeOverridden() = block == null
+	override var hasOverride: Boolean = false
 	val parameterSignature get() = "$name(${parameters.joinToString(", ") { it.parameterSignature }})"
 	val signature get() = "$name(${parameters.joinToString(", ") { it.parameterSignature }})" +
 			if (type != VoidType) ": $type" else ""
@@ -45,9 +46,11 @@ class LambdaDeclaration(override val name: String,
 class PropertyDeclaration(override var type: Type,
 						  override val name: String,
 						  val value: Expression?)
-	: MemberDeclaration(), VariableDeclaration {
+	: MemberDeclaration(), VariableDeclaration, NodeWithOverride {
 
 	override var evaluationType: Type? = type
+	override var hasOverride: Boolean = false
+	fun mustBeOverridden() = parent?.parent is TypeDeclaration && value == null
 }
 
 class VarDeclaration(override val name: String,

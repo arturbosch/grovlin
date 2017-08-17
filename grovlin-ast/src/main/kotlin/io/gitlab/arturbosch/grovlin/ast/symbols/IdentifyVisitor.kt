@@ -48,7 +48,7 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	override fun visit(propertyDeclaration: PropertyDeclaration, data: Any) {
 		currentScope.declare(propertyDeclaration, grovlinFile)
-		identifyVariable(propertyDeclaration) { PropertySymbol(it) }
+		identifyVariable(propertyDeclaration) { PropertySymbol(it, propertyDeclaration.mustBeOverridden()) }
 		super.visit(propertyDeclaration, data)
 	}
 
@@ -70,7 +70,9 @@ class IdentifyVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	override fun visit(methodDeclaration: MethodDeclaration, data: Any) {
 		currentScope.declare(methodDeclaration, grovlinFile)
-		val methodSymbol = MethodSymbol(methodDeclaration.name, methodDeclaration.type, currentScope)
+		val methodSymbol = MethodSymbol(methodDeclaration.name,
+				methodDeclaration.type, currentScope,
+				methodDeclaration.mustBeOverridden())
 		currentScope.define(methodSymbol)
 		methodSymbol.def = methodDeclaration
 		methodSymbol.scope = currentScope
