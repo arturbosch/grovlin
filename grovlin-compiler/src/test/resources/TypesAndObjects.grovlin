@@ -29,7 +29,6 @@ object LeafImpl as Leaf {
 
 def main(String args) {
     var tree = BinaryTree()
-    println(tree.parent)
     var leaf = LeafImpl()
     leaf.data = 5
     tree.left = leaf
