@@ -13,79 +13,72 @@ Antlr -> AST -> Grovlin -> Java -> Bytecode -> JVM
 
 ### Build & Run
 
-- `gradle build`
+- `gradle build fatjar`
 - `java -jar grovlin-compiler/build/libs/grovlin-compiler-0.1.0.jar run [path/to/program.grovlin]`
 
 
-### Coding exampes v0.1
+### Code examples
 
 ```
-def program() {
-    var x = 5
-    var y = 4
-    print(x + y)
-}
-```
+def main(String args) {
+    println("Guess my number (0-9)!")
+    var number = rand(10).toString()
+    var input = readline()
 
-```
-def program() {
-    var x = 5
-    var y = 4
-    y = 10
-    x = y + x / 3
-    print(x as Decimal + y)
-}
-```
-
-```
-def program() {
-    val b = true && true ^ (false ^ true)
-    if (b) {
-        print(0)
-    } elif (!b) {
-        print(1)
-    } elif (true) {
-        print(2)
+    if input == number {
+        println("You guessed my number!")
     } else {
-        print(3)
+        println("My number was " + number + " and your number is " + input)
     }
 }
 ```
 
 ```
-def meaningOfLife(Int number): Boolean {
-    return number == 42
+def main(String args) {
+    for i : 0..10 {
+        print(i)
+        if i != 9 {
+            print(", ")
+        }
+    }
+
+    println()
+    println(loop(5))
 }
 
-def program() {
-    var answer = meaningOfLife(42)
-    print(answer)
+def loop(Int n): String {
+    var current = n
+    while current > 0 {
+        print(".")
+        current = current - 1
+    }
+    println()
+    return "I 'have' finished!"
 }
-```
-
-##### Upcoming Type&Object Support
 
 ```
-type Node {
+
+```
+trait Node {
     def traverse()
 }
-type Leaf extends Node {
+trait Leaf extends Node {
     Int data
-    def traverse() {
+    override def traverse() {
         print(data)
     }
 }
-type Tree extends Node {
+trait Tree extends Node {
     Node left
     Node right
     Node parent
-    def traverse() {
+    override def traverse() {
         left.traverse()
         right.traverse()
     }
 }
 
-object TreeImpl as Tree {
+object BinaryTree as Tree {
     override Node left
     override Node right
     override Node parent
@@ -95,11 +88,12 @@ object LeafImpl as Leaf {
     override Int data = 1
 }
 
-def program() {
-    var tree = TreeImpl()
-    tree.left = LeafImpl()
-    tree.left.data = 5
-    var tree2 = TreeImpl()
+def main(String args) {
+    var tree = BinaryTree()
+    var leaf = LeafImpl()
+    leaf.data = 5
+    tree.left = leaf
+    var tree2 = BinaryTree()
     tree2.parent = tree
     tree.right = tree2
     tree2.left = LeafImpl()
