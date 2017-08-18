@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.hasSize
 import com.natpryce.hamkrest.present
 import io.gitlab.arturbosch.grovlin.ast.operations.asString
 import io.gitlab.arturbosch.grovlin.compiler.backend.asJavaFile
+import io.gitlab.arturbosch.grovlin.compiler.java.interpret
 import org.junit.Test
 
 /**
@@ -20,7 +21,7 @@ class CompileProgramWithTypesAndObjectsTest {
 		val cPackage = grovlinFile.asJavaFile()
 		val cUnit = cPackage.main
 		val clazz = cUnit.mainClass
-		println(clazz)
+		println(clazz.toString())
 		cPackage.cus.forEach { print(it.unit) }
 		assertThat(clazz, present())
 		assertThat(cPackage.cus, hasSize(equalTo(5)))
@@ -40,4 +41,25 @@ class CompileProgramWithTypesAndObjectsTest {
 		println(java.main)
 	}
 
+	@Test
+	fun memberAccessChains() {
+		"""
+		trait T {
+			def sayHello(): String {
+				return "Hello"
+			}
+		}
+		object A as T
+		object B {
+			A a = A()
+		}
+		object O {
+			B b = B()
+		}
+		def main(String args) {
+			val x = O().b.a.sayHello()
+			println(x)
+		}
+	""".asGrovlinFile().asJavaFile().interpret()
+	}
 }

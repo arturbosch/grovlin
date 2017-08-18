@@ -64,4 +64,9 @@ class CompilerTest {
 		val expressions = clazz.getChildNodesByType(BinaryExpr::class.java)
 		assertThat(expressions, hasSize(equalTo(11)))
 	}
+
+	@Test
+	fun parseProgramWithObjectAccesses() {
+		runFromResource("ObjectAccess.grovlin")
+	}
 }

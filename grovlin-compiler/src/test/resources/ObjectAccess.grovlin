@@ -1,0 +1,19 @@
+object A {
+    Int i = 5
+}
+object B {
+    A a = A()
+    def magicNumber(): Int {
+        return 42
+    }
+}
+object O {
+    B b = B()
+}
+def main(String args) {
+    val o = O()
+    println(o.b.a.i)
+    val x = o.b.magicNumber()
+    o.b.a.i = x
+    println(o.b.a.i)
+}

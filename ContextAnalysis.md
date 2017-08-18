@@ -19,3 +19,6 @@
 - [X] methods with empty block of traits need to be overridden
 - [X] properties are overridden
 - [X] overridden members have same types
+- [X] declared and evaluated property type must match
+- [X] traits cannot be instantiated
+- [ ] polymorphic method calls and assignments (promotion types)

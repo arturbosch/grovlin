@@ -297,16 +297,21 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 	override fun visit(getterAccessExpression: GetterAccessExpression, data: Any) {
 		super.visit(getterAccessExpression, data)
 		val scopeSym = getterAccessExpression.scope?.symbol
-		val classSym = scopeSym?.scope?.resolve(scopeSym.name)
-		val memberSym = (classSym?.scope as? ClassSymbol)?.resolveMember(getterAccessExpression.name)
+		val objectOrTraitName = scopeSym?.type?.name
+		val objectOrTraitSymbol = objectOrTraitName?.let { scopeSym.scope?.resolve(objectOrTraitName) }
+		val memberSym = (objectOrTraitSymbol as? ClassSymbol)?.resolveMember(getterAccessExpression.name)
 		getterAccessExpression.symbol = memberSym
+		getterAccessExpression.evaluationType = memberSym?.type as? Type
 	}
 
 	override fun visit(setterAccessExpression: SetterAccessExpression, data: Any) {
 		super.visit(setterAccessExpression, data)
 		val scopeSym = setterAccessExpression.scope?.symbol
-		val memberSym = (scopeSym?.scope as? ClassSymbol)?.resolveMember(setterAccessExpression.name)
+		val objectOrTraitName = scopeSym?.type?.name
+		val objectOrTraitSymbol = objectOrTraitName?.let { scopeSym.scope?.resolve(objectOrTraitName) }
+		val memberSym = (objectOrTraitSymbol as? ClassSymbol)?.resolveMember(setterAccessExpression.name)
 		setterAccessExpression.symbol = memberSym
+		setterAccessExpression.evaluationType = memberSym?.type as? Type
 	}
 
 	private fun assertScopeResolved(node: AstNode): Scope =
