@@ -18,6 +18,7 @@ import io.gitlab.arturbosch.grovlin.ast.MethodDeclaration
 import io.gitlab.arturbosch.grovlin.ast.MultiplicationExpression
 import io.gitlab.arturbosch.grovlin.ast.ObjectCreation
 import io.gitlab.arturbosch.grovlin.ast.ObjectDeclaration
+import io.gitlab.arturbosch.grovlin.ast.ObjectOrTypeType
 import io.gitlab.arturbosch.grovlin.ast.OrExpression
 import io.gitlab.arturbosch.grovlin.ast.ParameterDeclaration
 import io.gitlab.arturbosch.grovlin.ast.ParenExpression
@@ -68,9 +69,23 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 
 	override fun visit(propertyDeclaration: PropertyDeclaration, data: Any) {
 		super.visit(propertyDeclaration, data)
-		propertyDeclaration.evaluationType = propertyDeclaration.type
+		if (propertyDeclaration.isInitialized()) {
+			checkDeclaredTypeMatchesEvaluatedPropertyType(propertyDeclaration)
+		} else {
+			propertyDeclaration.evaluationType = propertyDeclaration.type
+		}
 		resolveVariableSymbolType(propertyDeclaration)
 		initializedWithinTraitCheck(propertyDeclaration)
+	}
+
+	private fun checkDeclaredTypeMatchesEvaluatedPropertyType(propertyDeclaration: PropertyDeclaration) {
+		val evaluationType = propertyDeclaration.value?.evaluationType
+		val expectedType = propertyDeclaration.type
+		if (evaluationType != expectedType) {
+			grovlinFile.addError(IncompatibleDeclaredAndEvaluatedPropertyType(
+					expectedType, evaluationType, propertyDeclaration.name, propertyDeclaration.position))
+		}
+		propertyDeclaration.evaluationType = evaluationType
 	}
 
 	private fun initializedWithinTraitCheck(propertyDeclaration: PropertyDeclaration) {
@@ -398,5 +413,11 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		if (resultType == T_BOOL_INDEX) {
 			xorExpression.evaluationType = BoolType
 		}
+	}
+
+	override fun visit(objectOrTypeType: ObjectOrTypeType, data: Any) {
+		super.visit(objectOrTypeType, data)
+		val symbol = objectOrTypeType.resolutionScope?.resolve(objectOrTypeType.name)
+		objectOrTypeType.symbol = symbol
 	}
 }

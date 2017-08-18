@@ -64,5 +64,9 @@ class IncompatibleOverrideType(actual: SymbolType?, expected: SymbolType?, posit
 class IllegalPropertyInitialization(positions: Position?) : SemanticError(
 		"Properties cannot be initialized in traits.", positions)
 
+class IncompatibleDeclaredAndEvaluatedPropertyType(expected: Type?, evaluated: Type?, propertyName: String,
+												   positions: Position?) : SemanticError(
+		"Incompatible type '$evaluated' found for property '$propertyName' with type '$expected'.", positions)
+
 class TraitInstantiation(typeName: String, positions: Position?) : SemanticError(
 		"Trait '$typeName' cannot be instantiated.", positions)

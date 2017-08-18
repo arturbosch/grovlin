@@ -50,6 +50,8 @@ class PropertyDeclaration(override var type: Type,
 
 	override var evaluationType: Type? = type
 	override var hasOverride: Boolean = false
+
+	fun isInitialized() = value != null
 	fun mustBeOverridden() = parent?.parent is TypeDeclaration && value == null
 }
 
