@@ -282,7 +282,8 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 	override fun visit(getterAccessExpression: GetterAccessExpression, data: Any) {
 		super.visit(getterAccessExpression, data)
 		val scopeSym = getterAccessExpression.scope?.symbol
-		val memberSym = (scopeSym?.scope as? ClassSymbol)?.resolveMember(getterAccessExpression.name)
+		val classSym = scopeSym?.scope?.resolve(scopeSym.name)
+		val memberSym = (classSym?.scope as? ClassSymbol)?.resolveMember(getterAccessExpression.name)
 		getterAccessExpression.symbol = memberSym
 	}
 
@@ -312,6 +313,10 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		super.visit(objectCreation, data)
 		val objectOrTypeType = objectCreation.type
 		val symbol = objectOrTypeType.resolutionScope?.resolve(objectOrTypeType.name)
+		val declaration = symbol?.def
+		if (declaration is TypeDeclaration) {
+			grovlinFile.addError(TraitInstantiation(objectOrTypeType.name, objectCreation.position))
+		}
 		objectCreation.evaluationType = objectOrTypeType
 		objectCreation.symbol = symbol
 	}
