@@ -44,7 +44,7 @@ public class JavaStringCompiler {
 			CompilationTask task = compiler.getTask(null, manager, null, null, null, fileObjects);
 			Boolean result = task.call();
 			if (result == null || !result) {
-				throw new RuntimeException("Compilation failed.");
+				throw new GrovlinRuntimeError("Compilation failed.");
 			}
 			return manager.getClassBytes();
 		}

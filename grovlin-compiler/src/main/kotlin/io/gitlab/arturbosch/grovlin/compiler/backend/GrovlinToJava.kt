@@ -14,6 +14,7 @@ import com.github.javaparser.ast.expr.BooleanLiteralExpr
 import com.github.javaparser.ast.expr.CastExpr
 import com.github.javaparser.ast.expr.DoubleLiteralExpr
 import com.github.javaparser.ast.expr.EnclosedExpr
+import com.github.javaparser.ast.expr.FieldAccessExpr
 import com.github.javaparser.ast.expr.IntegerLiteralExpr
 import com.github.javaparser.ast.expr.LambdaExpr
 import com.github.javaparser.ast.expr.MethodCallExpr
@@ -107,7 +108,15 @@ fun TopLevelDeclarableNode.toJava(): BodyDeclaration<*> = when (this) {
 	is MethodDeclaration -> toJava()
 	is TypeDeclaration -> transformToInterfaceDeclaration()
 	is ObjectDeclaration -> transformToClassDeclaration()
+	is VarDeclaration -> transformToStaticField()
 	else -> throw UnsupportedOperationException(javaClass.canonicalName)
+}
+
+fun VarDeclaration.transformToStaticField(): FieldDeclaration {
+	val modifiers =
+			if (isVal) EnumSet.of(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+			else EnumSet.of(Modifier.PUBLIC, Modifier.STATIC)
+	return FieldDeclaration(modifiers, VariableDeclarator(type.toJava(), name).setInitializer(value?.toJava()))
 }
 
 fun MainDeclaration.toJava(): ClassOrInterfaceDeclaration {
@@ -266,12 +275,17 @@ private fun ForStatement.forLoopFromIntRange(expr: IntRangeExpression): ForStmt 
 	return forStmt
 }
 
-fun VarReference.toJava(): JavaParserExpression = when (this.symbol?.def) {
-	is PropertyDeclaration -> MethodCallExpr(null, varName.toGetter())
-	is VarDeclaration -> NameExpr(varName)
-	is ParameterDeclaration -> NameExpr(varName)
-	else -> throw UnsupportedOperationException("Could not resolve '$varName' at '$position'"
-			+ " because no definition found!")
+fun VarReference.toJava(): JavaParserExpression {
+	val declaration = this.symbol?.def
+	return when (declaration) {
+		is PropertyDeclaration -> MethodCallExpr(null, varName.toGetter())
+		is VarDeclaration -> if (declaration.isTopLevelDeclaration)
+			FieldAccessExpr(NameExpr(declaration.getDeclaredFile()?.name), varName) else
+			NameExpr(varName)
+		is ParameterDeclaration -> NameExpr(varName)
+		else -> throw UnsupportedOperationException("Could not resolve '$varName' at '$position'"
+				+ " because no definition found!")
+	}
 }
 
 private fun String.toGetter() = "get" + get(0).toUpperCase() + substring(1)

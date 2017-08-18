@@ -56,7 +56,7 @@ class PropertyDeclaration(override var type: Type,
 class VarDeclaration(override val name: String,
 					 var value: Expression?,
 					 val isVal: Boolean = false)
-	: MemberDeclaration(), VariableDeclaration {
+	: MemberDeclaration(), VariableDeclaration, TopLevelDeclarableNode {
 
 	override var type: Type = UnknownType
 }

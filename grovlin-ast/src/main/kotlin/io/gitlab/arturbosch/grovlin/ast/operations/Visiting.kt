@@ -27,3 +27,14 @@ inline fun <reified T : AstNode> AstNode.findByType(): T? {
 	}
 	return result
 }
+
+inline fun <reified T : AstNode> AstNode.findParentByType(): T? {
+	var maybeParent = parent
+	while (maybeParent != null) {
+		if (maybeParent is T) {
+			return maybeParent
+		}
+		maybeParent = maybeParent.parent
+	}
+	return null
+}

@@ -1,6 +1,7 @@
 package io.gitlab.arturbosch.grovlin.ast
 
 import io.gitlab.arturbosch.grovlin.ast.operations.collectByType
+import io.gitlab.arturbosch.grovlin.ast.operations.findParentByType
 import io.gitlab.arturbosch.grovlin.ast.symbols.Scope
 import io.gitlab.arturbosch.grovlin.ast.symbols.Symbol
 
@@ -20,6 +21,7 @@ interface AstNode {
 	var resolutionScope: Scope?
 	var evaluationType: Type?
 	var promotionType: Type?
+	fun getDeclaredFile() = findParentByType<GrovlinFile>()
 }
 
 abstract class Node : AstNode {
@@ -40,6 +42,9 @@ interface Declaration : AstNode, NodeWithType, NodeWithName
 
 interface TopLevelDeclarableNode : AstNode {
 	val isTopLevelDeclaration get(): Boolean = parent?.parent is GrovlinFile // GrovlinFile>Block>This
+	override fun getDeclaredFile() =
+			if (isTopLevelDeclaration) parent?.parent as GrovlinFile
+			else super.getDeclaredFile()
 }
 
 abstract class MemberDeclaration : Statement(), Declaration
