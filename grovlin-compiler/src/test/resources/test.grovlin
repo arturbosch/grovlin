@@ -1,0 +1,22 @@
+def main(String args) {
+    println("Hello World!")
+
+    var x = 5
+    var y = 4
+    x = 10
+    println(x + y)
+
+    for i : 0..10 {
+        print(i)
+    }
+    println()
+    recurs(5)
+}
+
+def recurs(Int i) {
+    if (i > 0) {
+        recurs(i - 1)
+    } else {
+        println("Fertig")
+    }
+}
