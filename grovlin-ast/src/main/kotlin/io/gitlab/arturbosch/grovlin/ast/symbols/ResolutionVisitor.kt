@@ -70,6 +70,8 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 	override fun visit(propertyDeclaration: PropertyDeclaration, data: Any) {
 		super.visit(propertyDeclaration, data)
 		if (propertyDeclaration.isInitialized()) {
+			propertyDeclaration.evaluationType = propertyDeclaration.value?.evaluationType
+			checkPromotionPossibility(propertyDeclaration)
 			checkDeclaredTypeMatchesEvaluatedPropertyType(propertyDeclaration)
 		} else {
 			propertyDeclaration.evaluationType = propertyDeclaration.type
@@ -78,10 +80,24 @@ class ResolutionVisitor(val grovlinFile: GrovlinFile) : TreeBaseVisitor<Any>() {
 		initializedWithinTraitCheck(propertyDeclaration)
 	}
 
+	private fun checkPromotionPossibility(propertyDeclaration: PropertyDeclaration) {
+		val expectedType = propertyDeclaration.type
+		val evaluationType = propertyDeclaration.evaluationType
+		val evaluationSymbol = evaluationType?.name?.let { propertyDeclaration.resolutionScope?.resolve(it) }
+		if (evaluationSymbol is ClassSymbol) {
+			val allTraits = evaluationSymbol.getAllExtendedTraitSymbols()
+			val traitSymbol = allTraits.find { it.name == expectedType.name }
+			if (traitSymbol?.type?.name == expectedType.name) {
+				propertyDeclaration.promotionType = expectedType
+			}
+		}
+	}
+
 	private fun checkDeclaredTypeMatchesEvaluatedPropertyType(propertyDeclaration: PropertyDeclaration) {
 		val evaluationType = propertyDeclaration.value?.evaluationType
+		val promotedType = propertyDeclaration.promotionType
 		val expectedType = propertyDeclaration.type
-		if (evaluationType != expectedType) {
+		if (evaluationType != expectedType && promotedType != expectedType) {
 			grovlinFile.addError(IncompatibleDeclaredAndEvaluatedPropertyType(
 					expectedType, evaluationType, propertyDeclaration.name, propertyDeclaration.position))
 		}

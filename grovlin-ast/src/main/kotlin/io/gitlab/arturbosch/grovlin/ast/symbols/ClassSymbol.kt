@@ -2,6 +2,7 @@ package io.gitlab.arturbosch.grovlin.ast.symbols
 
 import io.gitlab.arturbosch.grovlin.ast.GrovlinFile
 import io.gitlab.arturbosch.grovlin.ast.NodeWithOverride
+import java.util.ArrayList
 import java.util.HashMap
 
 /**
@@ -105,6 +106,14 @@ class ClassSymbol(override val name: String,
 		symbolsNeedingOverride.values.forEach {
 			grovlinFile.addError(MemberNotOverridden(it.name, name, def?.position))
 		}
+	}
+
+	fun getAllExtendedTraitSymbols(): List<ClassSymbol> {
+		val symbols = ArrayList<ClassSymbol>(traitScopes)
+		for (traitScope in traitScopes) {
+			symbols += traitScope.getAllExtendedTraitSymbols()
+		}
+		return symbols
 	}
 
 	override fun getParentScope(): Scope? = parentScope ?: enclosingScope

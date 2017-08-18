@@ -21,4 +21,5 @@
 - [X] overridden members have same types
 - [X] declared and evaluated property type must match
 - [X] traits cannot be instantiated
+- [X] polymorphic property assignments (promotion types)
 - [ ] polymorphic method calls and assignments (promotion types)

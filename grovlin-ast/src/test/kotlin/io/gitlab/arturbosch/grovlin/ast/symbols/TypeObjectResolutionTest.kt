@@ -117,4 +117,20 @@ class TypeObjectResolutionTest {
 
 		Assertions.assertThat(xVar?.evaluationType).isEqualTo(StringType)
 	}
+
+	@Test
+	fun promotedPropertyType() {
+		val grovlinFile = """
+			trait B
+			object TheB as B
+			trait A {
+				B b
+			}
+			object O as A {
+				override B b = TheB()
+			}
+		""".asGrovlinFile().resolved()
+
+		Assertions.assertThat(grovlinFile.errors).isEmpty()
+	}
 }
